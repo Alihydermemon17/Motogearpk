@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#131418" />
+    <title>MotoGear PK | Ride with intent</title>
+    <script>
+      (() => {
+        try {
+          const preference = localStorage.getItem('motogearpk.theme');
+          document.documentElement.dataset.theme = preference === 'light' || preference === 'dark'
+            ? preference
+            : 'dark';
+          document.querySelector('meta[name="theme-color"]')?.setAttribute(
+            'content', document.documentElement.dataset.theme === 'dark' ? '#131418' : '#f1f0ec');
+        } catch {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

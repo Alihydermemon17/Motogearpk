@@ -1,0 +1,1 @@
+grant execute on function public.quote_customer_order(jsonb) to anon, authenticated;
