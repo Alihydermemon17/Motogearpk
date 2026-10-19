@@ -26,7 +26,7 @@ function productFromRow(row: Row, images: ProductImage[] = [], compatibleBikes: 
     slug: String(row.slug),
     name: String(row.name),
     pricePk: numberValue(row.discount_price ?? row.selling_price),
-    category: String(row.category_name ?? 'Street') as Product['category'],
+    category: String(row.category_name ?? 'Uncategorised') as Product['category'],
     categoryId: row.category_id as string | null | undefined,
     featured: Boolean(row.published),
     status: String(row.availability_status ?? 'CHECK_REQUIRED'),
@@ -128,8 +128,6 @@ function productPayload(input: Partial<AdminProductInput>) {
   };
 }
 
-import { dummyLedProducts } from '../mocks/dummyProducts';
-
 export const supabaseClient: ApiClient = {
   async getHealth() {
     try {
@@ -167,30 +165,7 @@ export const supabaseClient: ApiClient = {
       // Supabase is not populated or offline
     }
 
-    let products = await hydrate(rows).catch(() => []);
-    if (products.length === 0) {
-      products = [...dummyLedProducts];
-      if (filters.search) {
-        const s = filters.search.toLowerCase();
-        products = products.filter((p) => p.name.toLowerCase().includes(s) || p.brand?.toLowerCase().includes(s));
-      }
-      if (filters.categorySlug && filters.categorySlug !== 'All') {
-        products = products.filter((p) => p.category.toLowerCase() === filters.categorySlug?.toLowerCase());
-      }
-      if (filters.minPrice !== undefined) {
-        products = products.filter((p) => p.pricePk >= filters.minPrice!);
-      }
-      if (filters.maxPrice !== undefined) {
-        products = products.filter((p) => p.pricePk <= filters.maxPrice!);
-      }
-      if (filters.sort === 'price_asc') {
-        products.sort((a, b) => a.pricePk - b.pricePk);
-      } else if (filters.sort === 'price_desc') {
-        products.sort((a, b) => b.pricePk - a.pricePk);
-      } else if (filters.sort === 'name') {
-        products.sort((a, b) => a.name.localeCompare(b.name));
-      }
-    }
+    const products = await hydrate(rows).catch(() => []);
     return products;
   },
   async getProduct(slug) {
@@ -201,10 +176,9 @@ export const supabaseClient: ApiClient = {
         if (products[0]) return products[0];
       }
     } catch {
-      // fallback to dummy LED products
+      // Supabase is not configured or unreachable
     }
-    const found = dummyLedProducts.find((p) => p.slug === slug);
-    return found ?? null;
+    return null;
   },
   async getProductsByIds(ids) {
     if (!ids.length) return [];
@@ -215,12 +189,9 @@ export const supabaseClient: ApiClient = {
         products = await hydrate((data ?? []).map(toRow));
       }
     } catch {
-      // fallback
+      // Supabase is not configured or unreachable
     }
-    const foundIds = new Set(products.map((p) => p.id));
-    const missing = ids.filter((id) => !foundIds.has(id));
-    const dummyMatches = dummyLedProducts.filter((p) => missing.includes(p.id));
-    return [...products, ...dummyMatches];
+    return products;
   },
   async getAccountOrders() { return orders(); },
   async getAdminOrders() { return orders(); },

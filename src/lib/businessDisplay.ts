@@ -2,12 +2,22 @@ export interface BusinessDisplaySettings {
   businessName: string;
   currency: string;
   deliveryFee: number;
+  supportPhone: string;
+  supportEmail: string;
+  whatsappNumber: string;
+  returnPolicySummary: string;
+  defaultWarrantyText: string;
 }
 
 let settings: BusinessDisplaySettings = {
   businessName: 'MotoGear PK',
   currency: 'PKR',
   deliveryFee: 0,
+  supportPhone: '',
+  supportEmail: '',
+  whatsappNumber: '',
+  returnPolicySummary: '',
+  defaultWarrantyText: '',
 };
 
 export function setBusinessDisplaySettings(next: Partial<BusinessDisplaySettings>): void {

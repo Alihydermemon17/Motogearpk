@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Badge, Body1, Button, Card, Checkbox, Field, Input, MessageBar, MessageBarBody, Option, Select, Subtitle1, Textarea, Title1 } from '@fluentui/react-components';
+import { Badge, Body1, Button, Caption1, Card, Checkbox, Field, Input, MessageBar, MessageBarBody, Select, Subtitle1, Textarea } from '@fluentui/react-components';
+import { Option } from './SelectOption';
 import { AddRegular, ArrowSyncRegular, CheckmarkRegular, EditRegular } from '@fluentui/react-icons';
 import { api } from '../api';
 import type { AdminProductInput, AdminSupplier, AvailabilityStatus, BikeModel, Category, Product } from '../api/types';
@@ -23,6 +24,7 @@ export default function AdminProductsPage() {
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [formOpen, setFormOpen] = useState(false);
 
   const load = async () => {
     setLoading(true); setError('');
@@ -40,6 +42,12 @@ export default function AdminProductsPage() {
     setInput({ ...emptyInput, name: product.name, slug: product.slug, sku: product.sku ?? '', categoryId: product.categoryId ?? null, brand: product.brand ?? '', description: product.description, shortDescription: product.shortDescription ?? '', specifications: Object.fromEntries(product.specs.map((spec) => [spec.label, spec.value])), sellingPrice: product.originalPrice ?? product.pricePk, discountPrice: product.discountPrice ?? null, supplierId: product.supplierId ?? null, supplierProductUrl: product.supplierProductUrl ?? '', supplierSku: product.supplierSku ?? '', supplierCost: product.supplierCost ?? null, shippingCostEstimate: product.shippingCostEstimate ?? null, availabilityStatus: product.availabilityStatus ?? 'CHECK_REQUIRED', estimatedSupplierQuantity: product.stock ?? null, warranty: product.warranty ?? '', returnEligibility: product.returnEligibility ?? '', published: product.featured, seoTitle: product.seoTitle ?? '', seoDescription: product.seoDescription ?? '', archivedAt: product.archivedAt ?? null });
     setSelectedBikes((product.compatibleBikes ?? []).map((bike) => bike.id));
     setImageUrls((product.images ?? []).map((image) => image.url).join('\n'));
+    setFormOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const startCreate = () => {
+    setEditingId(null); setInput(emptyInput); setSelectedBikes([]); setImageUrls('');
+    setFormOpen(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const save = async () => {
@@ -64,9 +72,33 @@ export default function AdminProductsPage() {
   };
 
   return <div className="admin-page-content">
-    <div className="admin-section-title"><div><Body1>Manage supplier-backed listings without treating supplier quantity as warehouse stock.</Body1></div><Button appearance="subtle" icon={<ArrowSyncRegular />} onClick={() => void load()}>Refresh listings</Button></div>
+    <div className="admin-section-title">
+      <div><Body1>Manage supplier-backed listings without treating supplier quantity as warehouse stock.</Body1></div>
+      <div className="admin-inline-actions">
+        <Button appearance="primary" icon={<AddRegular />} onClick={startCreate}>Add product</Button>
+        <Button appearance="subtle" icon={<ArrowSyncRegular />} onClick={() => void load()}>Refresh</Button>
+      </div>
+    </div>
     {error && <MessageBar intent="error"><MessageBarBody>{error}</MessageBarBody></MessageBar>}{notice && <MessageBar intent="success"><MessageBarBody>{notice}</MessageBarBody></MessageBar>}
-    <Card className="admin-editor"><div className="admin-editor-head"><Subtitle1>{editingId ? 'Edit product' : 'Add product'}</Subtitle1>{editingId && <Button appearance="subtle" onClick={() => { setEditingId(null); setInput(emptyInput); setSelectedBikes([]); setImageUrls(''); }}>Cancel edit</Button>}</div>
+    <div className="admin-list">
+      <div className="admin-section-title"><Subtitle1>Listings</Subtitle1><Badge>{loading ? 'Loading' : `${products.length} records`}</Badge></div>
+      {!loading && products.length === 0 && <div className="admin-empty"><strong>No products</strong><span>Product listings appear here after an admin creates them.</span></div>}
+      <div className="admin-record-list">
+        {products.map((product) => <Card key={product.id} className="admin-record">
+          <div className="admin-record-main">
+            <Subtitle1>{product.name}</Subtitle1>
+            <Body1>{product.slug} · {product.availabilityStatus ?? product.status} · SKU {product.sku}</Body1>
+            <Caption1>Supplier cost: {product.supplierCost == null ? 'Not set' : `PKR ${product.supplierCost.toLocaleString('en-PK')}`} · Estimated profit: {product.estimatedProfit == null ? 'Not available' : `PKR ${product.estimatedProfit.toLocaleString('en-PK')}`}</Caption1>
+          </div>
+          <div className="admin-record-actions">
+            <Badge color={product.archivedAt ? 'danger' : product.featured ? 'success' : 'informative'}>{product.archivedAt ? 'Archived' : product.featured ? 'Published' : 'Draft'}</Badge>
+            <Button appearance="subtle" icon={<EditRegular />} onClick={() => edit(product)}>Edit</Button>
+            <Button appearance="subtle" onClick={() => void toggleArchive(product)}>{product.archivedAt ? 'Restore' : 'Archive'}</Button>
+          </div>
+        </Card>)}
+      </div>
+    </div>
+    {formOpen && <Card className="admin-editor"><div className="admin-editor-head"><Subtitle1>{editingId ? 'Edit product' : 'Add product'}</Subtitle1><Button appearance="subtle" onClick={() => { setFormOpen(false); setEditingId(null); setInput(emptyInput); setSelectedBikes([]); setImageUrls(''); }}>Close</Button></div>
       <div className="admin-form-grid">
         <Field label="Product name" required><Input value={input.name} onChange={(_, data) => setField('name', data.value)} /></Field>
         <Field label="SKU" required><Input value={input.sku} onChange={(_, data) => setField('sku', data.value)} /></Field>
@@ -93,7 +125,6 @@ export default function AdminProductsPage() {
         <Field label="Compatible bike models" className="admin-wide"><div className="bike-checks">{bikes.map((bike) => <Checkbox key={bike.id} label={bike.name} checked={selectedBikes.includes(bike.id)} onChange={(_, data) => setSelectedBikes((current) => data.checked ? [...current, bike.id] : current.filter((id) => id !== bike.id))} />)}</div></Field>
       </div>
       <div className="admin-actions"><Checkbox label="Published in customer shop" checked={input.published} onChange={(_, data) => setField('published', Boolean(data.checked))} /><Button appearance="primary" icon={editingId ? <CheckmarkRegular /> : <AddRegular />} onClick={() => void save()}>{editingId ? 'Save product changes' : 'Create product listing'}</Button></div>
-    </Card>
-    <div className="admin-list"><div className="section-head"><Subtitle1>Listings</Subtitle1><Badge>{loading ? 'Loading' : `${products.length} records`}</Badge></div>{!loading && products.length === 0 && <Card className="empty-state"><Subtitle1>No products</Subtitle1><Body1>Product listings appear here after an admin creates them.</Body1></Card>}{products.map((product) => <Card key={product.id} className="admin-row"><div><Subtitle1>{product.name}</Subtitle1><Body1>{product.slug} · {product.availabilityStatus ?? product.status} · SKU {product.sku}</Body1><Body1>Supplier cost: {product.supplierCost == null ? 'Not set' : `PKR ${product.supplierCost.toLocaleString('en-PK')}`} · Estimated profit: {product.estimatedProfit == null ? 'Not available' : `PKR ${product.estimatedProfit.toLocaleString('en-PK')}`}</Body1></div><div className="admin-row-meta"><Badge color={product.archivedAt ? 'danger' : product.featured ? 'success' : 'informative'}>{product.archivedAt ? 'Archived' : product.featured ? 'Published' : 'Draft'}</Badge><Button appearance="subtle" icon={<EditRegular />} onClick={() => edit(product)}>Edit</Button><Button appearance="subtle" onClick={() => void toggleArchive(product)}>{product.archivedAt ? 'Restore' : 'Archive'}</Button></div></Card>)}</div>
+    </Card>}
   </div>;
 }

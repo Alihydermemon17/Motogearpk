@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import {
   Badge, Body1, Button, Card, Caption1, Field, Input, MessageBar, MessageBarBody,
-  Option, Select, Skeleton, SkeletonItem, Subtitle1, Textarea, Title1, Title3,
+  Select, Skeleton, SkeletonItem, Subtitle1, Textarea, Title1, Title3,
 } from '@fluentui/react-components';
+import { Option } from './SelectOption';
 import { ArrowRightRegular, CheckmarkCircleRegular, LockClosedRegular } from '@fluentui/react-icons';
 import type { Product } from '../api/types';
 import type { CustomerOrder, CustomerOrderItem } from '../api/customer';

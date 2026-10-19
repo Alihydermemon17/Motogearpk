@@ -84,6 +84,34 @@ export async function quoteCustomerOrder(items: CartRequestItem[]): Promise<Cust
   return quoteSchema.parse(data);
 }
 
+/**
+ * Fire-and-forget the branded "Thank you for your order" email.
+ * Failures are swallowed on purpose - the order is already saved, so the
+ * customer must never see an error just because a notification bounced.
+ */
+export function sendOrderConfirmationEmail(orderId: string): void {
+  if (!supabase) return;
+  const baseUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/+$/, '');
+  if (!baseUrl) return;
+
+  void supabase.auth.getSession()
+    .then(async ({ data }) => {
+      const token = data.session?.access_token;
+      if (!token) return;
+      await fetch(`${baseUrl}/functions/v1/order-confirmation-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined)
+            || (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) || '',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ order_id: orderId }),
+      });
+    })
+    .catch(() => undefined);
+}
+
 export async function createCustomerOrder(items: CartRequestItem[], shipping: ShippingDetails, customerNotes: string): Promise<CreatedCustomerOrder> {
   const { data, error } = await client().rpc('create_customer_order', {
     p_items: items,
@@ -91,7 +119,9 @@ export async function createCustomerOrder(items: CartRequestItem[], shipping: Sh
     p_customer_notes: customerNotes.trim() || null,
   });
   if (error) throw error;
-  return createdOrderSchema.parse(data);
+  const created = createdOrderSchema.parse(data);
+  sendOrderConfirmationEmail(created.id);
+  return created;
 }
 
 export async function getCustomerOrders(): Promise<CustomerOrder[]> {

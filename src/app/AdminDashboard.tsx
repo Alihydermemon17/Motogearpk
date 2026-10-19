@@ -1,11 +1,16 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import {
   Badge, Body1, Button, Card, Checkbox, Caption1, Field, Input, MessageBar,
-  MessageBarBody, Option, Select, Subtitle1, Textarea, Title1, Title3,
+  MessageBarBody, Select, Subtitle1, Textarea, Title1, Title3,
 } from '@fluentui/react-components';
+import { Option } from './SelectOption';
 import {
-  AddRegular, ArrowSyncRegular, CheckmarkRegular, ChevronRightRegular,
-  DismissRegular, EditRegular, SaveRegular,
+  AddRegular, ArrowClockwiseRegular, ArrowDownRegular, ArrowRightRegular, ArrowSyncRegular, ArrowUndoRegular,
+  BoxMultipleRegular, BotRegular, CalendarLtrRegular, CartRegular, ChatRegular, CheckmarkCircleRegular,
+  CheckmarkRegular, ChevronRightRegular, ClockRegular, DataHistogramRegular, DismissRegular, EditRegular,
+  GridRegular, HomeRegular, LightbulbRegular, MoneyRegular, PeopleRegular, QuestionRegular, SaveRegular,
+  SearchRegular, SettingsRegular, ShieldCheckmarkRegular, SignOutRegular, StarRegular, TagRegular,
+  PrintRegular, VehicleTruckBagRegular, WarningRegular,
 } from '@fluentui/react-icons';
 import AdminProductsPage from './AdminProductsPage';
 import { AdminFaqPage, AdminReturnsPage, AdminSupportPage } from './AdminTrustPages';
@@ -23,35 +28,149 @@ import {
   type DashboardMetrics,
 } from '../api/admin';
 import type { AdminOrderStatus } from '../api/types';
+import { InvoiceModal } from './Invoice';
 
 type Navigate = (path: string) => void;
 type RequestType = 'PRODUCT_PUBLICATION' | 'SUPPLIER_PURCHASE' | 'REFUND' | 'MAJOR_PRICE_CHANGE' | 'PRODUCT_REMOVAL' | 'OTHER';
 type JsonValue = string | number | boolean | null | { [key: string]: JsonValue | undefined } | JsonValue[];
 const money = (value: number) => `PKR ${value.toLocaleString('en-PK')}`;
 const nice = (value: string) => value.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
-const failureText = (error: unknown) => error instanceof Error ? error.message : 'The request could not be completed.';
+const failureText = (error: unknown) => {
+  if (error instanceof Error && error.message) return error.message;
+  if (error && typeof error === 'object' && 'message' in error) {
+    const message = Reflect.get(error, 'message');
+    if (typeof message === 'string' && message) return message;
+    const code = Reflect.get(error, 'code');
+    if (typeof code === 'string' && code) return `Request failed (${code}).`;
+  }
+  return 'The request could not be completed.';
+};
 
-const adminLinks = [
-  ['/admin', 'Overview'], ['/admin/products', 'Products'], ['/admin/categories', 'Categories'],
-  ['/admin/bikes', 'Bike models'], ['/admin/suppliers', 'Suppliers'], ['/admin/orders', 'Orders'],
-  ['/admin/customers', 'Customers'], ['/admin/reviews', 'Reviews'], ['/admin/feedback', 'Feedback'],
-  ['/admin/returns', 'Returns'], ['/admin/support', 'Support'], ['/admin/faqs', 'FAQs'],
-  ['/admin/approvals', 'Approvals'], ['/admin/agents', 'AI command center'],
-  ['/admin/automation-logs', 'Automation logs'], ['/admin/settings', 'Settings'],
-] as const;
+type AdminNavItem = { href: string; label: string; icon: typeof HomeRegular; hint?: string };
 
-export default function AdminDashboard({ path, navigate }: { path: string; navigate: Navigate }) {
-  const title = adminLinks.find(([href]) => href === path)?.[1] ?? 'Admin';
-  return <div className="admin-shell page-content">
+const adminNav: Array<{ title?: string; items: AdminNavItem[] }> = [
+  { items: [{ href: '/admin', label: 'Overview', icon: HomeRegular, hint: 'Live business snapshot' }] },
+  {
+    title: 'Catalog',
+    items: [
+      { href: '/admin/products', label: 'Products', icon: BoxMultipleRegular, hint: 'Listings, pricing, stock' },
+      { href: '/admin/categories', label: 'Categories', icon: TagRegular },
+      { href: '/admin/bikes', label: 'Bike models', icon: GridRegular },
+      { href: '/admin/suppliers', label: 'Suppliers', icon: VehicleTruckBagRegular, hint: 'Sourcing and availability' },
+    ],
+  },
+  {
+    title: 'Sales',
+    items: [
+      { href: '/admin/orders', label: 'Orders', icon: CartRegular, hint: 'Fulfilment and tracking' },
+      { href: '/admin/returns', label: 'Returns', icon: ArrowUndoRegular },
+      { href: '/admin/customers', label: 'Customers', icon: PeopleRegular },
+    ],
+  },
+  {
+    title: 'Engagement',
+    items: [
+      { href: '/admin/reviews', label: 'Reviews', icon: StarRegular },
+      { href: '/admin/feedback', label: 'Feedback', icon: ChatRegular },
+      { href: '/admin/support', label: 'Support', icon: ShieldCheckmarkRegular },
+      { href: '/admin/faqs', label: 'FAQs', icon: QuestionRegular },
+    ],
+  },
+  {
+    title: 'System',
+    items: [
+      { href: '/admin/approvals', label: 'Approvals', icon: CheckmarkCircleRegular },
+      { href: '/admin/agents', label: 'AI command center', icon: BotRegular, hint: 'Not connected yet' },
+      { href: '/admin/automation-logs', label: 'Automation logs', icon: DataHistogramRegular },
+      { href: '/admin/settings', label: 'Settings', icon: SettingsRegular, hint: 'Store and contact details' },
+    ],
+  },
+];
+
+const adminItems: AdminNavItem[] = adminNav.flatMap((group) => group.items);
+
+type PipelineTone = 'warning' | 'informative' | 'success' | 'danger';
+type PillTone = PipelineTone | 'important' | 'subtle';
+
+const quickActions: AdminNavItem[] = [
+  { href: '/admin/orders', label: 'Process orders', hint: 'Confirm, ship and add tracking', icon: CartRegular },
+  { href: '/admin/products', label: 'Add a product', hint: 'Create a catalog listing', icon: AddRegular },
+  { href: '/admin/customers', label: 'Review customers', hint: 'Accounts and order value', icon: PeopleRegular },
+  { href: '/admin/settings', label: 'Store settings', hint: 'Contact and delivery details', icon: SettingsRegular },
+];
+
+const orderTone: Record<AdminOrderStatus, PillTone> = {
+  PENDING: 'warning',
+  CONFIRMED: 'informative',
+  SUPPLIER_PROCESSING: 'important',
+  SUPPLIER_SHIPPED: 'important',
+  IN_TRANSIT: 'important',
+  DELIVERED: 'success',
+  CANCELLED: 'danger',
+  RETURNED: 'danger',
+  REFUNDED: 'subtle',
+};
+
+const paymentTone: Record<string, PillTone> = {
+  PAID: 'success',
+  PENDING: 'warning',
+  UNPAID: 'warning',
+  FAILED: 'danger',
+  REFUNDED: 'subtle',
+  COD: 'informative',
+  CASH_ON_DELIVERY: 'informative',
+};
+
+function Pill({ tone, children }: { tone: PillTone; children: ReactNode }) {
+  return <Badge appearance="tint" color={tone} className="admin-pill">{children}</Badge>;
+}
+
+export default function AdminDashboard({ path, navigate, onSignOut }: { path: string; navigate: Navigate; onSignOut?: () => void }) {
+  const active = adminItems.find((item) => item.href === path);
+  const title = active?.label ?? 'Not found';
+  const group = adminNav.find((section) => section.items.some((item) => item.href === path))?.title;
+  return <div className="admin-shell">
     <aside className="admin-sidebar">
-      <div className="admin-sidebar-brand"><Caption1>WORKSPACE</Caption1><Title3>MotoGear PK</Title3><Badge color="brand">ADMIN</Badge></div>
+      <div className="admin-brand">
+        <span className="admin-brand-mark" aria-hidden="true">MG</span>
+        <span className="admin-brand-copy">
+          <strong>MotoGear PK</strong>
+          <Caption1>Admin console</Caption1>
+        </span>
+      </div>
       <nav aria-label="Admin navigation" className="admin-nav">
-        {adminLinks.map(([href, label]) => <Button key={href} appearance={href === path ? 'primary' : 'subtle'} className="admin-nav-link" onClick={() => navigate(href)}>{label}{href === path && <ChevronRightRegular />}</Button>)}
+        {adminNav.map((section) => <div className="admin-nav-group" key={section.title ?? 'overview'}>
+          {section.title && <Caption1 className="admin-nav-label">{section.title}</Caption1>}
+          {section.items.map((item) => <Button
+            key={item.href}
+            appearance="transparent"
+            className={`admin-nav-link${item.href === path ? ' is-active' : ''}`}
+            icon={<item.icon />}
+            onClick={() => navigate(item.href)}
+          >{item.label}</Button>)}
+        </div>)}
       </nav>
-      <Button appearance="subtle" onClick={() => navigate('/')}>Return to storefront</Button>
+      <div className="admin-sidebar-foot">
+        <div className="admin-sidebar-foot-row">
+          <Button appearance="secondary" icon={<ArrowUndoRegular />} title="View storefront" onClick={() => navigate('/')}>View storefront</Button>
+          <Button appearance="subtle" icon={<SignOutRegular />} onClick={() => onSignOut?.()} title="Sign out">Sign out</Button>
+        </div>
+        <Caption1>Signed in with admin access</Caption1>
+      </div>
     </aside>
     <section className="admin-workspace">
-      <header className="admin-workspace-head"><div><Caption1 className="section-kicker">MOTOGEAR PK / OPERATIONS</Caption1><Title1>{title}</Title1></div><Button appearance="subtle" icon={<ArrowSyncRegular />} onClick={() => window.location.reload()}>Reload</Button></header>
+      <header className="admin-workspace-head">
+        <div className="admin-head-copy">
+          <Caption1 className="admin-breadcrumb">MotoGear PK{group ? ` / ${group}` : ''}</Caption1>
+          <Title1>{title}</Title1>
+          {active?.hint && <Caption1 className="admin-head-hint">{active.hint}</Caption1>}
+        </div>
+        <div className="admin-head-actions">
+          <Button appearance="primary" icon={<AddRegular />} onClick={() => navigate('/admin/products')}>New product</Button>
+          <Button appearance="secondary" icon={<ArrowClockwiseRegular />} onClick={() => window.location.reload()}>Reload</Button>
+          <span className="admin-avatar" title="Administrator">AD</span>
+        </div>
+      </header>
       {path === '/admin' && <DashboardPage navigate={navigate} />}
       {path === '/admin/products' && <AdminProductsPage />}
       {path === '/admin/categories' && <CategoriesPage />}
@@ -68,25 +187,30 @@ export default function AdminDashboard({ path, navigate }: { path: string; navig
       {path === '/admin/agents' && <AgentPlaceholder />}
       {path === '/admin/automation-logs' && <AutomationLogsPage />}
       {path === '/admin/settings' && <SettingsPage />}
-      {!adminLinks.some(([href]) => href === path) && <EmptyPanel title="Admin page not found" detail="Choose a section from the operations menu." />}
+      {!active && <EmptyPanel title="Admin page not found" detail="Choose a section from the operations menu." />}
     </section>
   </div>;
 }
 
 function DashboardPage({ navigate }: { navigate: Navigate }) {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [orders, setOrders] = useState<AdminOrderBundle[]>([]);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState('');
   const load = async () => {
     setBusy(true); setError('');
-    try { setMetrics(await getDashboardMetrics()); }
-    catch (reason: unknown) { setError(failureText(reason)); }
+    try {
+      const [summary, orderRows] = await Promise.all([getDashboardMetrics(), listAdminOrders()]);
+      setMetrics(summary);
+      setOrders(orderRows);
+    } catch (reason: unknown) { setError(failureText(reason)); }
     finally { setBusy(false); }
   };
   useEffect(() => { void load(); }, []);
   if (busy) return <LoadingPanel />;
   if (error) return <ErrorPanel message={error} retry={() => void load()} />;
   if (!metrics) return <EmptyPanel title="Dashboard unavailable" detail="Metrics could not be loaded." />;
+
   const values: Array<[string, number | string, string, string]> = [
     ['Total orders', metrics.total_orders, 'All recorded orders', '/admin/orders'],
     ['Pending orders', metrics.pending_orders, 'Awaiting confirmation', '/admin/orders'],
@@ -102,11 +226,135 @@ function DashboardPage({ navigate }: { navigate: Navigate }) {
     ['Pending approvals', metrics.pending_approvals, 'Waiting for admin decision', '/admin/approvals'],
   ];
   const noData = Object.values(metrics).every((value) => value === 0);
+
+  const recent = [...orders].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 6);
+  const share = (count: number) => (metrics.total_orders ? Math.max(3, Math.round((count / metrics.total_orders) * 100)) : 0);
+  const pipeline: Array<[string, number, PipelineTone]> = [
+    ['Awaiting confirmation', metrics.pending_orders, 'warning'],
+    ['Confirmed', metrics.confirmed_orders, 'informative'],
+    ['Delivered', metrics.delivered_orders, 'success'],
+    ['Cancelled', metrics.cancelled_orders, 'danger'],
+  ];
+
   return <div className="admin-page-content">
     {noData && <MessageBar intent="info"><MessageBarBody>No business records yet. Metrics below reflect the current empty database.</MessageBarBody></MessageBar>}
-    <div className="admin-metric-grid">{values.map(([label, value, detail, href]) => <button type="button" className="admin-metric" key={label} onClick={() => navigate(href)}><Caption1>{label}</Caption1><strong>{value}</strong><span>{detail}</span></button>)}</div>
-    <div className="admin-quick-links">{[['Products', '/admin/products'], ['Orders', '/admin/orders'], ['Suppliers', '/admin/suppliers'], ['Approvals', '/admin/approvals']].map(([label, href]) => <Button key={href} appearance="secondary" onClick={() => navigate(href)}>{label}</Button>)}</div>
+
+    <section className="admin-hero">
+      <div className="admin-hero-main">
+        <Caption1 className="admin-hero-label"><MoneyRegular /> Collected revenue</Caption1>
+        <strong className="admin-hero-value">{money(metrics.revenue)}</strong>
+        <span className="admin-hero-sub">
+          {metrics.delivered_orders} delivered · {metrics.confirmed_orders} confirmed · {money(metrics.estimated_profit)} estimated profit
+        </span>
+        <div className="admin-hero-track" aria-hidden="true">
+          <span style={{ width: `${metrics.total_orders ? Math.round((metrics.delivered_orders / metrics.total_orders) * 100) : 0}%` }} />
+        </div>
+        <Caption1 className="admin-hero-caption">
+          {metrics.total_orders
+            ? `${Math.round((metrics.delivered_orders / metrics.total_orders) * 100)}% of all orders delivered`
+            : 'No orders placed yet'}
+        </Caption1>
+      </div>
+      <div className="admin-hero-tiles">
+        <StatTile label="Total orders" value={metrics.total_orders} detail="All time" icon={<CartRegular />} onClick={() => navigate('/admin/orders')} />
+        <StatTile label="Pending" value={metrics.pending_orders} detail="Needs confirmation" tone={metrics.pending_orders ? 'warning' : 'neutral'} icon={<WarningRegular />} onClick={() => navigate('/admin/orders')} />
+        <StatTile label="Products live" value={metrics.published_products} detail={`${metrics.unavailable_products} unavailable`} tone={metrics.unavailable_products ? 'error' : 'neutral'} icon={<BoxMultipleRegular />} onClick={() => navigate('/admin/products')} />
+        <StatTile label="Customers" value={metrics.total_customers} detail="Registered accounts" icon={<PeopleRegular />} onClick={() => navigate('/admin/customers')} />
+      </div>
+    </section>
+
+    <AttentionPanel metrics={metrics} navigate={navigate} />
+
+    <div className="admin-insight-grid">
+      <section className="admin-panel">
+        <PanelHead icon={<CartRegular />} kicker="Fulfilment" title="Order pipeline" actionLabel="Open orders" onAction={() => navigate('/admin/orders')} />
+        <div className="admin-pipeline">
+          {pipeline.map(([label, count, tone]) => <div className="admin-pipeline-row" key={label}>
+            <span className={`admin-pipeline-dot tone-${tone}`} aria-hidden="true" />
+            <span className="admin-pipeline-label">{label}</span>
+            <span className="admin-pipeline-track"><i className={`tone-${tone}`} style={{ width: `${share(count)}%` }} /></span>
+            <b>{count}</b>
+          </div>)}
+        </div>
+        <div className="admin-panel-foot">
+          <Caption1>{metrics.total_orders ? `${metrics.total_orders} orders recorded in total` : 'No orders placed yet'}</Caption1>
+          <strong>{money(metrics.revenue)}</strong>
+        </div>
+      </section>
+
+      <section className="admin-panel">
+        <PanelHead icon={<ClockRegular />} kicker="Activity" title="Recent orders" actionLabel="View all" onAction={() => navigate('/admin/orders')} />
+        {recent.length ? <div className="admin-table-wrap admin-recent-wrap"><table className="admin-table admin-recent-table">
+          <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody>{recent.map((row) => <tr key={row.id} className="admin-clickable-row" title={`Open ${row.order_number} in orders`} onClick={() => navigate('/admin/orders')}>
+            <td><strong className="admin-order-no">{row.order_number}</strong><small>{new Date(row.created_at).toLocaleDateString('en-PK', { day: '2-digit', month: 'short' })}</small></td>
+            <td><strong>{row.shipping_full_name}</strong><small>{row.shipping_city || 'City not set'}</small></td>
+            <td className="admin-cell-money">{money(row.total)}</td>
+            <td><Pill tone={orderTone[row.status]}>{nice(row.status)}</Pill></td>
+          </tr>)}</tbody>
+        </table></div> : <p className="admin-panel-empty">No orders have been placed yet.</p>}
+      </section>
+    </div>
+
+    <SectionTitle title="All metrics" count={values.length} />
+    <div className="admin-metric-grid">
+      {values.map(([label, value, detail, href]) => <button type="button" className="admin-metric" key={label} onClick={() => navigate(href)}>
+        <Caption1>{label}</Caption1><strong>{value}</strong><span>{detail}</span>
+        <ArrowRightRegular className="admin-metric-arrow" />
+      </button>)}
+    </div>
+
+    <SectionTitle title="Jump to" count={quickActions.length} />
+    <div className="admin-quick-actions">
+      {quickActions.map((action) => <button type="button" className="admin-quick" key={action.href} onClick={() => navigate(action.href)}>
+        <span className="admin-quick-icon" aria-hidden="true"><action.icon /></span>
+        <span className="admin-quick-copy"><strong>{action.label}</strong><span>{action.hint}</span></span>
+        <ArrowRightRegular aria-hidden="true" />
+      </button>)}
+    </div>
   </div>;
+}
+
+function PanelHead({ icon, kicker, title, actionLabel, onAction }: {
+  icon: ReactNode; kicker: string; title: string; actionLabel: string; onAction: () => void;
+}) {
+  return <div className="admin-panel-head">
+    <div className="admin-panel-head-copy">
+      <Caption1 className="admin-panel-kicker">{icon}{kicker}</Caption1>
+      <Subtitle1>{title}</Subtitle1>
+    </div>
+    <Button appearance="subtle" size="small" icon={<ArrowRightRegular />} iconPosition="after" onClick={onAction}>{actionLabel}</Button>
+  </div>;
+}
+
+function StatTile({ label, value, detail, icon, tone = 'neutral', onClick }: {
+  label: string; value: number | string; detail: string; icon: ReactNode; tone?: 'neutral' | 'warning' | 'error' | 'amber'; onClick: () => void;
+}) {
+  return <button type="button" className={`admin-stat tone-${tone}`} onClick={onClick}>
+    <span className="admin-stat-icon" aria-hidden="true">{icon}</span>
+    <span className="admin-stat-body">
+      <Caption1>{label}</Caption1>
+      <strong>{value}</strong>
+      <span>{detail}</span>
+    </span>
+    <ArrowRightRegular className="admin-stat-arrow" aria-hidden="true" />
+  </button>;
+}
+
+function AttentionPanel({ metrics, navigate }: { metrics: DashboardMetrics; navigate: Navigate }) {
+  const items: Array<{ label: string; detail: string; href: string; tone: 'warning' | 'error' }> = [];
+  if (metrics.pending_orders > 0) items.push({ label: `${metrics.pending_orders} order${metrics.pending_orders === 1 ? '' : 's'} awaiting confirmation`, detail: 'Confirm or cancel to keep fulfilment moving.', href: '/admin/orders', tone: 'warning' });
+  if (metrics.pending_approvals > 0) items.push({ label: `${metrics.pending_approvals} approval request${metrics.pending_approvals === 1 ? '' : 's'} pending`, detail: 'Decide before automated work is queued.', href: '/admin/approvals', tone: 'warning' });
+  if (metrics.unavailable_products > 0) items.push({ label: `${metrics.unavailable_products} product${metrics.unavailable_products === 1 ? '' : 's'} marked unavailable`, detail: 'These listings cannot be added to a cart.', href: '/admin/products', tone: 'error' });
+  if (!items.length) return <Card className="admin-clear"><CheckmarkCircleRegular /><div><Subtitle1>Nothing needs your attention</Subtitle1><Caption1>Orders are confirmed, approvals are decided, and the catalog is purchasable.</Caption1></div></Card>;
+  return <section className="admin-attention">
+    <div className="admin-attention-head"><WarningRegular /><Subtitle1>Needs attention</Subtitle1><Badge color="warning">{items.length}</Badge></div>
+    {items.map((item) => <button type="button" key={item.label} className={`admin-attention-row tone-${item.tone}`} onClick={() => navigate(item.href)}>
+      <span className="admin-attention-dot" aria-hidden="true" />
+      <span className="admin-attention-copy"><strong>{item.label}</strong><Caption1>{item.detail}</Caption1></span>
+      <ArrowRightRegular className="admin-attention-arrow" aria-hidden="true" />
+    </button>)}
+  </section>;
 }
 
 function CategoriesPage() {
@@ -231,9 +479,62 @@ function OrdersPage() {
   const load = async () => { setBusy(true); setError(''); try { setRows(await listAdminOrders()); } catch (reason: unknown) { setError(failureText(reason)); } finally { setBusy(false); } };
   useEffect(() => { void load(); }, []);
   const visible = rows.filter((row) => (filter === 'ALL' || row.status === filter) && (!search || `${row.order_number} ${row.shipping_full_name} ${row.shipping_phone}`.toLowerCase().includes(search.toLowerCase())));
-  const selected = rows.find((row) => row.id === selectedId);
-  return <div className="admin-page-content"><PageNotice error={error} success={notice} /><div className="admin-filter-row"><Field label="Search orders"><Input value={search} onChange={(_, value) => setSearch(value.value)} placeholder="Order number, customer, phone" /></Field><Field label="Status"><Select value={filter} onChange={(_, value) => setFilter(value.value)}><Option value="ALL">All statuses</Option>{orderStatuses.map((status) => <Option key={status} value={status}>{nice(status)}</Option>)}</Select></Field><Button appearance="subtle" icon={<ArrowSyncRegular />} onClick={() => void load()}>Refresh</Button></div>
-    {busy ? <LoadingPanel /> : visible.length ? <div className="admin-order-layout"><div className="admin-record-list">{visible.map((row) => <button className={`admin-order-select ${selectedId === row.id ? 'selected' : ''}`} key={row.id} onClick={() => setSelectedId(row.id)}><span><strong>{row.order_number}</strong><Caption1>{row.shipping_full_name} · {new Date(row.created_at).toLocaleDateString()}</Caption1></span><span><Badge>{nice(row.status)}</Badge><b>{money(row.total)}</b></span></button>)}</div>{selected ? <OrderDetail order={selected} saving={saving} onSave={async (next, tracking, courier, notes) => { setSaving(true); setError(''); setNotice(''); try { await updateAdminOrder(selected.id, next, tracking, courier, notes); setNotice('Order status and shipping information saved.'); await load(); } catch (reason: unknown) { setError(failureText(reason)); } finally { setSaving(false); } }} /> : <EmptyPanel title="Select an order" detail="Order details will appear here." />}</div> : <EmptyPanel title="No orders" detail="No real orders have been placed yet." />}
+  const selected = rows.find((row) => row.id === selectedId) ?? visible[0];
+  useEffect(() => {
+    if (selected && selected.id !== selectedId) setSelectedId(selected.id);
+  }, [selected, selectedId]);
+  const collected = rows.filter((row) => row.payment_status === 'PAID').reduce((sum, row) => sum + row.total, 0);
+  const chips: Array<{ key: string; icon: ReactNode; label: string; value: ReactNode }> = [
+    { key: 'orders', icon: <CartRegular />, label: 'Orders', value: rows.length },
+    { key: 'pending', icon: <WarningRegular />, label: 'Pending', value: rows.filter((row) => row.status === 'PENDING').length },
+    { key: 'progress', icon: <VehicleTruckBagRegular />, label: 'In progress', value: rows.filter((row) => ['CONFIRMED', 'SUPPLIER_PROCESSING', 'SUPPLIER_SHIPPED', 'IN_TRANSIT'].includes(row.status)).length },
+    { key: 'delivered', icon: <CheckmarkCircleRegular />, label: 'Delivered', value: rows.filter((row) => row.status === 'DELIVERED').length },
+    { key: 'collected', icon: <MoneyRegular />, label: 'Collected', value: money(collected) },
+  ];
+  return <div className="admin-page-content"><PageNotice error={error} success={notice} />
+
+    <div className="admin-orders-summary" aria-label="Order summary">
+      {chips.map((chip) => <span className="admin-order-chip" key={chip.key}>
+        <span className="admin-order-chip-icon" aria-hidden="true">{chip.icon}</span>
+        <span className="admin-order-chip-copy"><Caption1>{chip.label}</Caption1><b>{chip.value}</b></span>
+      </span>)}
+    </div>
+
+    <div className="admin-filter-row">
+      <Field label="Search orders"><Input value={search} onChange={(_, value) => setSearch(value.value)} placeholder="Order number, customer, phone" contentBefore={<SearchRegular />} /></Field>
+      <Field label="Status"><Select value={filter} onChange={(_, value) => setFilter(value.value)}><Option value="ALL">All statuses</Option>{orderStatuses.map((status) => <Option key={status} value={status}>{nice(status)}</Option>)}</Select></Field>
+      <Button appearance="subtle" icon={<ArrowSyncRegular />} onClick={() => void load()}>Refresh</Button>
+    </div>
+
+    {busy ? <LoadingPanel /> : visible.length ? <div className="admin-order-layout">
+      <div className="admin-table-wrap admin-orders-wrap">
+        <table className="admin-table admin-order-table">
+          <thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
+          <tbody>{visible.map((row) => {
+            const itemCount = row.items.reduce((count, item) => count + item.quantity, 0);
+            return <tr
+              key={row.id}
+              className={selectedId === row.id ? 'is-selected' : ''}
+              tabIndex={0}
+              aria-selected={selectedId === row.id}
+              onClick={() => setSelectedId(row.id)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setSelectedId(row.id); }
+              }}
+            >
+              <td><strong className="admin-order-no">{row.order_number}</strong><small>{row.courier ? `${row.courier}${row.tracking_number ? ` · ${row.tracking_number}` : ''}` : 'Courier not assigned'}</small></td>
+              <td><strong>{row.shipping_full_name}</strong><small>{[row.shipping_city, row.shipping_phone].filter(Boolean).join(' · ') || 'Contact not recorded'}</small></td>
+              <td className="admin-cell-date">{new Date(row.created_at).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' })}<small>{new Date(row.created_at).toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' })}</small></td>
+              <td className="admin-cell-num">{itemCount}</td>
+              <td className="admin-cell-money">{money(row.total)}</td>
+              <td><Pill tone={paymentTone[row.payment_status] ?? 'subtle'}>{nice(row.payment_status)}</Pill></td>
+              <td><Pill tone={orderTone[row.status]}>{nice(row.status)}</Pill></td>
+            </tr>;
+          })}</tbody>
+        </table>
+      </div>
+      {selected ? <OrderDetail order={selected} saving={saving} onSave={async (next, tracking, courier, notes) => { setSaving(true); setError(''); setNotice(''); try { await updateAdminOrder(selected.id, next, tracking, courier, notes); setNotice('Order status and shipping information saved.'); await load(); } catch (reason: unknown) { setError(failureText(reason)); } finally { setSaving(false); } }} /> : <EmptyPanel title="Select an order" detail="Pick any row to open the full order, its items, and the fulfilment controls." />}
+    </div> : <EmptyPanel title="No orders" detail="No real orders have been placed yet." />}
   </div>;
 }
 
@@ -242,9 +543,10 @@ function OrderDetail({ order, saving, onSave }: { order: AdminOrderBundle; savin
   const [tracking, setTracking] = useState(order.tracking_number ?? '');
   const [courier, setCourier] = useState(order.courier ?? '');
   const [notes, setNotes] = useState(order.internal_notes ?? '');
+  const [showInvoice, setShowInvoice] = useState(false);
   useEffect(() => { setStatus(order.status); setTracking(order.tracking_number ?? ''); setCourier(order.courier ?? ''); setNotes(order.internal_notes ?? ''); }, [order]);
   const allowed = orderTransitions(order.status, order.payment_status);
-  return <Card className="admin-order-detail"><div className="admin-order-detail-head"><div><Caption1>{order.order_number}</Caption1><Title3>{money(order.total)}</Title3></div><Badge>{nice(order.payment_status)}</Badge></div>
+  return <Card className="admin-order-detail"><div className="admin-order-detail-head"><div><Caption1>{order.order_number}</Caption1><Title3>{money(order.total)}</Title3></div><div className="admin-order-detail-tools"><Pill tone={paymentTone[order.payment_status] ?? 'subtle'}>{nice(order.payment_status)}</Pill><Button appearance="secondary" size="small" icon={<PrintRegular />} onClick={() => setShowInvoice(true)}>Invoice</Button><Button appearance="subtle" size="small" onClick={() => window.print()}>Print</Button></div></div>
     <div className="admin-detail-grid"><div><Caption1>Customer</Caption1><strong>{order.customer?.full_name || order.shipping_full_name}</strong><span>{order.customer?.email || order.shipping_email}</span><span>{order.customer?.phone || order.shipping_phone}</span></div><div><Caption1>Ship to</Caption1><strong>{order.shipping_address}</strong><span>{order.shipping_city}, {order.shipping_province}</span></div></div>
     <SectionTitle title="Items and supplier" />
     {order.items.length ? order.items.map((item) => <div className="admin-line-item" key={item.id}><div><strong>{item.product_name}</strong><Caption1>{item.product_sku} · Qty {item.quantity} · {item.supplier_name ?? 'Supplier unassigned'}</Caption1></div><b>{money(item.line_total)}</b></div>) : <Caption1>No order items recorded.</Caption1>}
@@ -252,6 +554,7 @@ function OrderDetail({ order, saving, onSave }: { order: AdminOrderBundle; savin
     <div className="admin-form-grid"><Field label="Order status"><Select value={status} onChange={(_, value) => setStatus(value.value as AdminOrderStatus)}>{allowed.map((item) => <Option key={item} value={item}>{nice(item)}</Option>)}</Select></Field><Field label="Courier"><Input value={courier} onChange={(_, value) => setCourier(value.value)} /></Field><Field label="Tracking number"><Input value={tracking} onChange={(_, value) => setTracking(value.value)} /></Field><Field label="Internal notes" className="admin-wide"><Textarea value={notes} onChange={(_, value) => setNotes(value.value)} /></Field></div>
     <Button appearance="primary" icon={<SaveRegular />} disabled={saving} onClick={() => void onSave(status, tracking, courier, notes)}>{saving ? 'Saving…' : 'Save allowed order updates'}</Button>
     <Caption1 className="admin-muted">Order totals and payment status are read-only. Status changes are checked by the database.</Caption1>
+    <InvoiceModal isOpen={showInvoice} onClose={() => setShowInvoice(false)} order={order} items={order.items} type="admin" />
   </Card>;
 }
 

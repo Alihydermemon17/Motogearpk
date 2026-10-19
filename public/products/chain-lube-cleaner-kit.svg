@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1b1f27"/><stop offset="100%" stop-color="#0e1014"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="42%" cy="45%" r="58%">
+      <stop offset="0%" stop-color="#ffb400" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#ffb400" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <g stroke="#ffffff" stroke-opacity="0.035">
+    <path d="M0 100h800M0 200h800M0 300h800M0 400h800M0 500h800"/>
+    <path d="M100 0v600M200 0v600M300 0v600M400 0v600M500 0v600M600 0v600M700 0v600"/>
+  </g>
+  <rect width="800" height="600" fill="url(#glow)"/>
+  <g transform="translate(400,300)">
+    <!-- spray can -->
+    <g transform="translate(-96,-14)">
+      <rect x="-72" y="-116" width="144" height="248" rx="20" fill="#1c2028" stroke="#ffb400" stroke-width="4"/>
+      <rect x="-72" y="-24" width="144" height="72" fill="#ffb400" opacity="0.14"/>
+      <rect x="-30" y="-158" width="60" height="46" rx="10" fill="#272c35" stroke="#ffb400" stroke-width="3"/>
+      <rect x="-14" y="-176" width="42" height="20" rx="7" fill="#272c35" stroke="#ffb400" stroke-width="2.5"/>
+      <rect x="-46" y="-6" width="92" height="66" rx="9" fill="#272c35"/>
+      <text x="0" y="36" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#ffb400" letter-spacing="2">LUBE</text>
+    </g>
+    <!-- chain links -->
+    <g transform="translate(116,44)" fill="none" stroke="#ffb400" stroke-width="9">
+      <rect x="-104" y="-34" width="76" height="42" rx="21"/>
+      <rect x="-40" y="-34" width="76" height="42" rx="21" stroke="#fcd34d"/>
+      <rect x="24" y="-34" width="76" height="42" rx="21"/>
+    </g>
+    <g transform="translate(116,-58)" fill="none" stroke="#ffb400" stroke-width="9" opacity="0.8">
+      <rect x="-72" y="-24" width="70" height="38" rx="19"/>
+      <rect x="-14" y="-24" width="70" height="38" rx="19" stroke="#fcd34d"/>
+    </g>
+    <g fill="#fcd34d" opacity="0.5">
+      <circle cx="204" cy="-116" r="7"/><circle cx="228" cy="-86" r="5"/><circle cx="186" cy="-72" r="4"/>
+    </g>
+  </g>
+</svg>

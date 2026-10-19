@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import {
   Badge, Body1, Button, Card, Caption1, Checkbox, Field, Input, MessageBar,
-  MessageBarBody, Option, Select, Subtitle1, Textarea, Title3,
+  MessageBarBody, Select, Subtitle1, Textarea, Title3,
 } from '@fluentui/react-components';
+import { Option } from './SelectOption';
 import { AddRegular, ArrowSyncRegular, SaveRegular } from '@fluentui/react-icons';
 import type { FaqTopic, ReturnRequestStatus, SupportConversationStatus } from '../lib/supabase';
 import {

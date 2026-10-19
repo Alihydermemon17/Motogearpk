@@ -371,8 +371,10 @@ export async function saveBusinessSettings(settings: BusinessSettings): Promise<
   if (error) throw error;
 }
 
-export async function getPublicBusinessSettings(): Promise<Pick<BusinessSettings, 'business_name' | 'currency' | 'delivery_fee'>> {
-  const { data, error } = await client().from('business_settings').select('setting_key,setting_value').in('setting_key', ['business_name', 'currency', 'delivery_fee']);
+export async function getPublicBusinessSettings(): Promise<BusinessSettings> {
+  const { data, error } = await client().from('business_settings').select('setting_key,setting_value').in('setting_key', [
+    'business_name', 'currency', 'delivery_fee', 'support_phone', 'support_email', 'whatsapp_number', 'return_policy_summary', 'default_warranty_text'
+  ]);
   if (error) throw error;
   const values: Partial<BusinessSettings> = {};
   for (const row of data) {
@@ -382,6 +384,11 @@ export async function getPublicBusinessSettings(): Promise<Pick<BusinessSettings
   return {
     business_name: values.business_name ?? 'MotoGear PK',
     currency: values.currency ?? 'PKR',
-    delivery_fee: values.delivery_fee ?? '4500',
+    delivery_fee: values.delivery_fee ?? '250',
+    support_phone: values.support_phone ?? '',
+    support_email: values.support_email ?? '',
+    whatsapp_number: values.whatsapp_number ?? '',
+    return_policy_summary: values.return_policy_summary ?? '',
+    default_warranty_text: values.default_warranty_text ?? '',
   };
 }
