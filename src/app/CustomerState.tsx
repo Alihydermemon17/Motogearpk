@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { getCustomerProfile, type CustomerProfile } from '../api/customer';
+import { clearOAuthCallbackParams, readOAuthCallbackIssue } from './oauthCallback';
 
 export interface CartEntry {
   productId: string;
@@ -14,6 +15,11 @@ interface AuthState {
   profile: CustomerProfile | null;
   loading: boolean;
   error: string;
+  /**
+   * Human-readable reason the last Google sign-in failed, captured from the
+   * OAuth callback URL. Empty when the callback succeeded or was never used.
+   */
+  oauthIssue: string;
   signUp(email: string, password: string, fullName: string, phone: string): Promise<void>;
   signIn(email: string, password: string): Promise<void>;
   signInWithGoogle(): Promise<void>;
@@ -51,6 +57,10 @@ export function CustomerStateProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  // Captured during the first render, on purpose: ProtectedRoute rewrites the
+  // URL to /login?required=1 the moment it sees there is no session, and a
+  // callback failure would otherwise be erased before anyone could read it.
+  const [oauthIssue] = useState(() => readOAuthCallbackIssue() ?? '');
   const [items, setItems] = useState<CartEntry[]>(() => {
     try {
       const stored: unknown = JSON.parse(window.localStorage.getItem(CART_KEY) ?? '[]');
@@ -107,6 +117,15 @@ export function CustomerStateProvider({ children }: { children: ReactNode }) {
     window.localStorage.setItem(CART_KEY, JSON.stringify(items));
   }, [items]);
 
+  // auth-js resolves only after it has consumed the callback URL, so by the time
+  // loading is false the tokens/codes in the address bar are spent. Scrubbing
+  // them stops a refresh replaying a one-shot code and keeps an access token out
+  // of a copied link. Storefront params such as `required=1` are preserved.
+  useEffect(() => {
+    if (loading) return;
+    clearOAuthCallbackParams();
+  }, [loading]);
+
   const [wishlistItems, setWishlistItems] = useState<string[]>(() => {
     try {
       const stored: unknown = JSON.parse(window.localStorage.getItem(WISHLIST_KEY) ?? '[]');
@@ -127,6 +146,7 @@ export function CustomerStateProvider({ children }: { children: ReactNode }) {
     profile,
     loading,
     error,
+    oauthIssue,
     async signUp(email, password, fullName, phone) {
       if (!supabase) throw new Error('Configure Supabase to create a customer account.');
       const { error: signUpError } = await supabase.auth.signUp({

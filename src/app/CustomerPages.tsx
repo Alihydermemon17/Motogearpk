@@ -111,7 +111,9 @@ export function SignInPage({ navigate, signUp = false, loginRequired = false }: 
   const [phone, setPhone] = useState('');
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
-  const [error, setError] = useState('');
+  // A failed Google callback lands back on this form, so start with the reason
+  // the sign-in was refused rather than showing an unexplained empty form.
+  const [error, setError] = useState(auth.oauthIssue || '');
   const [notice, setNotice] = useState('');
   const shopUrl = window.location.origin;
   const googleSignIn = async () => {
@@ -199,14 +201,14 @@ export function SignInPage({ navigate, signUp = false, loginRequired = false }: 
             </Body1>
           </div>
 
-          {loginRequired && (
-            <MessageBar intent="warning">
-              <MessageBarBody>Sign in or create an account to proceed with checkout.</MessageBarBody>
-            </MessageBar>
-          )}
           {error && (
             <MessageBar intent="error">
               <MessageBarBody>{error}</MessageBarBody>
+            </MessageBar>
+          )}
+          {loginRequired && !error && (
+            <MessageBar intent="warning">
+              <MessageBarBody>Sign in or create an account to proceed with checkout.</MessageBarBody>
             </MessageBar>
           )}
           {notice && (
