@@ -21,6 +21,7 @@ const supportStatuses: SupportConversationStatus[] = ['OPEN', 'IN_PROGRESS', 'WA
 const faqTopics: Array<[FaqTopic, string]> = [
   ['PRODUCTS', 'Products'], ['ORDERS', 'Orders'], ['DELIVERY', 'Delivery'], ['RETURNS', 'Returns'], ['WARRANTY', 'Warranty'],
   ['COMPATIBILITY', 'Compatibility'], ['INSTALLATION', 'Installation'], ['PAYMENT', 'Payment'], ['SUPPLIER_FULFILLMENT', 'Supplier fulfilment'],
+  ['SUPPORT', 'Support'],
 ];
 
 export function AdminReturnsPage() {

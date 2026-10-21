@@ -21,13 +21,15 @@ import {
   listAdminFeedback, listAdminOrders, listAdminReviews, listAdminSuppliers,
   listApprovalRequests, listAutomationLogs, listSupplierProducts, saveAdminBike,
   saveAdminCategory, saveAdminSupplier, saveBusinessSettings, saveSupplierProduct,
-  setReviewVisibility, setSupplierAvailability, updateAdminOrder, updateFeedback,
+  setReviewVisibility, setSupplierAvailability, updateAdminOrder, updateAdminOrderPayment,
+  updateFeedback,
   type AdminCustomer, type AdminFeedback, type AdminOrderBundle, type AdminReview,
   type AdminSupplierProduct, type BusinessSettings, type DashboardBikeInput,
   type DashboardCategoryInput, type DashboardSupplierInput, type DashboardSupplierProductInput,
   type DashboardMetrics,
 } from '../api/admin';
 import type { AdminOrderStatus } from '../api/types';
+import type { PaymentStatus } from '../lib/supabase';
 import { InvoiceModal } from './Invoice';
 
 type Navigate = (path: string) => void;
@@ -162,7 +164,10 @@ export default function AdminDashboard({ path, navigate, onSignOut }: { path: st
       <header className="admin-workspace-head">
         <div className="admin-head-copy">
           <Caption1 className="admin-breadcrumb">MotoGear PK{group ? ` / ${group}` : ''}</Caption1>
-          <Title1>{title}</Title1>
+          {/* The console's page title is the only heading that names the page,
+              so it is the h1. Fluent renders <Title> as a <span> unless `as`
+              is given, which left every admin route with no h1 at all. */}
+          <Title1 as="h1">{title}</Title1>
           {active?.hint && <Caption1 className="admin-head-hint">{active.hint}</Caption1>}
         </div>
         <div className="admin-head-actions">
@@ -533,12 +538,12 @@ function OrdersPage() {
           })}</tbody>
         </table>
       </div>
-      {selected ? <OrderDetail order={selected} saving={saving} onSave={async (next, tracking, courier, notes) => { setSaving(true); setError(''); setNotice(''); try { await updateAdminOrder(selected.id, next, tracking, courier, notes); setNotice('Order status and shipping information saved.'); await load(); } catch (reason: unknown) { setError(failureText(reason)); } finally { setSaving(false); } }} /> : <EmptyPanel title="Select an order" detail="Pick any row to open the full order, its items, and the fulfilment controls." />}
+      {selected ? <OrderDetail order={selected} saving={saving} onSave={async (next, tracking, courier, notes) => { setSaving(true); setError(''); setNotice(''); try { await updateAdminOrder(selected.id, next, tracking, courier, notes); setNotice('Order status and shipping information saved.'); await load(); } catch (reason: unknown) { setError(failureText(reason)); } finally { setSaving(false); } }} onSavePayment={async (nextPayment, reference, note) => { setSaving(true); setError(''); setNotice(''); try { await updateAdminOrderPayment(selected.id, nextPayment, reference, note); setNotice(nextPayment === 'PAID' ? 'Payment recorded as received.' : `Payment status set to ${nice(nextPayment)}.`); await load(); } catch (reason: unknown) { setError(failureText(reason)); } finally { setSaving(false); } }} /> : <EmptyPanel title="Select an order" detail="Pick any row to open the full order, its items, and the fulfilment controls." />}
     </div> : <EmptyPanel title="No orders" detail="No real orders have been placed yet." />}
   </div>;
 }
 
-function OrderDetail({ order, saving, onSave }: { order: AdminOrderBundle; saving: boolean; onSave: (status: AdminOrderStatus, tracking: string, courier: string, notes: string) => Promise<void> }) {
+function OrderDetail({ order, saving, onSave, onSavePayment }: { order: AdminOrderBundle; saving: boolean; onSave: (status: AdminOrderStatus, tracking: string, courier: string, notes: string) => Promise<void>; onSavePayment: (status: PaymentStatus, reference: string, note: string) => Promise<void> }) {
   const [status, setStatus] = useState<AdminOrderStatus>(order.status);
   const [tracking, setTracking] = useState(order.tracking_number ?? '');
   const [courier, setCourier] = useState(order.courier ?? '');
@@ -553,9 +558,79 @@ function OrderDetail({ order, saving, onSave }: { order: AdminOrderBundle; savin
     <div className="admin-detail-grid"><div><Caption1>Subtotal / delivery</Caption1><strong>{money(order.subtotal)} / {money(order.delivery_fee)}</strong></div><div><Caption1>Payment</Caption1><strong>{nice(order.payment_method)} · {nice(order.payment_status)}</strong></div></div>
     <div className="admin-form-grid"><Field label="Order status"><Select value={status} onChange={(_, value) => setStatus(value.value as AdminOrderStatus)}>{allowed.map((item) => <Option key={item} value={item}>{nice(item)}</Option>)}</Select></Field><Field label="Courier"><Input value={courier} onChange={(_, value) => setCourier(value.value)} /></Field><Field label="Tracking number"><Input value={tracking} onChange={(_, value) => setTracking(value.value)} /></Field><Field label="Internal notes" className="admin-wide"><Textarea value={notes} onChange={(_, value) => setNotes(value.value)} /></Field></div>
     <Button appearance="primary" icon={<SaveRegular />} disabled={saving} onClick={() => void onSave(status, tracking, courier, notes)}>{saving ? 'Saving…' : 'Save allowed order updates'}</Button>
-    <Caption1 className="admin-muted">Order totals and payment status are read-only. Status changes are checked by the database.</Caption1>
+    <Caption1 className="admin-muted">Order totals are read-only. Order status changes are checked by the database.</Caption1>
+    <PaymentPanel order={order} busy={saving} onSetPayment={onSavePayment} />
     <InvoiceModal isOpen={showInvoice} onClose={() => setShowInvoice(false)} order={order} items={order.items} type="admin" />
   </Card>;
+}
+
+/**
+ * Payment confirmation.
+ *
+ * Payment is confirmed by a human, once, and only when the money has actually
+ * been received. Placing, confirming or dispatching a Cash-on-Delivery order
+ * never changes this — COD is collected at the door, so it stays pending until
+ * someone records that the cash landed. A customer's screenshot is not treated
+ * as proof anywhere in this flow.
+ *
+ * The transition allow-list lives in the `admin_update_order_payment` RPC, so
+ * this panel can only offer moves the database will accept.
+ */
+function PaymentPanel({ order, onSetPayment, busy }: {
+  order: AdminOrderBundle;
+  busy: boolean;
+  onSetPayment: (status: PaymentStatus, reference: string, note: string) => Promise<void>;
+}) {
+  const [reference, setReference] = useState('');
+  const [note, setNote] = useState('');
+  useEffect(() => { setReference(''); setNote(''); }, [order.id, order.payment_status]);
+
+  const status = order.payment_status;
+  // Mirrors the allow-list enforced by admin_update_order_payment.
+  const canMarkPaid = status === 'PENDING' || status === 'FAILED';
+  const canMarkPending = status === 'FAILED';
+  const canRefund = status === 'PAID';
+
+  if (!canMarkPaid && !canMarkPending && !canRefund) {
+    return null;
+  }
+
+  return <div className="admin-payment-panel">
+    <div className="admin-payment-head">
+      <Subtitle1>Payment confirmation</Subtitle1>
+      <Pill tone={paymentTone[status] ?? 'subtle'}>{nice(status)}</Pill>
+    </div>
+    <Caption1 className="admin-muted">
+      Cash on Delivery is collected on delivery. Mark this paid only once the money has actually been
+      received — placing or dispatching the order does not do it for you.
+    </Caption1>
+    <div className="admin-form-grid">
+      {canMarkPaid && <Field label="Payment reference" hint="Transfer ID, transaction ref or cash receipt number. Optional.">
+        <Input value={reference} onChange={(_, value) => setReference(value.value)} placeholder="e.g. TCS receipt or bank transfer ref" />
+      </Field>}
+      <Field label="Confirmation note" className={canMarkPaid ? 'admin-wide' : undefined}>
+        <Textarea value={note} onChange={(_, value) => setNote(value.value)} placeholder="What was checked before confirming this payment" />
+      </Field>
+    </div>
+    <div className="admin-payment-actions">
+      {canMarkPaid && <Button appearance="primary" icon={<CheckmarkCircleRegular />} disabled={busy} onClick={() => void onSetPayment('PAID', reference, note)}>
+        {busy ? 'Saving…' : 'Mark as paid'}
+      </Button>}
+      {canMarkPending && <Button appearance="secondary" disabled={busy} onClick={() => void onSetPayment('PENDING', '', note)}>
+        Mark payment pending again
+      </Button>}
+      {canMarkPaid && <Button appearance="secondary" disabled={busy} onClick={() => void onSetPayment('FAILED', '', note)}>
+        Mark payment failed
+      </Button>}
+      {canRefund && <Button appearance="secondary" icon={<ArrowUndoRegular />} disabled={busy} onClick={() => void onSetPayment('REFUNDED', '', note)}>
+        Record refund issued
+      </Button>}
+    </div>
+    {status === 'PAID' && (order.payment_reference || order.payment_confirmed_at) && <Caption1 className="admin-muted">
+      {order.payment_reference ? `Reference: ${order.payment_reference} · ` : ''}
+      Confirmed {order.payment_confirmed_at ? new Date(order.payment_confirmed_at).toLocaleString('en-PK') : ''}
+    </Caption1>}
+  </div>;
 }
 
 function CustomersPage() {

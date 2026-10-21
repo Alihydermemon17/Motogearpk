@@ -1,93 +1,238 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* ==========================================================================
+   MotoGear PK — design tokens
+   Structure is graphite + off-white; actions, selection and focus are muted
+   teal. Light is the default theme; [data-theme='dark'] swaps to graphite.
+   Every colour below is referenced through var(), so the palette lives here
+   and nowhere else.
+   ========================================================================== */
 
 :root {
-  --container-wide: 1600px;
+  color-scheme: light;
+
+  /* --- Typography ------------------------------------------------------- */
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-display: var(--font-sans);
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --type-display: clamp(28px, 3vw, 34px);
+  --type-h1: clamp(23px, 2.1vw, 30px);
+  --type-h2: clamp(19px, 1.5vw, 22px);
+  --type-h3: 16px;
+  --type-body-lg: 16px;
+  --type-body: 15px;
+  --type-sm: 13px;
+  --type-caption: 12px;
+  --type-label: 11px;
+
+  /* --- Layout ----------------------------------------------------------- */
+  --container-wide: 1440px;
   --container-narrow: 1120px;
-  --container-gutter: clamp(20px, 3vw, 48px);
-  --content-section-space: clamp(32px, 4vw, 64px);
-  color-scheme: dark;
-  --color-background: #131418;
-  --color-surface: #18191f;
-  --color-surface-elevated: #1e2027;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #c4cad4;
-  --color-text-muted: #94a3b8;
-  --color-border: #2c303c;
-  --color-accent: #ffb400;
-  --color-accent-hover: #ffd166;
-  --color-accent-text: #ffd166;
-  --color-success: #4ade80;
-  --color-warning: #fbbf24;
-  --color-error: #f87171;
-  --color-focus: #ffd166;
-  --color-on-accent: #121316;
-  --color-header: rgba(19, 20, 24, 0.95);
-  --color-footer: #0f1013;
-  --shadow-header: 0 4px 20px rgba(0, 0, 0, 0.35);
-  --color-input: #16171d;
-  --color-pill: rgba(255, 255, 255, 0.06);
-  --motogear-amber: var(--color-accent);
-  --motogear-amber-light: var(--color-accent-hover);
-  --motogear-orange: #f36b21;
-  --motogear-bg: var(--color-background);
-  --motogear-surface: var(--color-surface);
-  --motogear-panel: var(--color-surface-elevated);
-  --motogear-panel-hover: #262933;
-  --motogear-border: var(--color-border);
-  --motogear-border-light: #3e4454;
-  --motogear-text: var(--color-text-primary);
-  --motogear-muted: var(--color-text-muted);
-  --motogear-subtle: #64748b;
+  --container-gutter: clamp(16px, 3vw, 40px);
+  --content-section-space: clamp(28px, 3.5vw, 52px);
+
+  /* --- Spacing scale ---------------------------------------------------- */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
+  --space-7: 28px;
   --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* --- Radius ----------------------------------------------------------- */
+  --radius-xs: 4px;
   --radius-control: 6px;
-  --radius-panel: 10px;
+  --radius-panel: 8px;
+  --radius-card: 10px;
+  --radius-modal: 12px;
+  --radius-pill: 999px;
+
+  /* --- Motion ----------------------------------------------------------- */
   --motion-fast: 130ms;
   --motion-standard: 190ms;
   --motion-smooth: 300ms;
   --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --shadow-panel: 0 8px 24px rgba(0, 0, 0, 0.28);
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* --- Surfaces --------------------------------------------------------- */
+  --color-background: #f4f3ef;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-surface-muted: #e7e9e5;
+  --color-surface-sunken: #edeee9;
+  --color-graphite: #202a30;
+  --color-graphite-soft: #2a353c;
+  --color-graphite-deep: #171e22;
+
+  /* --- Text ------------------------------------------------------------- */
+  --color-text-primary: #252b2d;
+  --color-text-secondary: #4a555b;
+  --color-text-muted: #6c767b;
+  /* Colour for text sitting on the graphite surfaces (footer, topbar, hero).
+     #6c767b only reaches 3.15:1 on graphite — below the 4.5:1 AA floor for the
+     13-14px footer copy — so the on-graphite tokens are lighter and theme with
+     the surface rather than being reused from the light palette. */
+  --color-on-graphite: #e7ebe9;
+  --color-on-graphite-muted: #9faaa9;
+  --color-text-on-graphite: var(--color-on-graphite);
+  --color-text-on-graphite-muted: var(--color-on-graphite-muted);
+  /* Text laid over photography. Fixed rather than themed — the photo's
+     luminance does not change with the theme. */
+  --color-text-on-image: #f8fafc;
+
+  /* --- Lines ------------------------------------------------------------ */
+  --color-border: #d9deda;
+  --color-border-strong: #c4cbc7;
+
+  /* --- Accent: muted teal ----------------------------------------------- */
+  --color-accent: #477c78;
+  --color-accent-hover: #3b6763;
+  --color-accent-active: #2f5451;
+  --color-accent-text: #2e524f;
+  --color-accent-soft: #e3edeb;
+  --color-accent-border: #b9d0cc;
+  --color-on-accent: #ffffff;
+  --color-focus: #477c78;
+
+  /* Muted text is tuned per surface. #6c767b reached only 3.15:1 on the
+     graphite footer, so the footer uses its own lighter muted token. */
+  --color-text-muted-on-dark: #9faaa9;
+
+  /* --- Semantic --------------------------------------------------------- */
+  --color-success: #2f6b4f;
+  --color-success-soft: #e2efe8;
+  --color-warning: #8a6116;
+  --color-warning-soft: #f6edda;
+  --color-error: #a33327;
+  --color-error-soft: #f7e4e1;
+  --color-info: #3b5d77;
+  --color-info-soft: #e4ebf1;
+
+  /* --- Chrome ----------------------------------------------------------- */
+  --color-header: rgba(244, 243, 239, 0.92);
+  --color-footer: #202a30;
+  --color-input: #ffffff;
+  --color-pill: rgba(37, 43, 45, 0.06);
+  --shadow-header: 0 1px 0 rgba(32, 42, 48, 0.08);
+  /* Accent tuned for the graphite surfaces. The default --color-accent
+     (#477c78) is only 2.28:1 on #202a30, so the footer/hero/topbar chrome
+     uses these lighter tints instead. */
+  --color-accent-on-dark: #7fb3ae;
+  --color-accent-on-dark-hover: #9ac7c3;
+
+  /* --- Elevation (kept deliberately flat) -------------------------------- */
+  --shadow-panel: 0 1px 2px rgba(32, 42, 48, 0.06);
+  --shadow-raised: 0 1px 2px rgba(32, 42, 48, 0.06), 0 6px 18px rgba(32, 42, 48, 0.08);
+  --shadow-overlay: 0 12px 40px rgba(32, 42, 48, 0.18);
+
+  /* --- Component dimensions --------------------------------------------- */
+  --btn-height: 38px;
+  --btn-height-sm: 30px;
+  --btn-height-lg: 44px;
+  --btn-padding-x: 16px;
+  --input-height: 40px;
+  --card-padding: 18px;
+  --card-padding-lg: 24px;
+  --badge-padding-y: 2px;
+  --badge-padding-x: 9px;
+  --table-header-height: 36px;
+  --table-row-height: 46px;
+  --modal-padding: 24px;
+
+  /* --- Legacy aliases ---------------------------------------------------
+     Existing rules still reference the original names. Pointing them at the
+     new tokens means the whole 6,800-line sheet follows the palette without
+     a rename sweep. `--motogear-amber` is a deprecated name that now resolves
+     to the teal accent. -------------------------------------------------- */
+  --motogear-accent: var(--color-accent);
+  --motogear-accent-light: var(--color-accent-hover);
+  --motogear-amber: var(--color-accent);
+  --motogear-amber-light: var(--color-accent-hover);
+  --motogear-bg: var(--color-background);
+  --motogear-surface: var(--color-surface);
+  --motogear-panel: var(--color-surface-elevated);
+  --motogear-panel-hover: var(--color-surface-muted);
+  --motogear-border: var(--color-border);
+  --motogear-border-light: var(--color-border-strong);
+  --motogear-text: var(--color-text-primary);
+  --motogear-muted: var(--color-text-muted);
+  --motogear-subtle: var(--color-text-muted);
+
+  font-family: var(--font-sans);
+  font-size: 15px;
   color: var(--motogear-text);
   background: var(--motogear-bg);
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
 }
 
-:root[data-theme='light'] {
-  color-scheme: light;
-  /* Deeper warm-gray page bg so white surfaces actually stand out (elevation hierarchy) */
-  --color-background: #e6e4dc;
-  --color-surface: #fbfaf6;
-  --color-surface-elevated: #ffffff;
-  --color-text-primary: #1a1d23;
-  --color-text-secondary: #3d434d;
-  --color-text-muted: #5c646f;
-  --color-border: #cccabf;
-  --color-accent: #ffb400;
-  --color-accent-hover: #e6a200;
-  --color-accent-text: #c58500;
-  --color-success: #147943;
-  --color-warning: #8a5b00;
-  --color-error: #b42318;
-  --color-focus: #d99400;
-  --color-on-accent: #171717;
-  --color-header: rgba(251, 250, 246, 0.92);
-  --color-footer: #d2cfc4; /* Prominent light grey — clearly distinct from white surfaces and the page bg */
-  --shadow-header: 0 1px 2px rgba(34, 37, 43, 0.07), 0 10px 28px rgba(34, 37, 43, 0.1);
-  --color-input: #ffffff;
-  --color-pill: rgba(26, 29, 35, 0.07);
-  --motogear-panel-hover: #efede6;
-  --motogear-border-light: #bfbdb2;
-  --motogear-subtle: #6e7681;
-  --motogear-amber: var(--color-accent-text);
-  --motogear-amber-light: #e6a200;
-  /* Layered shadows give cards real depth on the light background */
-  --shadow-panel: 0 2px 6px rgba(34, 37, 43, 0.07), 0 14px 32px rgba(34, 37, 43, 0.11);
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-background: #171e22;
+  --color-surface: #202a30;
+  --color-surface-elevated: #27323a;
+  --color-surface-muted: #263138;
+  --color-surface-sunken: #141a1e;
+  --color-graphite: #202a30;
+  --color-graphite-soft: #2a353c;
+  --color-graphite-deep: #11171a;
+
+  --color-text-primary: #eef1ef;
+  --color-text-secondary: #bac3c4;
+  --color-text-muted: #8d9a9e;
+  /* The footer/topbar sit at #11171a in dark mode, so these lift to stay
+     above 4.5:1 there (and remain well clear on the lighter #202a30 surfaces). */
+  --color-on-graphite: #eef1ef;
+  --color-on-graphite-muted: #97a3a5;
+  --color-text-on-graphite: var(--color-on-graphite);
+  --color-text-on-graphite-muted: var(--color-on-graphite-muted);
+  --color-text-on-image: #f8fafc;
+
+  --color-border: #33414a;
+  --color-border-strong: #42525c;
+
+  --color-accent: #63a19b;
+  --color-accent-on-dark: #7fb3ae;
+  --color-accent-on-dark-hover: #9ac7c3;
+  --color-accent-hover: #74b2ac;
+  --color-accent-active: #538f89;
+  --color-accent-text: #8cbcb6;
+  --color-accent-soft: #22343a;
+  --color-accent-border: #3a5a5d;
+  --color-on-accent: #10201e;
+  --color-focus: #63a19b;
+  --color-text-muted-on-dark: #8d9a9e;
+
+  --color-success: #6fb894;
+  --color-success-soft: #1d3229;
+  --color-warning: #d2a552;
+  --color-warning-soft: #33291a;
+  --color-error: #e08c80;
+  --color-error-soft: #3a221f;
+  --color-info: #8aaecb;
+  --color-info-soft: #1e2a35;
+
+  --color-header: rgba(23, 30, 34, 0.94);
+  --color-footer: #11171a;
+  --color-input: #1b2429;
+  --color-pill: rgba(255, 255, 255, 0.06);
+  --shadow-header: 0 1px 0 rgba(0, 0, 0, 0.4);
+
+  --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 22px rgba(0, 0, 0, 0.35);
+  --shadow-overlay: 0 16px 48px rgba(0, 0, 0, 0.5);
+
+  --motogear-panel-hover: #26313a;
+  --motogear-border-light: #42525c;
+  --motogear-subtle: #8d9a9e;
 }
 
 *, *::before, *::after {
@@ -130,6 +275,31 @@ a {
 .fui-Body1,
 .fui-Caption1 {
   display: block;
+}
+
+/* Heading scale. Fluent's Title/Text components render as <span> with no
+   intrinsic hierarchy and carry griffel class pairs such as `.fui-Title2.fui-Text`
+   (specificity 0,2,0), so these selectors are written at that same weight to
+   actually win. The semantic level is set per usage via the `as` prop; the size
+   follows that level rather than the component name. Per-context rules further
+   down override weight, colour and casing but never size. */
+.fui-Title1.fui-Text,
+.fui-Title1.fui-Text span {
+  font-size: var(--type-h1);
+  font-weight: var(--weight-semibold);
+  line-height: 1.15;
+}
+.fui-Title2.fui-Text,
+.fui-Title2.fui-Text span {
+  font-size: var(--type-h2);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+}
+.fui-Title3.fui-Text,
+.fui-Title3.fui-Text span {
+  font-size: var(--type-h3);
+  font-weight: var(--weight-semibold);
+  line-height: 1.3;
 }
 
 /* App Provider & Shell */
@@ -223,11 +393,11 @@ a {
   font-size: 13px;
   letter-spacing: -0.02em;
   transition: transform 0.18s ease;
-  box-shadow: 0 2px 8px rgba(255, 180, 0, 0.3);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
 .brand-name {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 18px;
   letter-spacing: 0.1em;
   font-weight: 700;
@@ -269,8 +439,8 @@ a {
   gap: 6px;
   padding: 6px 12px;
   border-radius: 9999px;
-  background: rgba(255, 180, 0, 0.08);
-  border: 1px solid rgba(255, 180, 0, 0.25);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
   color: var(--motogear-amber);
   font-size: 12px;
   font-weight: 500;
@@ -278,7 +448,7 @@ a {
 }
 
 .delivery-pill b {
-  color: #f8fafc;
+  color: var(--color-text-on-image);
 }
 
 .cart-button {
@@ -409,7 +579,7 @@ a {
   pointer-events: none;
   background:
     radial-gradient(ellipse 60% 40% at 78% 20%, rgba(255, 200, 60, 0.12), transparent 60%),
-    radial-gradient(ellipse 40% 50% at 82% 55%, rgba(255, 180, 0, 0.08), transparent 50%),
+    radial-gradient(ellipse 40% 50% at 82% 55%, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 50%),
     radial-gradient(ellipse 30% 30% at 70% 80%, rgba(243, 107, 33, 0.06), transparent 50%);
   animation: hero-glow-pulse 6s ease-in-out infinite;
 }
@@ -452,10 +622,23 @@ a {
   z-index: 1;
 }
 
+/* Scrim over the hero photo. A later rule at line ~625 re-declares .hero-overlay
+   without a background, which silently dropped the gradient defined at line 555
+   and left the headline sitting on raw photo pixels (measured 1.2:1 against the
+   brightest slide). Re-asserting it here, after both earlier rules, guarantees a
+   dark backdrop under the copy in every slide and in both themes. */
 .hero-overlay {
   position: absolute !important;
   inset: 0;
   z-index: 2;
+  background: linear-gradient(
+    100deg,
+    rgba(10, 14, 17, 0.86) 0%,
+    rgba(10, 14, 17, 0.72) 38%,
+    rgba(10, 14, 17, 0.42) 68%,
+    rgba(10, 14, 17, 0.3) 100%
+  );
+  pointer-events: none;
 }
 
 .hero-glow {
@@ -505,41 +688,59 @@ a {
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--motogear-amber);
+  /* 11px is body-size text, so it needs 4.5:1. --motogear-amber aliases
+     --color-accent (#477c78), which is only 4.28:1 on the page background.
+     --color-accent-text (#2e524f) clears it at 7.76:1. The hero eyebrow sits
+     on the dark photograph and is overridden to --color-accent-on-dark by
+     `.hero-card .eyebrow` below. */
+  color: var(--color-accent-text);
 }
 
+/* Hero headline. Sized on the shared type scale rather than its own scale —
+   it leads the page without dwarfing the section headings below it. The hero
+   always sits on a dark photo, so its copy uses the on-graphite text tokens
+   in both themes. */
+/* The hero card is background:transparent, but that does NOT mean the text sits
+   on the page background — the .hero-slides photo fills the card behind it
+   (measured at opacity 0.72 with no scrim, so the effective backdrop is the
+   dark photo). Light-on-graphite tokens are therefore correct here; the
+   graphite-on-page-background variant measured 1.2:1 against the photo. */
 .app-provider .hero-card .fui-Title1 {
   display: block !important;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   width: 100% !important;
-  font-size: clamp(54px, 4.6vw, 72px);
-  line-height: 0.98;
-  letter-spacing: 0.01em;
+  font-size: var(--type-display);
+  line-height: 1.1;
+  letter-spacing: 0.005em;
   text-transform: uppercase;
   margin: 0 !important;
-  max-width: 720px;
-  color: #f8fafc; /* Hero always sits on dark photos — keep text bright in both themes */
+  max-width: 680px;
+  color: var(--color-text-on-graphite);
 }
 
+/* Emphasised word: lightened accent. --color-accent (#477c78) reaches only
+   3.42:1 over the photo; --color-accent-on-dark reaches ~6.9:1. The gradient
+   remains as a fallback for browsers without background-clip:text. */
 .app-provider .hero-card .fui-Title1 span {
-  color: var(--motogear-amber);
-  background: linear-gradient(135deg, #ffd166 0%, #ffb400 100%);
+  color: var(--color-accent-on-dark);
+  background: linear-gradient(135deg, var(--color-accent-on-dark-hover) 0%, var(--color-accent-on-dark) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .app-provider .hero-card .fui-Body1 {
   display: block;
-  max-width: 620px;
-  color: #c4cad4; /* Fixed light gray — readable on dark hero photos in both themes */
+  max-width: 600px;
+  color: var(--color-text-on-graphite);
   line-height: 1.6;
-  font-size: 16px;
+  font-size: var(--type-body-lg);
   margin: 0;
 }
 
-/* Hero eyebrow stays vibrant amber on the dark photos, even in light theme */
+/* Eyebrow also sits over the photo, so it uses the on-dark accent too. */
 .hero-card .eyebrow {
-  color: #ffb400;
+  color: var(--color-accent-on-dark);
 }
 
 .hero-actions {
@@ -600,7 +801,7 @@ a {
 
 .hero-dot.active {
   width: 42px;
-  background: var(--motogear-amber);
+  background: var(--color-accent-on-dark);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -623,114 +824,19 @@ a {
   align-self: center;
   width: min(100%, 320px);
   padding: 18px 0 4px 24px;
-  border-left: 1px solid rgba(255, 180, 0, 0.38);
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(18px, 1.5vw, 24px);
-  line-height: 1.3;
+  border-left: 1px solid color-mix(in srgb, var(--color-accent-on-dark) 46%, transparent);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(15px, 1.3vw, 20px);
+  line-height: 1.35;
   letter-spacing: 0.08em;
-  color: #94a3b8;
+  color: var(--color-text-on-graphite-muted);
   text-align: right;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .hero-stamp b {
   color: var(--motogear-amber);
   font-size: 14px;
-}
-
-.app-provider .hero-card .fui-Title1 {
-  display: block !important;
-  font-family: 'Barlow Condensed', sans-serif;
-  width: 100% !important;
-  font-size: clamp(54px, 4.6vw, 72px);
-  line-height: 0.98;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-  margin: 0 !important;
-  max-width: 720px;
-  color: #f8fafc; /* Hero always sits on dark photos — keep text bright in both themes */
-}
-
-.app-provider .hero-card .fui-Title1 span {
-  color: var(--motogear-amber);
-  background: linear-gradient(135deg, #ffd166 0%, #ffb400 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.app-provider .hero-card .fui-Body1 {
-  display: block;
-  max-width: 620px;
-  color: #c4cad4; /* Fixed light gray — readable on dark hero photos in both themes */
-  line-height: 1.6;
-  font-size: 16px;
-  margin: 0;
-}
-
-/* Hero eyebrow stays vibrant amber on the dark photos, even in light theme */
-.hero-card .eyebrow {
-  color: #ffb400;
-}
-
-.hero-actions {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-/* Rotating hero copy — stacked so the tallest slide sets the height (no layout jump) */
-.hero-copy-stack {
-  display: grid;
-  width: 100%;
-}
-
-.hero-copy-slide {
-  grid-area: 1 / 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  min-width: 0;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  pointer-events: none;
-}
-
-.hero-copy-slide.active {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.hero-dots {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.hero-dot {
-  width: 24px;
-  height: 3px;
-  padding: 0;
-  border: none;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.28);
-  cursor: pointer;
-  transition: width 0.3s ease, background 0.3s ease;
-}
-
-.hero-dot:hover {
-  background: rgba(255, 255, 255, 0.55);
-}
-
-.hero-dot.active {
-  width: 42px;
-  background: var(--motogear-amber);
 }
 
 /* Mobile responsiveness for hero */
@@ -822,7 +928,10 @@ a {
   font-size: 11px !important;
   font-weight: 700 !important;
   letter-spacing: 0.15em !important;
-  color: var(--motogear-amber) !important;
+  /* See `.eyebrow` above: --color-accent is 4.28:1 on the page background,
+     under the 4.5:1 body floor for 11px text. These headings all sit on
+     light surfaces. */
+  color: var(--color-accent-text) !important;
   margin: 0 !important;
   line-height: 1 !important;
 }
@@ -832,9 +941,9 @@ a {
 .account-head .fui-Title1,
 .shop-header .fui-Title1 {
   display: block !important;
-  font-family: 'Barlow Condensed', sans-serif !important;
-  font-size: clamp(34px, 5vw, 44px) !important;
-  line-height: 1 !important;
+  font-family: var(--font-display), sans-serif !important;
+  font-size: var(--type-h1) !important;
+  line-height: 1.1 !important;
   text-transform: uppercase !important;
   margin: 0 !important;
   color: var(--color-text-primary) !important;
@@ -842,8 +951,8 @@ a {
 
 .section-head .fui-Title3,
 .catalog-heading .fui-Title3 {
-  font-family: 'Barlow Condensed', sans-serif !important;
-  font-size: clamp(22px, 3vw, 28px) !important;
+  font-family: var(--font-display), sans-serif !important;
+  font-size: var(--type-h2) !important;
   line-height: 1.15 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.03em !important;
@@ -922,15 +1031,15 @@ a {
   min-height: 40px !important;
   padding: 0 !important;
   border-radius: 50% !important;
-  background: rgba(19, 20, 24, 0.72) !important;
+  background: color-mix(in srgb, var(--color-graphite-deep) 72%, transparent) !important;
   border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  color: #f8fafc !important;
+  color: var(--color-text-on-image) !important;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
 
 .wishlist-toggle:hover {
-  background: rgba(19, 20, 24, 0.88) !important;
+  background: color-mix(in srgb, var(--color-graphite-deep) 88%, transparent) !important;
   border-color: var(--motogear-amber) !important;
 }
 
@@ -962,18 +1071,18 @@ a {
   min-height: 44px !important;
 }
 
-:root[data-theme='light'] .wishlist-toggle {
-  background: rgba(255, 254, 250, 0.86) !important;
-  border-color: rgba(32, 35, 41, 0.16) !important;
-  color: #202329 !important;
+:root[data-theme='dark'] .wishlist-toggle {
+  background: rgba(23, 30, 34, 0.86) !important;
+  border-color: rgba(231, 235, 233, 0.18) !important;
+  color: var(--color-text-on-graphite) !important;
 }
 
-:root[data-theme='light'] .wishlist-toggle:hover {
-  background: #fffefa !important;
-  border-color: var(--motogear-amber) !important;
+:root[data-theme='dark'] .wishlist-toggle:hover {
+  background: #1f2a30 !important;
+  border-color: var(--color-accent) !important;
 }
 
-:root[data-theme='light'] .wishlist-toggle.is-active {
+:root[data-theme='dark'] .wishlist-toggle.is-active {
   color: var(--color-error) !important;
 }
 
@@ -1075,7 +1184,7 @@ a {
 }
 
 .price-stack strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 22px;
   font-weight: 700;
   color: var(--color-text-primary);
@@ -1184,9 +1293,9 @@ a {
 }
 
 .detail-copy .fui-Title1 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(36px, 3.7vw, 56px);
-  line-height: 1;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-display);
+  line-height: 1.08;
   text-transform: uppercase;
   margin: 8px 0 14px;
 }
@@ -1205,8 +1314,8 @@ a {
 }
 
 .price-main {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 34px;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h1);
   font-weight: 700;
   color: var(--motogear-amber);
 }
@@ -1240,8 +1349,8 @@ a {
 }
 
 .spec-heading .fui-Subtitle1 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 20px;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h3);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -1294,9 +1403,9 @@ a {
 }
 
 .detail-note .fui-Title3 {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   text-transform: uppercase;
-  font-size: 28px;
+  font-size: var(--type-h2);
   margin: 0;
   line-height: 1.15;
 }
@@ -1351,7 +1460,7 @@ a {
 }
 
 .customer-cart-product strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 20px;
   color: var(--motogear-amber);
 }
@@ -1403,7 +1512,7 @@ a {
 }
 
 .summary-line.total b {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 24px;
   color: var(--motogear-amber);
 }
@@ -1489,8 +1598,8 @@ a {
   gap: 14px;
   padding: 40px 34px;
   background:
-    radial-gradient(ellipse 90% 60% at 20% 0%, rgba(255, 180, 0, 0.16), transparent 60%),
-    linear-gradient(160deg, rgba(255, 180, 0, 0.1), rgba(255, 180, 0, 0.03));
+    radial-gradient(ellipse 90% 60% at 20% 0%, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 60%),
+    linear-gradient(160deg, color-mix(in srgb, var(--color-accent) 10%, transparent), color-mix(in srgb, var(--color-accent) 3%, transparent));
   border-right: 1px solid var(--motogear-border);
 }
 
@@ -1501,8 +1610,8 @@ a {
 }
 
 .auth-side-title {
-  font-family: 'Barlow Condensed', sans-serif !important;
-  font-size: 32px !important;
+  font-family: var(--font-display), sans-serif !important;
+  font-size: var(--type-h1) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.02em !important;
   margin: 10px 0 0 !important;
@@ -1645,10 +1754,16 @@ a {
 }
 
 .auth-tab-btn.active {
-  background: var(--motogear-amber);
+  /* The tab is a filled chip, so it needs --color-accent (the real brand
+     fill) rather than --color-accent-on-dark. The latter is the light teal
+     reserved for text on graphite, and it is value-invariant across themes
+     while --color-on-accent flips (#ffffff in light, #10201e in dark). Pairing
+     them left white text on #7fb3ae in the light theme: 1.66:1. Against
+     --color-accent the white text measures 4.75:1. */
+  background: var(--color-accent);
   color: var(--color-on-accent);
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(255, 180, 0, 0.25);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent) 25%, transparent);
 }
 
 .auth-header {
@@ -1659,8 +1774,8 @@ a {
 }
 
 .auth-title {
-  font-family: 'Barlow Condensed', sans-serif !important;
-  font-size: 34px !important;
+  font-family: var(--font-display), sans-serif !important;
+  font-size: var(--type-display) !important;
   text-transform: uppercase !important;
   margin: 0 !important;
   line-height: 1 !important;
@@ -1821,7 +1936,7 @@ a {
 .timeline-marker.current {
   color: var(--color-on-accent);
   border-color: var(--motogear-amber);
-  background: var(--motogear-amber);
+  background: var(--color-accent-on-dark);
 }
 
 .order-success-page {
@@ -1912,19 +2027,19 @@ a {
   width: 42px;
   height: 42px;
   border-radius: 13px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 21px;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: var(--color-on-accent);
-  background: linear-gradient(135deg, #ffd466 0%, var(--motogear-amber) 100%);
-  box-shadow: 0 6px 18px rgba(255, 180, 0, 0.26);
+  background: linear-gradient(135deg, var(--color-accent-hover) 0%, var(--motogear-amber) 100%);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 26%, transparent);
 }
 
 .admin-brand-copy { display: grid; gap: 1px; min-width: 0; }
 
 .admin-brand-copy strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 19px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -2001,7 +2116,7 @@ a {
   bottom: 9px;
   width: 3px;
   border-radius: 0 3px 3px 0;
-  background: var(--motogear-amber);
+  background: var(--color-accent-on-dark);
 }
 
 .admin-nav-link.is-active .fui-Button__icon { color: var(--motogear-amber); }
@@ -2073,9 +2188,9 @@ a {
 
 .admin-workspace-head .fui-Title1 {
   margin: 0;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(30px, 2.4vw, 42px);
-  line-height: 1;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h1);
+  line-height: 1.1;
   text-transform: uppercase;
   color: var(--color-text-primary);
 }
@@ -2143,7 +2258,7 @@ a {
 .admin-hero-value {
   display: block;
   margin-top: 10px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(46px, 4.8vw, 72px);
   font-weight: 800;
   line-height: 0.95;
@@ -2231,7 +2346,7 @@ a {
 }
 
 .admin-stat-body strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 27px;
   font-weight: 700;
   line-height: 1;
@@ -2280,7 +2395,7 @@ a {
 
 .admin-attention-head .fui-Subtitle1 {
   margin: 0;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 19px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2353,7 +2468,7 @@ a {
 
 .admin-clear .fui-Subtitle1 {
   margin: 0;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 19px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -2372,7 +2487,7 @@ a {
 
 .admin-section-title .fui-Subtitle1 {
   margin: 0;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 21px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2395,7 +2510,7 @@ a {
 
 .admin-editor-head .fui-Subtitle1 {
   margin: 0;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 21px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2474,8 +2589,8 @@ a {
 }
 
 .admin-metric strong {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 31px;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h2);
   font-weight: 700;
   line-height: 1;
   color: var(--color-text-primary);
@@ -2618,19 +2733,35 @@ a {
 
 .admin-order-select > span { display: grid; gap: 3px; min-width: 0; }
 .admin-order-select > span:last-child { justify-items: end; text-align: right; }
-.admin-order-select strong { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; letter-spacing: 0.03em; color: var(--color-text-primary); }
+.admin-order-select strong { font-family: var(--font-display), sans-serif; font-size: 17px; letter-spacing: 0.03em; color: var(--color-text-primary); }
 .admin-order-select b { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--color-text-secondary); }
 
-.admin-order-detail {
+/* Specificity is deliberate here: Fluent's griffel Card base sets
+   `overflow: hidden`, which silently beat the `overflow-y: auto` below and
+   clipped the panel. Because the card is also a flex column, that clip made
+   every child squash to fit instead of scrolling — the "Save" button collapsed
+   to 12px and painted over the notes field above it. `.fui-Card` (0,2,0) wins,
+   and `display: block` stops the children from being shrunk. */
+.admin-order-detail.fui-Card {
   position: sticky;
   top: 104px;
   max-height: calc(100vh - 128px);
+  overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: thin;
   padding: clamp(18px, 2vw, 26px) !important;
   background: var(--color-surface) !important;
   border: 1px solid var(--motogear-border) !important;
   border-radius: 16px !important;
+}
+
+/* The panel above is a flex column with a height cap. Flex children default to
+   `flex-shrink: 1`, so when the content overflowed the cap the "Save" button
+   was the one that got crushed (down to 12px) instead of the panel scrolling.
+   Holding every direct child at its natural size forces the overflow into the
+   scroll container, where it belongs. */
+.admin-order-detail.fui-Card > * {
+  flex-shrink: 0;
 }
 
 .admin-order-detail-tools {
@@ -2684,6 +2815,46 @@ a {
 
 .admin-line-item:last-child { border-bottom: 0; }
 
+/* ---- payment confirmation ---- */
+/* Visually separated from the fulfilment form so "we shipped it" and "we were
+   paid" never read as one action. */
+.admin-payment-panel {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 15px 16px 16px;
+  border: 1px solid var(--motogear-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 10px;
+  background: var(--color-surface-muted);
+}
+
+.admin-payment-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-payment-head .fui-Subtitle1 { margin: 0; }
+
+.admin-payment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Muted copy inside this panel sits on --color-surface-muted, which is
+   noticeably darker than the page background in the light theme. --motogear-muted
+   (#6c767b) measures just 3.81:1 there, under the 4.5:1 body floor for 12px
+   text. #5b6569 clears it at 4.90:1 while still reading as muted. The dark
+   theme pairs its own surface (#263138) with #8d9a9e and already passes at
+   4.59:1, so it is deliberately left untouched. */
+:root:not([data-theme='dark']) .admin-payment-panel .admin-muted {
+  color: #5b6569;
+}
+
 /* ---- misc helpers ---- */
 .admin-muted { color: var(--motogear-muted); }
 
@@ -2709,7 +2880,7 @@ a {
 .admin-loading { grid-auto-flow: column; }
 
 .admin-empty strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 24px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -2747,7 +2918,12 @@ a {
 /* ============================================================
    FOOTER
    ============================================================ */
+/* Single authoritative footer rule. A later duplicate at 5137 set
+   background: var(--motogear-panel), which out-cascaded var(--color-footer)
+   here and rendered the footer white. --color-footer resolves per theme
+   (#202a30 light, #11171a dark), so this stays correct when the theme flips. */
 .site-footer {
+  position: relative;
   margin-top: 60px;
   border-top: 1px solid var(--motogear-border);
   background: var(--color-footer);
@@ -2780,7 +2956,7 @@ a {
 
 .footer-desc {
   display: block !important;
-  color: var(--motogear-muted) !important;
+  color: var(--color-on-graphite-muted) !important;
   line-height: 1.6 !important;
   font-size: 14px !important;
   max-width: 360px !important;
@@ -2788,13 +2964,13 @@ a {
 }
 
 .footer-col-title {
-  font-family: 'Barlow Condensed', sans-serif !important;
+  font-family: var(--font-display), sans-serif !important;
   text-transform: uppercase !important;
   letter-spacing: 0.08em !important;
-  font-size: 20px !important;
+  font-size: var(--type-h3) !important;
   font-weight: 700 !important;
-  color: var(--color-text-primary) !important;
-  margin: 0 !important;
+  color: var(--color-text-on-graphite) !important;
+  margin: 0 0 14px !important;
   line-height: 1.2 !important;
 }
 
@@ -2811,7 +2987,7 @@ a {
   border: 0;
   padding: 0;
   margin: 0;
-  color: var(--motogear-muted);
+  color: var(--color-on-graphite-muted);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -2821,29 +2997,31 @@ a {
 }
 
 .footer-link-btn:hover {
-  color: var(--motogear-amber);
+  color: var(--color-on-graphite);
 }
 
 .footer-cities {
   display: block !important;
-  color: var(--motogear-muted) !important;
+  color: var(--color-on-graphite-muted) !important;
   line-height: 1.6 !important;
   font-size: 13px !important;
   margin: 0 !important;
 }
 
+/* One badge rule. Two competing declarations existed — one at 2914 with
+   !important (amber, square, 6px gap) and one later (pill, 7px gap). Merged. */
 .footer-badge {
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
   margin-top: 4px !important;
-  color: var(--motogear-amber) !important;
+  color: var(--color-accent-on-dark) !important;
   font-size: 12px !important;
   font-weight: 600 !important;
-  background: rgba(255, 180, 0, 0.08) !important;
-  border: 1px solid rgba(255, 180, 0, 0.22) !important;
-  padding: 6px 12px !important;
-  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-accent-on-dark) 14%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--color-accent-on-dark) 34%, transparent) !important;
+  padding: 7px 13px !important;
+  border-radius: 9999px !important;
 }
 
 .footer-divider {
@@ -2861,11 +3039,11 @@ a {
 }
 
 .footer-bottom-copy {
-  color: var(--motogear-subtle);
+  color: var(--color-text-muted-on-dark);
 }
 
 .footer-bottom-badge {
-  color: var(--motogear-muted);
+  color: var(--color-text-muted-on-dark);
   font-weight: 500;
 }
 
@@ -2947,7 +3125,7 @@ a {
     min-height: 420px;
   }
   .hero-card .fui-Title1 {
-    font-size: 44px;
+    font-size: var(--type-display);
   }
   .hero-actions {
     flex-direction: column;
@@ -3126,8 +3304,8 @@ textarea {
   }
 
   .detail-copy .fui-Title1 {
-    font-size: clamp(34px, 7vw, 48px);
-    line-height: 1;
+    font-size: var(--type-display);
+    line-height: 1.08;
   }
 
   .admin-metric-grid {
@@ -3258,8 +3436,8 @@ textarea {
 
   .hero-card .fui-Title1 {
     max-width: 100%;
-    font-size: clamp(38px, 12vw, 54px);
-    line-height: 0.98;
+    font-size: var(--type-display);
+    line-height: 1.08;
     overflow-wrap: anywhere;
   }
 
@@ -3290,8 +3468,8 @@ textarea {
   .section-head .fui-Title1,
   .account-head .fui-Title1,
   .shop-header .fui-Title1 {
-    font-size: clamp(30px, 9vw, 40px) !important;
-    line-height: 1.05 !important;
+    font-size: var(--type-h1) !important;
+    line-height: 1.1 !important;
     overflow-wrap: anywhere;
   }
 
@@ -3355,7 +3533,7 @@ textarea {
   }
 
   .detail-copy .fui-Title1 {
-    font-size: clamp(32px, 10vw, 46px);
+    font-size: var(--type-display);
   }
 
   .detail-price-box {
@@ -3525,8 +3703,8 @@ textarea {
   }
 
   .admin-workspace-head .fui-Title1 {
-    font-size: clamp(28px, 8vw, 38px);
-    line-height: 1.05;
+    font-size: var(--type-h1);
+    line-height: 1.1;
     overflow-wrap: anywhere;
   }
 
@@ -3563,7 +3741,7 @@ textarea {
   }
 
   .admin-metric strong {
-    font-size: clamp(24px, 7vw, 32px);
+    font-size: var(--type-h2);
     overflow-wrap: anywhere;
   }
 
@@ -3591,7 +3769,7 @@ textarea {
     padding: 12px;
   }
 
-  .admin-order-detail {
+  .admin-order-detail.fui-Card {
     padding: 16px !important;
   }
 
@@ -3628,7 +3806,7 @@ textarea {
 
 @media (min-width: 861px) and (max-width: 1100px) {
   .app-provider .hero-card .fui-Title1 {
-    font-size: 48px;
+    font-size: var(--type-display);
   }
 }
 
@@ -3666,18 +3844,8 @@ textarea {
   }
 }
 
-/* Theme-aware finish and shared interaction system. */
-:root {
-  --type-display: clamp(48px, 7vw, 92px);
-  --type-h1: clamp(34px, 5vw, 48px);
-  --type-h2: clamp(26px, 3.5vw, 34px);
-  --type-h3: 22px;
-  --type-body-large: 16px;
-  --type-body: 14px;
-  --type-caption: 12px;
-  --type-label: 11px;
-}
-
+/* Base type size. Heading sizes come from the token block at the top of the
+   file — that block is the single source of truth for the type scale. */
 body {
   font-size: var(--type-body);
   line-height: 1.5;
@@ -3728,8 +3896,8 @@ body {
   background: var(--color-accent);
 }
 
-.site-header,
-.site-footer,
+/* Shared card surface. The header and footer were never meant to be in this
+   list — they are page chrome, not cards, so they are excluded here. */
 .product-card,
 .admin-record,
 .admin-metric,
@@ -3742,13 +3910,16 @@ body {
 .order-detail-card,
 .shipping-card,
 .timeline-card,
-/* Delivery info */
 .delivery-info {
-  margin-top: 32px;
-  padding: 20px;
+  margin-top: 0;
+  padding: var(--card-padding);
   background: var(--motogear-surface);
   border: 1px solid var(--motogear-border);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
+}
+
+.delivery-info {
+  margin-top: var(--space-6);
 }
 
 .delivery-info-title {
@@ -3850,6 +4021,11 @@ body {
   list-style: none;
   font-weight: 600;
   color: var(--color-text-primary);
+  /* The summary row was 20px tall, under the 24px WCAG 2.2 target-size
+     minimum. min-height lifts only the hit area; the visual rhythm is
+     unchanged because the row is already vertically centred inside the
+     16px-padded .faq-entry. */
+  min-height: 24px;
 }
 
 .faq-entry summary::-webkit-details-marker {
@@ -3916,7 +4092,7 @@ body {
 
 .support-thread-link.selected {
   border-color: var(--motogear-amber);
-  background: rgba(255, 180, 0, 0.06);
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 
 .support-thread-link strong {
@@ -3968,7 +4144,7 @@ body {
 }
 
 .trust-record-heading > strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 20px;
   color: var(--motogear-amber);
 }
@@ -4174,73 +4350,35 @@ body {
   width: 100%;
 }
 
-:root[data-theme='light'] body {
-  background: var(--color-background);
-}
-
-:root[data-theme='light'] .hero-card {
+/* Graphite dark mode — the light default already covers structure, so this
+   block only adjusts depth and anything that sits directly on the page. */
+:root[data-theme='dark'] .hero-card {
   background: transparent;
   border-color: var(--color-border);
   box-shadow: var(--shadow-panel);
 }
 
-/* Prominent grey footer on the light theme — amber brand band on top, dark readable text */
-:root[data-theme='light'] .site-footer {
-  border-top: 2px solid var(--color-accent);
+:root[data-theme='dark'] .product-card,
+:root[data-theme='dark'] .admin-record,
+:root[data-theme='dark'] .admin-metric,
+:root[data-theme='dark'] .spec-card,
+:root[data-theme='dark'] .trust-record,
+:root[data-theme='dark'] .checkout-form,
+:root[data-theme='dark'] .auth-card,
+:root[data-theme='dark'] .profile-card,
+:root[data-theme='dark'] .order-detail-card,
+:root[data-theme='dark'] .shipping-card,
+:root[data-theme='dark'] .timeline-card,
+:root[data-theme='dark'] .summary-card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-/* Darker than the default muted tone so text stays prominent on the grey footer */
-:root[data-theme='light'] .site-footer .footer-desc,
-:root[data-theme='light'] .site-footer .footer-cities {
-  color: #43484f !important;
+:root[data-theme='dark'] .product-card:hover,
+:root[data-theme='dark'] .admin-metric:hover {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 22px rgba(0, 0, 0, 0.35);
 }
 
-:root[data-theme='light'] .site-footer .footer-link-btn {
-  color: #43484f;
-}
-
-:root[data-theme='light'] .site-footer .footer-link-btn:hover {
-  color: #a86e00;
-}
-
-:root[data-theme='light'] .site-footer .footer-badge {
-  background: rgba(255, 180, 0, 0.14) !important;
-  border-color: rgba(166, 110, 0, 0.35) !important;
-}
-
-:root[data-theme='light'] .site-footer .footer-divider {
-  border-color: #b5b2a6 !important;
-}
-
-:root[data-theme='light'] .site-footer .footer-bottom-copy {
-  color: #5c646f;
-}
-
-:root[data-theme='light'] .site-footer .footer-bottom-badge {
-  color: #43484f;
-}
-
-:root[data-theme='light'] .product-card,
-:root[data-theme='light'] .admin-record,
-:root[data-theme='light'] .admin-metric,
-:root[data-theme='light'] .spec-card,
-:root[data-theme='light'] .trust-record,
-:root[data-theme='light'] .checkout-form,
-:root[data-theme='light'] .auth-card,
-:root[data-theme='light'] .profile-card,
-:root[data-theme='light'] .order-detail-card,
-:root[data-theme='light'] .shipping-card,
-:root[data-theme='light'] .timeline-card,
-:root[data-theme='light'] .summary-card {
-  box-shadow: 0 1px 3px rgba(34, 37, 43, 0.06), 0 10px 26px rgba(34, 37, 43, 0.1);
-}
-
-:root[data-theme='light'] .product-card:hover,
-:root[data-theme='light'] .admin-metric:hover {
-  box-shadow: 0 2px 6px rgba(34, 37, 43, 0.08), 0 18px 40px rgba(34, 37, 43, 0.14);
-}
-
-:root[data-theme='light'] .detail-image-box {
+:root[data-theme='dark'] .detail-image-box {
   box-shadow: var(--shadow-panel);
 }
 
@@ -4281,8 +4419,8 @@ body {
   }
 
   .app-provider .hero-card .fui-Title1 {
-    font-size: clamp(38px, 11vw, 54px);
-    line-height: 1;
+    font-size: var(--type-display);
+    line-height: 1.08;
   }
 
   .app-provider .hero-card .fui-Body1 {
@@ -4501,7 +4639,7 @@ body {
 
 /* Footer link hover slide */
 .footer-link-btn:hover {
-  color: var(--motogear-amber);
+  color: var(--color-accent-on-dark-hover);
   transform: translateX(3px);
 }
 
@@ -4599,7 +4737,7 @@ img {
   width: 16px;
   height: 2px;
   border-radius: 2px;
-  background: var(--motogear-amber);
+  background: var(--color-accent-on-dark);
   animation: nav-indicator 0.2s var(--motion-ease) both;
 }
 
@@ -4714,7 +4852,7 @@ img {
   text-align: left;
 }
 .media-caption b {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -4731,18 +4869,24 @@ img {
   color: var(--motogear-muted);
 }
 
-:root[data-theme='light'] .product-media-fallback {
+.product-media-fallback {
   background:
-    radial-gradient(120% 85% at 50% -10%, color-mix(in srgb, var(--media-tint) 20%, transparent) 0%, transparent 62%),
-    linear-gradient(160deg, #fbfaf6 0%, #ecebe4 100%);
+    radial-gradient(120% 85% at 50% -10%, color-mix(in srgb, var(--media-tint) 18%, transparent) 0%, transparent 62%),
+    linear-gradient(160deg, #ffffff 0%, var(--color-surface-muted) 100%);
+}
+
+:root[data-theme='dark'] .product-media-fallback {
+  background:
+    radial-gradient(120% 85% at 50% -10%, color-mix(in srgb, var(--media-tint) 22%, transparent) 0%, transparent 62%),
+    linear-gradient(160deg, var(--color-surface) 0%, var(--color-surface-sunken) 100%);
 }
 
 /* ============================================================
    ANNOUNCEMENT BAR + HEADER REFINEMENTS
    ============================================================ */
 .topbar {
-  background: linear-gradient(90deg, #1a1d23 0%, #232833 50%, #1a1d23 100%);
-  border-bottom: 1px solid rgba(255, 180, 0, 0.14);
+  background: linear-gradient(90deg, var(--color-graphite-deep) 0%, var(--color-graphite) 50%, var(--color-graphite-deep) 100%);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 .topbar-inner {
   max-width: var(--container-wide);
@@ -4760,19 +4904,27 @@ img {
   gap: 6px;
   font-size: 11.5px;
   letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.62);
+  /* The topbar sits on the light header (--color-header, ~#f4f3ef), not on
+     graphite. The old rgba(255,255,255,.62) was a dark-theme leftover and
+     measured 1.11:1 there. --color-accent is 4.28:1 on this surface, which is
+     under the 4.5:1 body floor, so the small 11.5px text uses the darker
+     accent-text token (7.76:1). */
+  color: var(--color-accent-text);
   white-space: nowrap;
 }
-.topbar-item b { color: #ffb400; font-weight: 600; }
-.topbar-item svg { color: #ffb400; width: 14px; height: 14px; }
+/* The <b> carries the phrase that must be read, so it holds the same AA-safe
+   token as its parent. --color-accent (#477c78) measures only 4.28:1 on the
+   light topbar, under the 4.5:1 body floor for 11.5px text. */
+.topbar-item b { color: var(--color-accent-text); font-weight: 600; }
+/* Icons are non-text UI, so they only need the 3:1 large/graphic threshold;
+   --color-accent clears that at 4.28:1. */
+.topbar-item svg { color: var(--color-accent); width: 14px; height: 14px; }
 .topbar-dot {
   width: 3px; height: 3px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
+  /* Dark-theme leftover: white at 22% was invisible on the light topbar.
+     These dots are purely decorative separators between the trust items. */
+  background: var(--color-border);
 }
-:root[data-theme='light'] .topbar {
-  background: linear-gradient(90deg, #1a1d23 0%, #262b36 50%, #1a1d23 100%);
-}
-
 .site-header { padding-bottom: 0; }
 .header-inner { padding-block: 10px; }
 
@@ -4780,7 +4932,9 @@ img {
 .nav-link-btn.fui-Button {
   position: relative;
   font-weight: 600;
-  color: var(--motogear-muted);
+  /* 14px body text on the light header needs 4.5:1; --motogear-muted
+     (#6c767b) measures 4.19:1 there. */
+  color: var(--color-text-secondary);
   padding-inline: 14px;
   border-radius: 8px;
 }
@@ -4794,7 +4948,10 @@ img {
   left: 14px; right: 14px; bottom: 3px;
   height: 2px;
   border-radius: 2px;
-  background: var(--motogear-amber);
+  /* Active-tab indicator on a light header. --color-accent-on-dark is a light
+     teal (#7fb3ae) that only reaches contrast on graphite; against the light
+     header it was 2.11:1. */
+  background: var(--color-accent);
   transform: scaleX(0);
   transform-origin: center;
   transition: transform 0.22s var(--motion-ease);
@@ -4803,7 +4960,7 @@ img {
   color: var(--color-text-primary);
   background: transparent;
 }
-.nav-link-btn.fui-Button.is-active .fui-Button__icon { color: var(--motogear-amber); }
+.nav-link-btn.fui-Button.is-active .fui-Button__icon { color: var(--color-accent-text); }
 .nav-link-btn.fui-Button.is-active::after { transform: scaleX(1); }
 
 .header-sep {
@@ -4836,19 +4993,20 @@ img {
   height: 38px;
   border-radius: 10px;
   padding-inline: 14px;
-  box-shadow: 0 4px 14px rgba(255, 180, 0, 0.22);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 
 /* ============================================================
    PRODUCT CARD — richer, more deliberate layout
    ============================================================ */
+/* Restrained card depth — a hairline border does most of the work. */
 .product-card {
-  border-radius: 14px !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18) !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: var(--shadow-panel) !important;
 }
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.42) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-raised) !important;
 }
 .product-preview { height: 200px; }
 .product-preview img,
@@ -4865,7 +5023,7 @@ img {
 
 .price-stack { display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
 .price-stack strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 22px;
   font-weight: 800;
   letter-spacing: 0.01em;
@@ -4952,7 +5110,7 @@ img {
   inset: 0;
   display: grid;
   place-items: center;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(150px, 40%, 260px);
   font-weight: 800;
   line-height: 1;
@@ -5017,7 +5175,7 @@ img {
 }
 .detail-note .fui-Title3 {
   display: block;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 26px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -5095,32 +5253,27 @@ img {
 /* ============================================================
    FOOTER — clearer hierarchy, stronger close
    ============================================================ */
-.site-footer {
-  position: relative;
-  border-top: 1px solid var(--motogear-border);
-  background: var(--motogear-panel);
-}
 .site-footer::before {
   content: '';
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
-  background: linear-gradient(90deg, #ffb400 0%, #ff8c00 45%, transparent 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-active) 45%, transparent 100%);
 }
 
 .footer-col-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h3);
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--motogear-amber);
+  color: var(--color-text-on-graphite);
   margin: 0 0 14px;
 }
 
 .footer-desc,
 .footer-cities {
-  color: var(--motogear-muted);
+  color: var(--color-on-graphite-muted);
   line-height: 1.7;
   font-size: 13.5px;
   max-width: 340px;
@@ -5129,7 +5282,7 @@ img {
 .footer-link-btn {
   position: relative;
   padding-left: 0;
-  color: var(--motogear-muted);
+  color: var(--color-on-graphite-muted);
   font-size: 13.5px;
   transition: color 0.2s ease, padding-left 0.2s ease;
 }
@@ -5140,50 +5293,37 @@ img {
   top: 50%;
   width: 0;
   height: 1px;
-  background: var(--motogear-amber);
+  background: var(--color-accent-on-dark);
   transform: translateY(-50%);
   transition: width 0.22s var(--motion-ease);
 }
 .footer-link-btn:hover {
-  color: var(--color-text-primary);
+  /* Was var(--color-text-primary) (#252b2d), which is 1.02:1 on the graphite
+     footer — hovering made the label effectively invisible. */
+  color: var(--color-on-graphite);
   padding-left: 14px;
 }
 .footer-link-btn:hover::before { width: 8px; }
 
-.footer-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 14px;
-  padding: 7px 13px;
-  border-radius: 9999px;
-  background: color-mix(in srgb, var(--motogear-amber) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--motogear-amber) 30%, transparent);
-  color: var(--motogear-amber);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
 .footer-bottom {
   align-items: center;
 }
-.footer-bottom-copy { color: var(--motogear-muted); font-size: 12.5px; }
+.footer-bottom-copy { color: var(--color-text-muted-on-dark); font-size: 12.5px; }
 .footer-bottom-badge {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--motogear-amber);
+  color: var(--color-accent-on-dark);
 }
 
 /* Light theme: darken tinted media ink so icons stay legible on pale panels */
-:root[data-theme='light'] .media-glyph,
-:root[data-theme='light'] .media-caption b {
-  color: color-mix(in srgb, var(--media-tint) 72%, #1a1d23);
+:root[data-theme='dark'] .media-glyph,
+:root[data-theme='dark'] .media-caption b {
+  color: color-mix(in srgb, var(--media-tint) 72%, #eef1ef);
 }
-:root[data-theme='light'] .media-glyph {
+:root[data-theme='dark'] .media-glyph {
   background: color-mix(in srgb, var(--media-tint) 16%, transparent);
   border-color: color-mix(in srgb, var(--media-tint) 32%, transparent);
   box-shadow: 0 10px 26px color-mix(in srgb, var(--media-tint) 16%, transparent);
@@ -5209,8 +5349,8 @@ img {
   margin: 0 auto 18px;
   border-radius: 50%;
   color: #121316;
-  background: linear-gradient(135deg, #ffd466 0%, #ffb400 100%);
-  box-shadow: 0 12px 34px rgba(255, 180, 0, 0.34);
+  background: linear-gradient(135deg, var(--color-accent-hover) 0%, var(--color-accent) 100%);
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--color-accent) 34%, transparent);
 }
 .success-ring svg { width: 38px; height: 38px; }
 
@@ -5245,7 +5385,7 @@ img {
   flex-wrap: wrap;
 }
 .invoice-ref-row b {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 23px;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -5314,7 +5454,7 @@ img {
 .track-dot svg { width: 17px; height: 17px; }
 .track-step.is-done .track-dot {
   border-color: var(--motogear-amber);
-  background: var(--motogear-amber);
+  background: var(--color-accent-on-dark);
   color: #121316;
 }
 .track-step.is-current .track-dot {
@@ -5379,16 +5519,16 @@ img {
   width: 56px;
   height: 56px;
   border-radius: 17px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 26px;
   font-weight: 800;
   color: var(--color-on-accent);
-  background: linear-gradient(135deg, #ffd466 0%, var(--motogear-amber) 100%);
-  box-shadow: 0 12px 30px rgba(255, 180, 0, 0.28);
+  background: linear-gradient(135deg, var(--color-accent-hover) 0%, var(--motogear-amber) 100%);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--color-accent) 28%, transparent);
 }
 
 .admin-gate strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(19px, 5.2vw, 26px);
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -5407,7 +5547,7 @@ img {
 
 .admin-gate .fui-Title3 {
   margin: 0;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(20px, 5.5vw, 28px);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -5480,7 +5620,7 @@ img {
 
 .admin-panel-head .fui-Subtitle1 {
   margin: 0;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -5510,7 +5650,7 @@ img {
 .admin-panel-foot .fui-Caption1 { color: var(--motogear-muted); }
 
 .admin-panel-foot strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 21px;
   font-weight: 700;
   color: var(--motogear-amber);
@@ -5588,7 +5728,7 @@ img {
 .admin-clickable-row { cursor: pointer; }
 
 .admin-order-no {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -5735,7 +5875,7 @@ img {
   .admin-hero-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-insight-grid { grid-template-columns: minmax(0, 1fr); }
   .admin-order-layout { grid-template-columns: minmax(0, 1fr); }
-  .admin-order-detail { position: static; max-height: none; }
+  .admin-order-detail.fui-Card { position: static; max-height: none; }
 }
 
 @media (max-width: 1024px) {
@@ -5827,7 +5967,7 @@ img {
     padding-top: 14px;
   }
   .admin-head-copy { width: 100%; gap: 8px; }
-  .admin-workspace-head .fui-Title1 { font-size: clamp(26px, 8vw, 34px); line-height: 1.04; }
+  .admin-workspace-head .fui-Title1 { font-size: var(--type-h1); line-height: 1.1; }
   .admin-head-actions { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
   .admin-head-actions .fui-Button { flex: 1 1 auto; justify-content: center; }
 
@@ -5881,30 +6021,41 @@ img {
 
 .hero-dot {
   position: relative;
-  overflow: hidden;
-  height: 4px;
+  /* The visual bar stays 4px, but the button itself is 24px tall so the
+     carousel dots meet the WCAG 2.2 AA target-size minimum. The bar is
+     .hero-dot-progress, absolutely positioned — so it is pinned to the
+     visual centre of the button below rather than filling it. */
+  height: 24px;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
 }
 
 .hero-dot-progress {
   position: absolute;
-  inset: 0;
+  inset: auto 0;
+  top: 50%;
+  height: 4px;
   width: 100%;
+  /* Centred with top/margin rather than transform:translateY, because the
+     fill animation below animates `transform` and would clobber it. */
+  margin-top: -2px;
   transform-origin: left center;
-  background: var(--motogear-amber);
-  border-radius: inherit;
+  background: var(--color-accent-on-dark);
+  border-radius: 999px;
   animation: hero-dot-fill 6s linear forwards;
 }
 
 @keyframes hero-dot-fill {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+  from { width: 0%; }
+  to { width: 100%; }
 }
 
 .hero-counter {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 13px;
   letter-spacing: 0.14em;
   color: rgba(255, 255, 255, 0.5);
@@ -6020,9 +6171,9 @@ img {
 
 .promise-band-head .fui-Title1 {
   display: block !important;
-  font-family: 'Barlow Condensed', sans-serif !important;
-  font-size: clamp(30px, 4vw, 42px) !important;
-  line-height: 1 !important;
+  font-family: var(--font-display), sans-serif !important;
+  font-size: var(--type-h1) !important;
+  line-height: 1.1 !important;
   text-transform: uppercase !important;
   margin: 0 !important;
   color: var(--color-text-primary) !important;
@@ -6054,7 +6205,7 @@ img {
 }
 
 .promise-card:hover {
-  border-color: var(--motogear-amber);
+  border-color: var(--color-accent-text);
   transform: translateY(-2px);
 }
 
@@ -6065,8 +6216,8 @@ img {
   height: 40px;
   margin-bottom: 4px;
   border-radius: 10px;
-  color: var(--motogear-amber);
-  background: color-mix(in srgb, var(--motogear-amber) 12%, transparent);
+  color: var(--color-accent-text);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 
 .promise-card-icon svg { width: 21px; height: 21px; }
@@ -6084,7 +6235,7 @@ img {
   display: block !important;
   font-size: 12.5px !important;
   line-height: 1.55 !important;
-  color: var(--motogear-muted) !important;
+  color: var(--color-text-secondary) !important;
   margin: 0 !important;
 }
 
@@ -6114,9 +6265,9 @@ img {
 
 .cta-band-copy .fui-Title1 {
   display: block !important;
-  font-family: 'Barlow Condensed', sans-serif !important;
-  font-size: clamp(26px, 3.4vw, 36px) !important;
-  line-height: 1.02 !important;
+  font-family: var(--font-display), sans-serif !important;
+  font-size: var(--type-h1) !important;
+  line-height: 1.1 !important;
   text-transform: uppercase !important;
   margin: 0 !important;
   color: var(--color-text-primary) !important;
@@ -6194,9 +6345,9 @@ img {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    color-mix(in srgb, var(--motogear-amber) 55%, transparent) 18%,
-    var(--motogear-amber) 50%,
-    color-mix(in srgb, var(--motogear-amber) 55%, transparent) 82%,
+    color-mix(in srgb, var(--color-accent-on-dark) 55%, transparent) 18%,
+    var(--color-accent-on-dark) 50%,
+    color-mix(in srgb, var(--color-accent-on-dark) 55%, transparent) 82%,
     transparent 100%
   );
   opacity: 0.75;
@@ -6207,11 +6358,20 @@ img {
   gap: clamp(24px, 3vw, 48px);
 }
 
+/* The brand name appears in both the header (on the page background) and the
+   footer (on graphite), so the footer variant needs its own colour rather than
+   inheriting --color-text-primary, which measured 1.02:1 on graphite. */
+.site-footer .footer-brand-name {
+  color: var(--color-text-on-graphite);
+}
+
+/* Footer column heading. One rule — earlier revisions set 20px, then 14px,
+   then 13px in three places that overrode each other. */
 .site-footer .footer-col-title {
-  font-size: 13px !important;
+  font-size: var(--type-h3) !important;
   letter-spacing: 0.16em !important;
-  color: var(--motogear-amber) !important;
-  margin-bottom: 4px !important;
+  color: var(--color-text-on-graphite) !important;
+  margin-bottom: 6px !important;
 }
 
 .site-footer .footer-links {
@@ -6224,6 +6384,20 @@ img {
   transition: color 0.16s ease, padding-left 0.16s ease;
 }
 
+/* The visible label stays 19px tall so the footer keeps its compact rhythm,
+   but the interactive area is stretched to 24px — the WCAG 2.2 AA target-size
+   minimum. The ::before below is repurposed for the hover indicator; this
+   pseudo-element is the hit area. */
+.site-footer .footer-link-btn::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 24px;
+  transform: translateY(-50%);
+}
+
 .site-footer .footer-link-btn::before {
   content: '';
   position: absolute;
@@ -6231,7 +6405,7 @@ img {
   top: 50%;
   width: 0;
   height: 1.5px;
-  background: var(--motogear-amber);
+  background: var(--color-accent-on-dark);
   transform: translateY(-50%);
   transition: width 0.18s ease;
 }
@@ -6268,7 +6442,7 @@ img {
 .footer-trust-chip svg {
   width: 14px;
   height: 14px;
-  color: var(--motogear-amber);
+  color: var(--color-accent-on-dark);
   flex-shrink: 0;
 }
 
@@ -6294,8 +6468,8 @@ img {
 }
 
 .footer-contact-link:hover {
-  border-color: var(--motogear-border);
-  background: var(--motogear-panel);
+  border-color: var(--color-border-strong);
+  background: var(--color-graphite-soft);
   transform: translateX(2px);
 }
 
@@ -6304,7 +6478,7 @@ img {
   width: 17px;
   height: 17px;
   flex-shrink: 0;
-  color: var(--motogear-amber);
+  color: var(--color-accent-on-dark);
 }
 
 .footer-contact-link > span,
@@ -6321,16 +6495,18 @@ img {
   font-size: 10.5px !important;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--motogear-subtle) !important;
+  color: var(--color-text-muted-on-dark) !important;
   margin: 0 !important;
   line-height: 1.2 !important;
 }
 
+/* Contact values sit on the graphite footer, so they use on-graphite text.
+   #252b2d measured 1.02:1 there. */
 .footer-contact-link b,
 .footer-contact-empty b {
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-text-on-graphite);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -6538,8 +6714,8 @@ img {
 
   /* Hero copy needs a real size floor so it never overruns the card. */
   .app-provider .hero-card .fui-Title1 {
-    font-size: clamp(30px, 9vw, 40px) !important;
-    line-height: 1 !important;
+    font-size: var(--type-display) !important;
+    line-height: 1.08 !important;
     max-width: 100% !important;
   }
 
@@ -6607,7 +6783,7 @@ img {
 
 @media (max-width: 420px) {
   .app-provider .hero-card .fui-Title1 {
-    font-size: clamp(26px, 8.4vw, 34px) !important;
+    font-size: var(--type-display) !important;
   }
 
   .category-tile {
@@ -6712,7 +6888,7 @@ img {
 }
 
 .customer-order-card .order-meta strong {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 19px;
   font-weight: 700;
   color: var(--color-text-primary);
@@ -6754,7 +6930,7 @@ img {
   /* Huge ghosted numeral behind the copy, matching the display type. */
   content: '404';
   position: absolute;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(160px, 26vw, 340px);
   font-weight: 800;
   line-height: 0.8;
@@ -6772,9 +6948,9 @@ img {
 
 .not-found-page .fui-Title1 {
   display: block !important;
-  font-family: 'Barlow Condensed', sans-serif !important;
-  font-size: clamp(34px, 6vw, 58px) !important;
-  line-height: 1 !important;
+  font-family: var(--font-display), sans-serif !important;
+  font-size: var(--type-display) !important;
+  line-height: 1.1 !important;
   text-transform: uppercase !important;
   margin: 8px 0 12px !important;
   color: var(--color-text-primary) !important;

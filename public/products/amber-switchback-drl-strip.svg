@@ -1,30 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1b1f27"/><stop offset="100%" stop-color="#0e1014"/>
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#edf0ea"/>
     </linearGradient>
     <radialGradient id="glow" cx="50%" cy="50%" r="58%">
-      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.26"/>
-      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#477c78" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#477c78" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="800" height="600" fill="url(#bg)"/>
-  <g stroke="#ffffff" stroke-opacity="0.035">
+  <g stroke="#252b2d" stroke-opacity="0.035">
     <path d="M0 100h800M0 200h800M0 300h800M0 400h800M0 500h800"/>
     <path d="M100 0v600M200 0v600M300 0v600M400 0v600M500 0v600M600 0v600M700 0v600"/>
   </g>
   <rect width="800" height="600" fill="url(#glow)"/>
   <g transform="translate(400,300)">
-    <path d="M-270,74 C-170,-58 170,-58 270,74" stroke="#1c2028" stroke-width="46" fill="none" stroke-linecap="round"/>
-    <path d="M-270,74 C-170,-58 170,-58 270,74" stroke="#f59e0b" stroke-width="13" fill="none" stroke-linecap="round" opacity="0.9"/>
-    <g fill="#fcd34d">
+    <path d="M-270,74 C-170,-58 170,-58 270,74" stroke="#eceee9" stroke-width="46" fill="none" stroke-linecap="round"/>
+    <path d="M-270,74 C-170,-58 170,-58 270,74" stroke="#477c78" stroke-width="13" fill="none" stroke-linecap="round" opacity="0.9"/>
+    <g fill="#8fc0bb">
       <circle cx="-240" cy="46" r="11"/><circle cx="-180" cy="4" r="11"/>
       <circle cx="-120" cy="-24" r="11"/><circle cx="-60" cy="-40" r="11"/>
       <circle cx="0" cy="-46" r="11"/><circle cx="60" cy="-40" r="11"/>
       <circle cx="120" cy="-24" r="11"/><circle cx="180" cy="4" r="11"/>
       <circle cx="240" cy="46" r="11"/>
     </g>
-    <rect x="-286" y="72" width="46" height="46" rx="9" fill="#272c35" stroke="#f59e0b" stroke-width="3"/>
-    <rect x="240" y="72" width="46" height="46" rx="9" fill="#272c35" stroke="#f59e0b" stroke-width="3"/>
+    <rect x="-286" y="72" width="46" height="46" rx="9" fill="#dfe2dd" stroke="#477c78" stroke-width="3"/>
+    <rect x="240" y="72" width="46" height="46" rx="9" fill="#dfe2dd" stroke="#477c78" stroke-width="3"/>
   </g>
 </svg>

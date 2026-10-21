@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#131418" />
+    <meta name="theme-color" content="#f4f3ef" />
     <title>MotoGear PK | Ride with intent</title>
     <script>
       (() => {
@@ -11,11 +11,11 @@
           const preference = localStorage.getItem('motogearpk.theme');
           document.documentElement.dataset.theme = preference === 'light' || preference === 'dark'
             ? preference
-            : 'dark';
+            : 'light';
           document.querySelector('meta[name="theme-color"]')?.setAttribute(
-            'content', document.documentElement.dataset.theme === 'dark' ? '#131418' : '#f1f0ec');
+            'content', document.documentElement.dataset.theme === 'dark' ? '#171e22' : '#f4f3ef');
         } catch {
-          document.documentElement.dataset.theme = 'dark';
+          document.documentElement.dataset.theme = 'light';
         }
       })();
     </script>

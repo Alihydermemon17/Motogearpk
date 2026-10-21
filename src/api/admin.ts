@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { supabase } from '../lib/supabase';
-import type { Database } from '../lib/supabase';
+import type { Database, PaymentStatus } from '../lib/supabase';
 import type { AdminOrderStatus } from './types';
 
 type Tables = Database['public']['Tables'];
@@ -226,6 +226,31 @@ export async function updateAdminOrder(orderId: string, status: AdminOrderStatus
     p_tracking_number: trackingNumber || null,
     p_courier: courier || null,
     p_internal_notes: internalNotes || null,
+  });
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Confirm or reverse payment on an order.
+ *
+ * This is the only path in the app that writes `orders.payment_status`. It is
+ * admin-only and manual on purpose: a Cash-on-Delivery order stays PENDING when
+ * it is placed, confirmed or dispatched — money changes hands at the door, and
+ * nothing here treats a placed order (or a customer screenshot) as proof of
+ * payment. The allow-list of transitions lives in the RPC, not here.
+ */
+export async function updateAdminOrderPayment(
+  orderId: string,
+  paymentStatus: PaymentStatus,
+  reference: string,
+  note: string,
+): Promise<OrderRow> {
+  const { data, error } = await client().rpc('admin_update_order_payment', {
+    p_order_id: orderId,
+    p_payment_status: paymentStatus,
+    p_reference: reference || null,
+    p_note: note || null,
   });
   if (error) throw error;
   return data;

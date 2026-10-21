@@ -33,6 +33,7 @@ const supportCategories: Array<[SupportCategory, string]> = [
 const faqTopics: Array<[FaqTopic, string]> = [
   ['PRODUCTS', 'Products'], ['ORDERS', 'Orders'], ['DELIVERY', 'Delivery'], ['RETURNS', 'Returns'], ['WARRANTY', 'Warranty'],
   ['COMPATIBILITY', 'Compatibility'], ['INSTALLATION', 'Installation'], ['PAYMENT', 'Payment'], ['SUPPLIER_FULFILLMENT', 'Supplier fulfilment'],
+  ['SUPPORT', 'Support'],
 ];
 
 export function ProductReviews({ product, navigate }: { product: Product; navigate: Navigate }) {
@@ -89,7 +90,7 @@ export function ProductReviews({ product, navigate }: { product: Product; naviga
         <div className="trust-record-heading"><strong>{review.rating} / 5</strong><Caption1>{new Date(review.created_at).toLocaleDateString()}</Caption1>{review.verified_purchase && <Badge color="success" icon={<CheckmarkCircleRegular />}>Verified Purchase</Badge>}</div>
         {review.title && <Subtitle1>{review.title}</Subtitle1>}<Body1>{review.body}</Body1>
       </Card>)}
-    </div> : <Card className="empty-state trust-empty"><Title3>No reviews yet</Title3><Body1>Customer reviews will appear after they are submitted and approved.</Body1></Card>}
+    </div> : <Card className="empty-state trust-empty"><Title3 as="h3">No reviews yet</Title3><Body1>Customer reviews will appear after they are submitted and approved.</Body1></Card>}
     {!auth.user && <div className="trust-form-note"><Body1>Only customers with a delivered order for this product can submit a review.</Body1><Button appearance="secondary" icon={<LockClosedRegular />} onClick={() => navigate('/login')}>Sign in</Button></div>}
     {auth.user && ownReview && <MessageBar intent="info"><MessageBarBody>{ownReview.is_visible ? 'You have already reviewed this product.' : 'Your submitted review is waiting for moderation.'}</MessageBarBody></MessageBar>}
     {auth.user && !ownReview && !busy && orders.length === 0 && <Caption1 className="trust-muted">A review form will be available after a delivered order containing this product.</Caption1>}
@@ -158,7 +159,7 @@ export function CustomerReturnRequest({ order, items }: { order: CustomerOrder; 
     finally { setSaving(false); }
   };
   return <section className="trust-section order-action-section">
-    <div className="section-head"><div><Caption1 className="section-kicker">RETURNS & REFUNDS</Caption1><Title3>Request a return</Title3></div></div>
+    <div className="section-head"><div><Caption1 className="section-kicker">RETURNS & REFUNDS</Caption1><Title3 as="h3">Request a return</Title3></div></div>
     {error && <MessageBar intent="error"><MessageBarBody>{error}</MessageBarBody></MessageBar>}
     {loading ? <Skeleton><SkeletonItem /><SkeletonItem /></Skeleton> : <>
       {requests.map((request) => <Card className="trust-record" key={request.id}><div className="trust-record-heading"><strong>{statusText(request.status)}</strong><Caption1>{reasons.find(([value]) => value === request.reason)?.[1] ?? request.reason}</Caption1></div><Body1>{request.description || 'No description provided.'}</Body1><Caption1>Submitted {new Date(request.created_at).toLocaleDateString()}</Caption1></Card>)}
@@ -200,7 +201,7 @@ export function OrderFeedbackForm({ order, items }: { order: CustomerOrder; item
     finally { setSaving(false); }
   };
   return <section className="trust-section order-action-section">
-    <div className="section-head"><div><Caption1 className="section-kicker">POST-ORDER</Caption1><Title3>Share feedback</Title3></div></div>
+    <div className="section-head"><div><Caption1 className="section-kicker">POST-ORDER</Caption1><Title3 as="h3">Share feedback</Title3></div></div>
     {error && <MessageBar intent="error"><MessageBarBody>{error}</MessageBarBody></MessageBar>}
     {loading ? <Skeleton><SkeletonItem /><SkeletonItem /></Skeleton> : existing.length ? <Card className="trust-record"><Badge>{existing[0].rating ? `${existing[0].rating} / 5` : 'Feedback received'}</Badge><Body1>{existing[0].message}</Body1><Caption1>Submitted {new Date(existing[0].created_at).toLocaleDateString()}</Caption1></Card>
       : <form className="trust-form" onSubmit={(event) => void submit(event)}>
@@ -222,7 +223,7 @@ export function FaqPage({ navigate }: { navigate: Navigate }) {
   useEffect(() => { void load(); }, []);
   const visible = faqs.filter((faq) => topic === 'ALL' || faq.topic === topic);
   return <div className="page-content narrow customer-trust-page">
-    <div className="section-head"><div><Caption1 className="section-kicker">HELP CENTRE</Caption1><Title1>Frequently asked questions.</Title1></div><Button appearance="subtle" onClick={() => navigate('/support')}>Contact support</Button></div>
+    <div className="section-head"><div><Caption1 className="section-kicker">HELP CENTRE</Caption1><Title1 as="h1">Frequently asked questions.</Title1></div><Button appearance="subtle" onClick={() => navigate('/support')}>Contact support</Button></div>
     {error && <MessageBar intent="error"><MessageBarBody>{error} <Button appearance="transparent" onClick={() => void load()}>Try again</Button></MessageBarBody></MessageBar>}
     <div className="faq-topic-filter"><Select aria-label="Filter FAQs by topic" value={topic} onChange={(_, data) => setTopic(data.value)}><Option value="ALL" text="All topics">All topics</Option>{faqTopics.map(([value, label]) => <Option key={value} value={value} text={label}>{label}</Option>)}</Select></div>
     {loading ? <Skeleton><SkeletonItem /><SkeletonItem /><SkeletonItem /></Skeleton> : visible.length ? <div className="faq-list">{visible.map((faq) => <details className="faq-entry" key={faq.id}><summary><span>{faq.question}</span><Caption1>{faqTopics.find(([value]) => value === faq.topic)?.[1]}</Caption1></summary><Body1>{faq.answer}</Body1></details>)}</div> : <Card className="empty-state trust-empty"><Title3>No published answers yet</Title3><Body1>FAQ answers will appear here after MotoGear PK publishes them.</Body1></Card>}
@@ -269,7 +270,7 @@ export function SupportPage({ navigate, conversationId }: { navigate: Navigate; 
     finally { setSaving(false); }
   };
   return <div className="page-content customer-trust-page">
-    <div className="section-head"><div><Caption1 className="section-kicker">CUSTOMER SUPPORT</Caption1><Title1>Support conversations.</Title1></div><Button appearance="subtle" onClick={() => navigate('/faq')}>Browse FAQs</Button></div>
+    <div className="section-head"><div><Caption1 className="section-kicker">CUSTOMER SUPPORT</Caption1><Title1 as="h1">Support conversations.</Title1></div><Button appearance="subtle" onClick={() => navigate('/faq')}>Browse FAQs</Button></div>
     {error && <MessageBar intent="error"><MessageBarBody>{error} <Button appearance="transparent" onClick={() => void load()}>Try again</Button></MessageBarBody></MessageBar>}
     <div className="support-layout">
       <aside className="support-list" aria-label="Your conversations">

@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import {
   Badge, Body1, Button, Card, CardPreview, Caption1, createDarkTheme, createLightTheme,
   Divider, FluentProvider, Input, MessageBar, MessageBarBody, Select, Skeleton, SkeletonItem,
-  Subtitle1, Title1, Title3,
+  Subtitle1, Title1, Title2, Title3,
 } from '@fluentui/react-components';
 import { Option } from './SelectOption';
 import {
@@ -33,11 +33,17 @@ import { useCustomerAuth, useCustomerCart, useCustomerWishlist } from './Custome
 import { DeliveryInfo, FaqPage, ProductReviews, SupportPage } from './CustomerTrustPages';
 import { ProductImage } from './ProductImage';
 
+/**
+ * Fluent UI brand ramp — muted teal.
+ * Step 50 is the brand colour; the surrounding steps feed Fluent's foreground,
+ * surface and border tokens, so primary buttons, focused inputs, selected pills
+ * and brand badges all pick up the teal identity from here.
+ */
 const brandRamp = {
-  10: '#3d2600', 20: '#684100', 30: '#955d00', 40: '#c17a00',
-  50: '#FFB400', 60: '#e5a200', 70: '#c98e00', 80: '#a97600',
-  90: '#895f00', 100: '#694900', 110: '#4c3500', 120: '#332400',
-  130: '#241900', 140: '#191100', 150: '#110c00', 160: '#090600',
+  10: '#0e1a19', 20: '#17302e', 30: '#204340', 40: '#2e5c58',
+  50: '#477c78', 60: '#417370', 70: '#3b6a67', 80: '#35615e',
+  90: '#2e5754', 100: '#274c4a', 110: '#1f3f3d', 120: '#173130',
+  130: '#102423', 140: '#0a1918', 150: '#05100f', 160: '#020807',
 };
 const THEME_KEY = 'motogearpk.theme';
 type ThemeMode = 'light' | 'dark';
@@ -73,7 +79,7 @@ function NotFoundPage({ navigate }: { navigate: (path: string) => void }) {
   return (
     <div className="page-content narrow not-found-page">
       <Caption1 className="section-kicker">404 / PAGE NOT FOUND</Caption1>
-      <Title1>This page took a wrong turn.</Title1>
+        <Title1 as="h1">This page took a wrong turn.</Title1>
       <Body1>
         The link may be old, or the page moved. Pick a route below and we will get you back on the road.
       </Body1>
@@ -107,7 +113,7 @@ function App() {
   const toggleTheme = () => {
     const nextTheme: ThemeMode = themeMode === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = nextTheme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#131418' : '#f1f0ec');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#171e22' : '#f4f3ef');
     try {
       window.localStorage.setItem(THEME_KEY, nextTheme);
     } catch {
@@ -463,7 +469,7 @@ function AdminGate({
     return (
       <div className="admin-gate">
         <span className="admin-gate-mark" aria-hidden="true">MG</span>
-        <Title3>Administrator access required</Title3>
+        <Title3 as="h1">Administrator access required</Title3>
         <Body1 className="admin-gate-sub">
           This operations workspace is limited to MotoGear PK administrators. Sign in with an admin
           account to continue.
@@ -557,7 +563,11 @@ function Hero({ onNavigate }: { onNavigate: (path: string) => void }) {
               <div className="eyebrow">
                 <SparkleRegular /> {item.eyebrow}
               </div>
-              <Title1>
+              {/* The first slide carries the page's only h1; the rest are h2s so
+                  the document outline has a single top-level heading even though
+                  every slide stays mounted. Off-screen slides are aria-hidden and
+                  inert, so assistive tech only ever reads the active one. */}
+              <Title1 as={i === 0 ? 'h1' : 'h2'}>
                 {item.titleTop}<br />
                 <span>{item.titleAccent}</span>
               </Title1>
@@ -657,7 +667,7 @@ function HomePage({ onNavigate, onAdd }: { onNavigate: (path: string) => void; o
       <ScrollReveal className="home-reveal" delay={0.06}><div className="catalog-heading">
         <div className="heading-group">
           <Caption1 className="section-kicker">MOTOGEAR PK / FEATURED</Caption1>
-          <Title1 as="h2">Gear for every ride.</Title1>
+          <Title2 as="h2">Gear for every ride.</Title2>
         </div>
         <Button
           appearance="subtle"
@@ -681,7 +691,7 @@ function HomePage({ onNavigate, onAdd }: { onNavigate: (path: string) => void; o
       <ScrollReveal className="home-reveal" delay={0.1}><section className="promise-band" aria-label="The MotoGear promise">
         <div className="promise-band-head">
           <Caption1 className="section-kicker">WHY RIDERS PICK US</Caption1>
-          <Title1 as="h2">Built around the way Pakistan rides.</Title1>
+          <Title2 as="h2">Built around the way Pakistan rides.</Title2>
           <Body1>
             Long highway runs, monsoon commutes, and weekend trails. We stock what survives them —
             and we tell you exactly what fits before you pay.
@@ -714,7 +724,7 @@ function HomePage({ onNavigate, onAdd }: { onNavigate: (path: string) => void; o
       <ScrollReveal className="home-reveal" delay={0.12}><section className="cta-band">
         <div className="cta-band-copy">
           <Caption1 className="section-kicker">NOT SURE WHAT FITS?</Caption1>
-          <Title1 as="h2">Tell us your bike. We will shortlist the parts.</Title1>
+          <Title2 as="h2">Tell us your bike. We will shortlist the parts.</Title2>
           <Body1>Send your model and we will point you at parts confirmed to fit it.</Body1>
         </div>
         <div className="cta-band-actions">
@@ -796,7 +806,7 @@ function ShopPage({ onNavigate, onAdd }: { onNavigate: (path: string) => void; o
       <div className="shop-header">
         <div>
           <Caption1 className="section-kicker">MOTORCYCLE ACCESSORIES & PARTS</Caption1>
-          <Title1>Parts for every ride.</Title1>
+          <Title1 as="h1">Parts for every ride.</Title1>
           <Body1>Explore lighting, controls, protective gear, and road-ready essentials with live supplier availability.</Body1>
         </div>
       </div>
@@ -871,7 +881,7 @@ function ShopPage({ onNavigate, onAdd }: { onNavigate: (path: string) => void; o
       {state === 'data' && filtered.length === 0 && (
         <Card className="empty-state">
           <SearchRegular />
-          <Title3>Nothing matches those filters</Title3>
+          <Title3 as="h3">Nothing matches those filters</Title3>
           <Body1>Try a different category, or clear the filters to see the full catalog.</Body1>
           <Button appearance="primary" onClick={clearFilters}>Clear filters</Button>
         </Card>
@@ -1004,7 +1014,7 @@ function ProductPage({
           <Caption1 className="section-kicker">
             {product.category.toUpperCase()} / {product.brand ?? 'MOTOGEAR PK'}
           </Caption1>
-          <Title1>{product.name}</Title1>
+          <Title1 as="h1">{product.name}</Title1>
           <Caption1 className="detail-section-label">Description</Caption1>
           <Body1 className="detail-desc">{product.description}</Body1>
 
@@ -1071,7 +1081,7 @@ function ProductPage({
       </div>
 
       <section className="detail-note">
-        <Title3>Made for miles.</Title3>
+        <Title3 as="h2">Made for miles.</Title3>
         <Body1>{product.description}</Body1>
       </section>
       <ProductReviews product={product} navigate={onNavigate} />
@@ -1268,7 +1278,7 @@ function Footer({ onNavigate }: { onNavigate: (path: string) => void }) {
               aria-label="MotoGear PK home"
             >
               <span className="brand-mark">MG</span>
-              <span className="brand-name">
+              <span className="brand-name footer-brand-name">
                 MOTOGEAR <b>PK</b>
               </span>
             </button>
@@ -1283,7 +1293,7 @@ function Footer({ onNavigate }: { onNavigate: (path: string) => void }) {
           </div>
 
           <div className="footer-col links-col">
-            <h4 className="footer-col-title">Shop</h4>
+            <h2 className="footer-col-title">Shop</h2>
             <div className="footer-links">
               <button type="button" className="footer-link-btn" onClick={() => onNavigate('/')}>Home</button>
               <button type="button" className="footer-link-btn" onClick={() => onNavigate('/shop')}>All products</button>
@@ -1294,7 +1304,7 @@ function Footer({ onNavigate }: { onNavigate: (path: string) => void }) {
           </div>
 
           <div className="footer-col links-col">
-            <h4 className="footer-col-title">Account</h4>
+            <h2 className="footer-col-title">Account</h2>
             <div className="footer-links">
               <button type="button" className="footer-link-btn" onClick={() => onNavigate('/account')}>My account</button>
               <button type="button" className="footer-link-btn" onClick={() => onNavigate('/orders')}>Track an order</button>
@@ -1305,7 +1315,7 @@ function Footer({ onNavigate }: { onNavigate: (path: string) => void }) {
           </div>
 
           <div className="footer-col contact-col">
-            <h4 className="footer-col-title">Talk to us</h4>
+            <h2 className="footer-col-title">Talk to us</h2>
             <p className="footer-cities">
               Order questions, fitment checks, and returns — answered by our team, 9am to 9pm, seven days a week.
             </p>

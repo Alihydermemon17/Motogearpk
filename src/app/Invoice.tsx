@@ -94,7 +94,7 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <link rel="preconnect" href="https://fonts.googleapis.com">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+          <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
           ${styles}
           <style>
             body { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #eceef2; padding: 24px; margin: 0; }
@@ -147,7 +147,7 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
             </div>
           </div>
           <div className="invoice-meta">
-            <div className="invoice-title">Tax Invoice</div>
+            <h1 className="invoice-title">Tax Invoice</h1>
             <div className="invoice-number">#{order.order_number}</div>
             <Badge appearance="filled" color={getStatusColor(order.status)} className="invoice-status">
               {statusLabel(order.status)}
@@ -182,7 +182,7 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         {/* From / To */}
         <div className="invoice-parties">
           <div className="party from-party">
-            <Title3 className="inv-label">From</Title3>
+            <Title3 as="h2" className="inv-label">From</Title3>
             <Body1 className="party-name"><b>{business.businessName || 'MotoGear PK'}</b></Body1>
             <Body1 className="party-address">
               {business.supportPhone && <span className="contact-line"><PhoneRegular /> {business.supportPhone}</span>}
@@ -191,7 +191,7 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
             </Body1>
           </div>
           <div className="party to-party">
-            <Title3 className="inv-label">Ship To</Title3>
+            <Title3 as="h2" className="inv-label">Ship To</Title3>
             <Body1 className="party-name"><b>{order.shipping_full_name}</b></Body1>
             <Body1 className="party-address">
               {order.shipping_phone && <span className="contact-line"><PhoneRegular /> {order.shipping_phone}</span>}
@@ -241,13 +241,13 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         <div className="invoice-summary">
           <div className="summary-side">
             <div className="side-card">
-              <Title3 className="inv-h">Payment</Title3>
+              <Title3 as="h2" className="inv-h">Payment</Title3>
               <Badge appearance="filled" color="brand">Cash on Delivery (COD)</Badge>
               <Caption1 className="inv-p muted">Please keep the exact amount ready. Our courier will hand over the parcel after payment.</Caption1>
             </div>
             {order.customer_notes && (
               <div className="side-card">
-                <Title3 className="inv-h">Order Notes</Title3>
+                <Title3 as="h2" className="inv-h">Order Notes</Title3>
                 <Body1 className="inv-p">{order.customer_notes}</Body1>
               </div>
             )}
@@ -284,7 +284,7 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         {/* Terms + signature */}
         <div className="invoice-foot">
           <div className="invoice-terms">
-            <Title3 className="inv-h">Terms &amp; Conditions</Title3>
+            <Title3 as="h2" className="inv-h">Terms &amp; Conditions</Title3>
             <div className="terms-list">
               <div className="terms-item"><span className="terms-num">1.</span><span>Goods once sold will not be taken back or exchanged unless covered under warranty.</span></div>
               <div className="terms-item"><span className="terms-num">2.</span><span>Warranty claims are subject to manufacturer/supplier terms.</span></div>
@@ -348,7 +348,7 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         }
         .invoice-accent {
           height: 6px;
-          background: linear-gradient(90deg, #ffb400 0%, #ff8c00 45%, #1a1d23 100%);
+          background: linear-gradient(90deg, #477C78 0%, #3B6763 45%, #1a1d23 100%);
         }
 
         /* ---------- Header ---------- */
@@ -364,22 +364,22 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         .invoice-brand { display: flex; align-items: center; gap: 16px; }
         .inv-mark {
           width: 56px; height: 56px; border-radius: 14px;
-          background: linear-gradient(135deg, #ffb400 0%, #ff8c00 100%);
+          background: linear-gradient(135deg, #477C78 0%, #3B6763 100%);
           color: #121316; font-weight: 800; font-size: 20px;
           display: grid; place-items: center;
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           letter-spacing: 0.04em;
-          box-shadow: 0 8px 24px rgba(255,180,0,0.35);
+          box-shadow: 0 8px 24px rgba(71, 124, 120, 0.35);
           flex-shrink: 0;
         }
         .inv-brand-name {
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 30px; font-weight: 700;
           letter-spacing: 0.1em; text-transform: uppercase;
           color: #ffffff; line-height: 1;
         }
         .inv-brand-name b {
-          color: #ffb400; margin-left: 9px;
+          color: #477C78; margin-left: 9px;
           background: none; padding: 0; border-radius: 0;
           display: inline; vertical-align: baseline;
         }
@@ -389,13 +389,13 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         }
         .invoice-meta { text-align: right; flex-shrink: 0; }
         .invoice-title {
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 13px; font-weight: 700;
           letter-spacing: 0.32em; text-transform: uppercase;
-          color: #ffb400; margin: 0 0 6px;
+          color: #7fb3ae; margin: 0 0 6px;  /* sits on the graphite header: 6.30:1 (the #2E524F tuned for white was 1.71:1) */
         }
         .invoice-number {
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 24px; font-weight: 800;
           color: #ffffff; letter-spacing: 0.02em;
           line-height: 1.1; margin: 0; word-break: break-all;
@@ -416,12 +416,12 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         }
         .fact:last-child { border-right: none; }
         .fact-label {
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 11px; font-weight: 700; letter-spacing: 0.16em;
-          text-transform: uppercase; color: #98a0ad;
+          text-transform: uppercase; color: #5f6873;
         }
         .fact-value { font-size: 15px; font-weight: 700; color: #1a1d23; line-height: 1.3; }
-        .fact-sub { font-size: 11px; color: #98a0ad; }
+        .fact-sub { font-size: 11px; color: #5f6873; }
 
         /* ---------- Parties ---------- */
         .invoice-parties {
@@ -433,17 +433,17 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         .party {
           background: #fbfbfc;
           border: 1px solid #eceef2;
-          border-left: 3px solid #ffb400;
+          border-left: 3px solid #477C78;
           border-radius: 10px;
           padding: 18px 20px;
         }
         .party.to-party { border-left-color: #1a1d23; }
         .inv-label {
           display: block;
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 13px; font-weight: 700;
           letter-spacing: 0.16em; text-transform: uppercase;
-          color: #98a0ad; line-height: 1.2; margin: 0 0 10px;
+          color: #5f6873; line-height: 1.2; margin: 0 0 10px;
         }
         .party-name {
           display: block;
@@ -453,7 +453,7 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         .party-address { display: block; color: #5b6270; line-height: 1.6; font-size: 14px; margin: 0; }
         .contact-line { display: flex; align-items: center; gap: 8px; min-height: 22px; }
         .contact-line.indent { padding-left: 24px; }
-        .contact-line svg { color: #ffb400; flex-shrink: 0; }
+        .contact-line svg { color: #477C78; flex-shrink: 0; }
 
         /* ---------- Table ---------- */
         .invoice-table-wrapper { padding: 0 44px 8px; overflow-x: auto; }
@@ -468,7 +468,7 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
           padding: 13px 16px;
           background: #1a1d23;
           color: rgba(255,255,255,0.85);
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 12px; font-weight: 700;
           letter-spacing: 0.14em; text-transform: uppercase;
         }
@@ -497,13 +497,13 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         .item-index {
           flex-shrink: 0;
           width: 26px; height: 26px; border-radius: 6px;
-          background: #fff4d6; color: #b07800;
-          font-family: 'Barlow Condensed', sans-serif;
+          background: #E3EDEB; color: #2E524F;  /* 7.22:1 — was #b07800 at 3.18:1, under the 4.5:1 floor */
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 14px; font-weight: 700;
           display: grid; place-items: center; margin-top: 1px;
         }
         .item-name { font-weight: 600; color: #1a1d23; margin: 0 0 6px; line-height: 1.4; }
-        .item-sku { font-size: 12px; color: #98a0ad; margin: 0 0 8px; letter-spacing: 0.02em; }
+        .item-sku { font-size: 12px; color: #5f6873; margin: 0 0 8px; letter-spacing: 0.02em; }
         .item-warranty {
           display: inline-flex; align-items: center; gap: 5px;
           font-size: 12px; color: #147943;
@@ -530,18 +530,18 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
         .summary-side { display: grid; gap: 14px; align-content: start; }
         .side-card {
           background: #fbfbfc; border: 1px solid #eceef2;
-          border-left: 3px solid #ffb400; border-radius: 10px;
+          border-left: 3px solid #477C78; border-radius: 10px;
           padding: 16px 18px;
         }
         .inv-h {
           display: block;
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 16px; font-weight: 700;
           letter-spacing: 0.12em; text-transform: uppercase;
           color: #1a1d23; line-height: 1.2; margin: 0 0 10px;
         }
         .inv-p { display: block; margin: 10px 0 0; color: #5b6270; font-size: 13px; line-height: 1.65; }
-        .inv-p.muted { color: #98a0ad; }
+        .inv-p.muted { color: #5f6873; }
 
         .totals-table {
           display: grid;
@@ -564,13 +564,13 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
           border-radius: 12px; padding: 16px 22px; margin-top: 6px;
         }
         .totals-row.grand-total > span:first-child {
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 19px; font-weight: 700; letter-spacing: 0.12em;
           text-transform: uppercase; color: rgba(255,255,255,0.7);
         }
         .totals-row.grand-total > span:last-child {
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: 30px; font-weight: 800; color: #ffb400;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+          font-size: 30px; font-weight: 800; color: #7fb3ae;  /* on graphite band: 6.05:1 (was #477C78 = 2.99:1) */
           text-align: right; line-height: 1;
         }
         .totals-foot {
@@ -578,10 +578,10 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
           display: flex; justify-content: space-between; align-items: center;
           gap: 16px; margin-top: 14px; flex-wrap: wrap;
         }
-        .amount-words { font-size: 12px; color: #98a0ad; }
+        .amount-words { font-size: 12px; color: #5f6873; }
         .amount-words b { color: #5b6270; font-weight: 600; }
         .stamp {
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 16px; font-weight: 800; letter-spacing: 0.18em;
           text-transform: uppercase;
           padding: 6px 16px; border-radius: 6px;
@@ -599,7 +599,7 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
           border-top: 1px solid #e8eaee;
         }
         .terms-list { display: grid; gap: 6px; }
-        .terms-item { display: flex; gap: 10px; color: #98a0ad; font-size: 12px; line-height: 1.7; }
+        .terms-item { display: flex; gap: 10px; color: #5f6873; font-size: 12px; line-height: 1.7; }
         .terms-num { flex-shrink: 0; width: 16px; font-weight: 600; color: #5b6270; }
         .invoice-signature { text-align: center; }
         .seal {
@@ -622,9 +622,9 @@ export function Invoice({ order, items, onClose, showActions = true }: InvoicePr
           font-size: 12px;
         }
         .bottom-thanks {
-          font-family: 'Barlow Condensed', sans-serif;
+          font-family: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
           font-size: 14px; font-weight: 700; letter-spacing: 0.14em;
-          text-transform: uppercase; color: #ffb400;
+          text-transform: uppercase; color: #7fb3ae;  /* on graphite: 7.20:1 (was #477C78 = 3.55:1) */
         }
         .bottom-contact { letter-spacing: 0.02em; }
 

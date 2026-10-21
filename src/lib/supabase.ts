@@ -3,13 +3,13 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 type AvailabilityStatus = 'AVAILABLE' | 'UNAVAILABLE' | 'CHECK_REQUIRED';
 type OrderStatus = 'PENDING' | 'CONFIRMED' | 'SUPPLIER_PROCESSING' | 'SUPPLIER_SHIPPED' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED' | 'RETURNED' | 'REFUNDED';
-type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 type PaymentMethod = 'CASH_ON_DELIVERY';
 export type ReturnReason = 'DAMAGED' | 'NOT_WORKING' | 'WRONG_PRODUCT' | 'COMPATIBILITY' | 'DIFFERENT_FROM_LISTING' | 'MISSING_ITEM' | 'OTHER';
 export type ReturnRequestStatus = 'REQUESTED' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED' | 'RETURNED' | 'REFUNDED' | 'REPLACEMENT_SENT' | 'CLOSED';
 export type SupportConversationStatus = 'OPEN' | 'IN_PROGRESS' | 'WAITING_FOR_CUSTOMER' | 'RESOLVED' | 'CLOSED';
 export type SupportCategory = 'PRODUCT_QUESTION' | 'COMPATIBILITY' | 'ORDER_STATUS' | 'DELIVERY' | 'WARRANTY' | 'RETURN' | 'REFUND' | 'COMPLAINT' | 'OTHER';
-export type FaqTopic = 'PRODUCTS' | 'ORDERS' | 'DELIVERY' | 'RETURNS' | 'WARRANTY' | 'COMPATIBILITY' | 'INSTALLATION' | 'PAYMENT' | 'SUPPLIER_FULFILLMENT';
+export type FaqTopic = 'PRODUCTS' | 'ORDERS' | 'DELIVERY' | 'RETURNS' | 'WARRANTY' | 'COMPATIBILITY' | 'INSTALLATION' | 'PAYMENT' | 'SUPPLIER_FULFILLMENT' | 'SUPPORT';
 type Relationship<ForeignKey extends string, Column extends string, Relation extends string, ReferencedColumn extends string> = {
   foreignKeyName: ForeignKey;
   columns: [Column];
@@ -32,8 +32,8 @@ export interface Database {
         { id: string; full_name?: string; phone?: string; email?: string; address?: string | null; city?: string | null; province?: string | null; created_at?: string; updated_at?: string }
       >;
       orders: Table<
-        { id: string; order_number: string; customer_id: string; subtotal: number; delivery_fee: number; discount_amount: number; total: number; payment_method: PaymentMethod; payment_status: PaymentStatus; status: OrderStatus; shipping_full_name: string; shipping_phone: string; shipping_email: string; shipping_address: string; shipping_city: string; shipping_province: string; customer_notes: string | null; internal_notes: string | null; tracking_number: string | null; courier: string | null; created_at: string; updated_at: string },
-        { id?: string; order_number: string; customer_id: string; subtotal: number; delivery_fee: number; discount_amount?: number; total: number; payment_method?: PaymentMethod; payment_status?: PaymentStatus; status?: OrderStatus; shipping_full_name: string; shipping_phone: string; shipping_email: string; shipping_address: string; shipping_city: string; shipping_province: string; customer_notes?: string | null; internal_notes?: string | null; tracking_number?: string | null; courier?: string | null; created_at?: string; updated_at?: string }
+        { id: string; order_number: string; customer_id: string; subtotal: number; delivery_fee: number; discount_amount: number; total: number; payment_method: PaymentMethod; payment_status: PaymentStatus; payment_reference: string | null; payment_confirmed_at: string | null; payment_confirmed_by: string | null; status: OrderStatus; shipping_full_name: string; shipping_phone: string; shipping_email: string; shipping_address: string; shipping_city: string; shipping_province: string; customer_notes: string | null; internal_notes: string | null; tracking_number: string | null; courier: string | null; created_at: string; updated_at: string },
+        { id?: string; order_number: string; customer_id: string; subtotal: number; delivery_fee: number; discount_amount?: number; total: number; payment_method?: PaymentMethod; payment_status?: PaymentStatus; payment_reference?: string | null; payment_confirmed_at?: string | null; payment_confirmed_by?: string | null; status?: OrderStatus; shipping_full_name: string; shipping_phone: string; shipping_email: string; shipping_address: string; shipping_city: string; shipping_province: string; customer_notes?: string | null; internal_notes?: string | null; tracking_number?: string | null; courier?: string | null; created_at?: string; updated_at?: string }
       >;
       order_items: Table<
         { id: string; order_id: string; product_id: string | null; product_name: string; product_sku: string; quantity: number; base_unit_price: number; unit_price: number; discount_amount: number; line_total: number; warranty: string | null; created_at: string },
@@ -152,6 +152,7 @@ export interface Database {
       quote_customer_order: { Args: { p_items: Json }; Returns: Json };
       create_customer_order: { Args: { p_items: Json; p_shipping: Json; p_customer_notes?: string | null }; Returns: Json };
       admin_update_order: { Args: { p_order_id: string; p_status: OrderStatus; p_tracking_number?: string | null; p_courier?: string | null; p_internal_notes?: string | null }; Returns: Database['public']['Tables']['orders']['Row'] };
+      admin_update_order_payment: { Args: { p_order_id: string; p_payment_status: PaymentStatus; p_reference?: string | null; p_note?: string | null }; Returns: Database['public']['Tables']['orders']['Row'] };
       admin_dashboard_metrics: { Args: Record<PropertyKey, never>; Returns: Json };
     };
     Enums: {

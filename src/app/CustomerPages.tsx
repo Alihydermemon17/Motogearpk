@@ -354,10 +354,10 @@ export function CartPage({ navigate }: { navigate: Navigate }) {
   useEffect(() => { if (!loading && items.length && !unavailable.length) void refreshQuote(); }, [loading, cart.items, Object.keys(products).length]);
   
   return <div className="page-content narrow">
-    <div className="section-head"><div><Caption1 className="section-kicker">YOUR GARAGE</Caption1><Title1>Shopping cart.</Title1></div>{cart.items.length > 0 && <Button appearance="subtle" icon={<DeleteRegular />} onClick={cart.clear}>Clear cart</Button>}</div>
+    <div className="section-head"><div><Caption1 className="section-kicker">YOUR GARAGE</Caption1><Title1 as="h1">Shopping cart.</Title1></div>{cart.items.length > 0 && <Button appearance="subtle" icon={<DeleteRegular />} onClick={cart.clear}>Clear cart</Button>}</div>
     {error && <MessageBar intent="error"><MessageBarBody>{error}</MessageBarBody></MessageBar>}
     {useFallback && <MessageBar intent="info"><MessageBarBody>Showing estimated totals (server quote unavailable). Final amount confirmed at checkout.</MessageBarBody></MessageBar>}
-    {loading ? <div className="customer-loading"><Skeleton><SkeletonItem size={24} /><SkeletonItem /><SkeletonItem /></Skeleton></div> : cart.items.length === 0 ? <Card className="empty-state"><Title3>Your cart is empty.</Title3><Body1>Find something made for the next ride.</Body1><Button appearance="primary" onClick={() => navigate('/shop')}>Browse the shop</Button></Card> : <>
+    {loading ? <div className="customer-loading"><Skeleton><SkeletonItem size={24} /><SkeletonItem /><SkeletonItem /></Skeleton></div> : cart.items.length === 0 ? <Card className="empty-state"><Title3 as="h2">Your cart is empty.</Title3><Body1>Find something made for the next ride.</Body1><Button appearance="primary" onClick={() => navigate('/shop')}>Browse the shop</Button></Card> : <>
       {unavailable.length > 0 && <MessageBar intent="error"><MessageBarBody>One or more cart products are unavailable or no longer listed. Remove them before checkout.</MessageBarBody></MessageBar>}
       <div className="customer-cart-list">{cart.items.map((item) => {
         const product = products[item.productId];
@@ -392,14 +392,14 @@ export function WishlistPage({ navigate }: { navigate: Navigate }) {
   }, [wishlist.items]);
   return <div className="page-content narrow">
     <div className="section-head">
-      <div><Caption1 className="section-kicker">YOUR GARAGE</Caption1><Title1>Your wishlist.</Title1></div>
+      <div><Caption1 className="section-kicker">YOUR GARAGE</Caption1><Title1 as="h1">Your wishlist.</Title1></div>
       {wishlist.items.length > 0 && <Button appearance="subtle" icon={<DeleteRegular />} onClick={wishlist.clear}>Clear wishlist</Button>}
     </div>
     {error && <MessageBar intent="error"><MessageBarBody>{error}</MessageBarBody></MessageBar>}
     {loading ? <div className="customer-loading"><Skeleton><SkeletonItem size={24} /><SkeletonItem /><SkeletonItem /></Skeleton></div> : wishlist.items.length === 0 ? (
       <Card className="empty-state">
         <HeartRegular />
-        <Title3>Your wishlist is empty.</Title3>
+        <Title3 as="h2">Your wishlist is empty.</Title3>
         <Body1>Tap the heart on any product to save it here for later.</Body1>
         <Button appearance="primary" onClick={() => navigate('/shop')}>Browse the shop</Button>
       </Card>
@@ -498,9 +498,9 @@ export function CheckoutPage({ navigate }: { navigate: Navigate }) {
     finally { setBusy(false); }
   };
   
-  if (cart.items.length === 0) return <div className="page-content narrow"><Card className="empty-state"><Title3>Your cart is empty.</Title3><Button appearance="primary" onClick={() => navigate('/shop')}>Browse the shop</Button></Card></div>;
+  if (cart.items.length === 0) return <div className="page-content narrow"><Card className="empty-state"><Title3 as="h2">Your cart is empty.</Title3><Button appearance="primary" onClick={() => navigate('/shop')}>Browse the shop</Button></Card></div>;
   
-  return <div className="page-content narrow"><Button appearance="subtle" icon={<ChevronLeftRegular />} onClick={() => navigate('/cart')}>Back to cart</Button><div className="account-head"><div><Caption1 className="section-kicker">CASH ON DELIVERY</Caption1><Title1>Delivery details.</Title1><Body1>Your order is charged only on delivery. No online payment is collected.</Body1></div></div>
+  return <div className="page-content narrow"><Button appearance="subtle" icon={<ChevronLeftRegular />} onClick={() => navigate('/cart')}>Back to cart</Button><div className="account-head"><div><Caption1 className="section-kicker">CASH ON DELIVERY</Caption1><Title1 as="h1">Delivery details.</Title1><Body1>Your order is charged only on delivery. No online payment is collected.</Body1></div></div>
     {error && <MessageBar intent="error"><MessageBarBody>{error}</MessageBarBody></MessageBar>}
     {useFallbackQuote && <MessageBar intent="info"><MessageBarBody>Order totals estimated. Final amount confirmed on delivery.</MessageBarBody></MessageBar>}
     <div className="checkout-layout customer-checkout-layout"><form className="checkout-form" onSubmit={(event) => void submit(event)}>
@@ -568,7 +568,7 @@ export function AccountPage({ navigate }: { navigate: Navigate }) {
     finally { setSaving(false); }
   };
   return <div className="page-content">
-    <div className="account-head"><div><Caption1 className="section-kicker">RIDER ACCOUNT</Caption1><Title1>Your account.</Title1><Body1>Profile information and your order history.</Body1></div>
+    <div className="account-head"><div><Caption1 className="section-kicker">RIDER ACCOUNT</Caption1><Title1 as="h1">Your account.</Title1><Body1>Profile information and your order history.</Body1></div>
       <div className="account-head-actions">
         {auth.user?.app_metadata.role === 'admin' && <Button appearance="primary" icon={<ShieldCheckmarkRegular />} onClick={() => navigate('/admin')}>Admin console</Button>}
         <Button appearance="subtle" onClick={() => void auth.signOut().then(() => navigate('/'))}>Sign out</Button>
@@ -583,8 +583,8 @@ export function AccountPage({ navigate }: { navigate: Navigate }) {
       <div className="form-grid"><Field label="City"><Input autoComplete="address-level2" value={profile.city} onChange={(_, data) => setField('city', data.value)} /></Field><Field label="Province / territory"><Select value={profile.province} onChange={(_, data) => setField('province', data.value)}><Option value="">Select province</Option>{provinces.map((province) => <Option key={province} value={province}>{province}</Option>)}</Select></Field></div>
       <Button appearance="primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save profile'}</Button>
     </form>}</Card>
-      <section className="account-orders"><div className="section-head"><div><Caption1 className="section-kicker">ORDER HISTORY</Caption1><Title3>Your orders</Title3></div><Badge>{orders.length} orders</Badge></div>
-        {busy ? <Skeleton><SkeletonItem /><SkeletonItem /></Skeleton> : orders.length === 0 ? <Card className="empty-state"><Title3>No orders yet.</Title3><Body1>Your placed orders will appear here.</Body1><Button appearance="primary" onClick={() => navigate('/shop')}>Shop the catalog</Button></Card> : orders.map((order) => <CustomerOrderCard key={order.id} order={order} navigate={navigate} />)}
+      <section className="account-orders"><div className="section-head"><div><Caption1 className="section-kicker">ORDER HISTORY</Caption1><Title3 as="h2">Your orders</Title3></div><Badge>{orders.length} orders</Badge></div>
+        {busy ? <Skeleton><SkeletonItem /><SkeletonItem /></Skeleton> : orders.length === 0 ? <Card className="empty-state"><Title3 as="h2">No orders yet.</Title3><Body1>Your placed orders will appear here.</Body1><Button appearance="primary" onClick={() => navigate('/shop')}>Shop the catalog</Button></Card> : orders.map((order) => <CustomerOrderCard key={order.id} order={order} navigate={navigate} />)}
       </section>
     </div>
   </div>;
@@ -603,9 +603,9 @@ export function OrdersPage({ navigate }: { navigate: Navigate }) {
     void getCustomerOrders().then((rows) => { if (active) setOrders(rows); }).catch((reason: unknown) => { if (active) setError(errorText(reason)); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
-  return <div className="page-content"><div className="account-head"><div><Caption1 className="section-kicker">RIDER ACCOUNT</Caption1><Title1>Your orders.</Title1></div><Button appearance="subtle" onClick={() => navigate('/account')}>Profile</Button></div>
+  return <div className="page-content"><div className="account-head"><div><Caption1 className="section-kicker">RIDER ACCOUNT</Caption1><Title1 as="h1">Your orders.</Title1></div><Button appearance="subtle" onClick={() => navigate('/account')}>Profile</Button></div>
     {error && <MessageBar intent="error"><MessageBarBody>{error}</MessageBarBody></MessageBar>}
-    {loading ? <Skeleton><SkeletonItem /><SkeletonItem /></Skeleton> : orders.length === 0 ? <Card className="empty-state"><Title3>No orders yet.</Title3><Body1>Orders you place will be listed here.</Body1><Button appearance="primary" onClick={() => navigate('/shop')}>Browse the shop</Button></Card> : <div className="customer-orders-list">{orders.map((order) => <CustomerOrderCard key={order.id} order={order} navigate={navigate} />)}</div>}
+    {loading ? <Skeleton><SkeletonItem /><SkeletonItem /></Skeleton> : orders.length === 0 ? <Card className="empty-state"><Title3 as="h2">No orders yet.</Title3><Body1>Orders you place will be listed here.</Body1><Button appearance="primary" onClick={() => navigate('/shop')}>Browse the shop</Button></Card> : <div className="customer-orders-list">{orders.map((order) => <CustomerOrderCard key={order.id} order={order} navigate={navigate} />)}</div>}
   </div>;
 }
 
@@ -623,7 +623,7 @@ export function OrderDetailsPage({ orderId }: { orderId: string }) {
   if (loading) return <div className="page-content narrow"><Skeleton><SkeletonItem size={24} /><SkeletonItem /><SkeletonItem /></Skeleton></div>;
   if (error || !details) return <div className="page-content narrow"><MessageBar intent="error"><MessageBarBody>{error || 'Order not found.'}</MessageBarBody></MessageBar></div>;
   const { order, items, timeline } = details;
-  return <div className="page-content narrow"><div className="account-head"><div><Caption1 className="section-kicker">ORDER TRACKING</Caption1><Title1>{order.order_number}</Title1><Body1>Placed {new Date(order.created_at).toLocaleString()}</Body1></div><div style={{display:'flex', gap:'12px', alignItems:'center', flexWrap:'wrap'}}><Badge appearance="filled" color="brand">{statusLabel(order.status)}</Badge><Button appearance="secondary" onClick={() => setShowInvoice(true)}>View Invoice</Button><Button appearance="subtle" icon={<PrintRegular />} onClick={() => window.print()}>Print</Button></div></div>
+  return <div className="page-content narrow"><div className="account-head"><div><Caption1 className="section-kicker">ORDER TRACKING</Caption1><Title1 as="h1">{order.order_number}</Title1><Body1>Placed {new Date(order.created_at).toLocaleString()}</Body1></div><div style={{display:'flex', gap:'12px', alignItems:'center', flexWrap:'wrap'}}><Badge appearance="filled" color="brand">{statusLabel(order.status)}</Badge><Button appearance="secondary" onClick={() => setShowInvoice(true)}>View Invoice</Button><Button appearance="subtle" icon={<PrintRegular />} onClick={() => window.print()}>Print</Button></div></div>
     <div className="order-detail-grid"><Card className="order-detail-card"><CardHeader header={<Subtitle1>Items</Subtitle1>} />{items.map((item) => <div className="summary-line customer-review-item" key={item.id}><div><b>{item.product_name}</b><Caption1>SKU {item.product_sku} · Quantity {item.quantity} · {money(item.unit_price)} each</Caption1><Caption1>Warranty: {item.warranty?.trim() || 'Information not available'}</Caption1></div><strong>{money(item.line_total)}</strong></div>)}<Divider /><div className="summary-line"><span>Subtotal</span><b>{money(order.subtotal)}</b></div><div className="summary-line"><span>Delivery</span><b>{money(order.delivery_fee)}</b></div>{order.discount_amount > 0 && <div className="summary-line"><span>Discount</span><b>−{money(order.discount_amount)}</b></div>}<div className="summary-line total"><span>Total</span><b>{money(order.total)}</b></div>
       <div className="order-payment"><Badge appearance="tint">Cash on Delivery</Badge><Badge appearance="tint">Payment {statusLabel(order.payment_status)}</Badge></div></Card>
       <Card className="shipping-card"><CardHeader header={<Subtitle1>Shipping information</Subtitle1>} /><Body1>{order.shipping_full_name}</Body1><Body1>{order.shipping_phone}</Body1><Body1>{order.shipping_email}</Body1><Body1>{order.shipping_address}</Body1><Body1>{order.shipping_city}, {order.shipping_province}</Body1>{order.tracking_number && <Body1>Tracking number: {order.tracking_number}</Body1>}{order.courier && <Body1>Courier: {order.courier}</Body1>}{order.customer_notes && <><Divider /><Caption1>Order notes</Caption1><Body1>{order.customer_notes}</Body1></>}</Card>
@@ -666,7 +666,7 @@ export function OrderSuccessPage({ orderId, navigate }: { orderId: string; navig
     <Card className="success-hero">
       <span className="success-ring"><CheckmarkCircleRegular /></span>
       <Caption1 className="section-kicker">ORDER CONFIRMED</Caption1>
-      <Title1>Thank you for your order</Title1>
+      <Title1 as="h1">Thank you for your order</Title1>
       <Body1 className="success-lead">
         We have received your order and it is now with our team. You only pay the courier when the parcel reaches your door.
       </Body1>

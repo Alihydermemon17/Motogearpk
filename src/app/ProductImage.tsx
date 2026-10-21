@@ -7,13 +7,16 @@ import { useState } from 'react';
    broken-image icons.
    --------------------------------------------------------------- */
 
+/* Placeholder palette for products with no uploaded image. These are muted on
+   purpose — the old bright set fought the graphite/teal identity. The labels
+   only exist for whoever reads this file next, so they name the real colours. */
 const THEMES = [
-  { tint: '#ffb400', label: 'Amber' },
-  { tint: '#38bdf8', label: 'Sky' },
-  { tint: '#34d399', label: 'Mint' },
-  { tint: '#a78bfa', label: 'Violet' },
-  { tint: '#fb7185', label: 'Rose' },
-  { tint: '#f59e0b', label: 'Gold' },
+  { tint: '#477C78', label: 'Teal' },
+  { tint: '#4A6E86', label: 'Slate' },
+  { tint: '#5C7F62', label: 'Moss' },
+  { tint: '#6B6480', label: 'Heather' },
+  { tint: '#8A5B5B', label: 'Clay' },
+  { tint: '#7A6A4A', label: 'Ochre' },
 ] as const;
 
 function hashIndex(seed: string, mod: number): number {
