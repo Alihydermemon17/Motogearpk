@@ -2985,6 +2985,9 @@ a {
 .footer-link-btn {
   background: transparent;
   border: 0;
+  /* Kept at 19.6px deliberately: the WCAG 2.2 24px target minimum is met by
+     the ::after hit-area extension further down, not by padding, so the
+     footer keeps its compact rhythm. */
   padding: 0;
   margin: 0;
   color: var(--color-on-graphite-muted);
@@ -3434,6 +3437,24 @@ textarea {
     padding: clamp(24px, 7vw, 36px) clamp(18px, 5vw, 24px);
   }
 
+  /* On narrow screens the copy wraps across the card's full width, so it runs
+     into the light end of the 100deg scrim, where alpha falls to 0.30. Sampled
+     against the real slide photograph that measured 3.06:1 for the 14px body
+     copy and 4.45:1 for the gradient-filled accent span — both under the 4.5:1
+     AA floor for their size. The desktop gradient is left exactly as it is;
+     this only raises the mobile floor, where the copy covers most of the photo
+     anyway. Verified by sampling the actual slide image through the scrim
+     rather than by eye. */
+  .hero-overlay {
+    background: linear-gradient(
+      100deg,
+      rgba(10, 14, 17, 0.9) 0%,
+      rgba(10, 14, 17, 0.86) 38%,
+      rgba(10, 14, 17, 0.8) 68%,
+      rgba(10, 14, 17, 0.76) 100%
+    );
+  }
+
   .hero-card .fui-Title1 {
     max-width: 100%;
     font-size: var(--type-display);
@@ -3850,6 +3871,22 @@ body {
   font-size: var(--type-body);
   line-height: 1.5;
   transition: background-color var(--motion-smooth) var(--motion-ease), color var(--motion-smooth) var(--motion-ease);
+}
+
+/* Fluent's tint badge paints 12px brand-coloured text on a pale brand wash,
+   which measured 3.31:1 — under the 4.5:1 floor for its size. This swaps in the
+   darker accent token that exists for exactly this case: it is 7.76:1 on light
+   surfaces and must never be used as a fill. */
+.trust-section .review-summary-badge {
+  color: var(--color-accent-text);
+}
+
+/* The support phone and email in the delivery grid render as bare anchors with
+   no class, measuring 20px tall — under the 24px target minimum. These are
+   inline, so vertical padding grows the clickable box without changing the
+   line box or shifting the rows beneath. */
+.delivery-info-grid a[href] {
+  padding: 2px 0;
 }
 
 .review-breakdown {
@@ -4904,26 +4941,27 @@ img {
   gap: 6px;
   font-size: 11.5px;
   letter-spacing: 0.06em;
-  /* The topbar sits on the light header (--color-header, ~#f4f3ef), not on
-     graphite. The old rgba(255,255,255,.62) was a dark-theme leftover and
-     measured 1.11:1 there. --color-accent is 4.28:1 on this surface, which is
-     under the 4.5:1 body floor, so the small 11.5px text uses the darker
-     accent-text token (7.76:1). */
-  color: var(--color-accent-text);
+  /* .topbar paints its OWN graphite gradient (see the .topbar rule above) — it
+     is not the light header surface beneath it. Measured on that gradient,
+     --color-text-muted-on-dark (#9faaa9) gives 7.06:1 on --color-graphite-deep
+     and 6.13:1 on --color-graphite, both clearing the 4.5:1 floor for 11.5px
+     text. --color-accent-text (#2e524f) was a dark-on-dark mistake here: it
+     measured 1.70:1. */
+  color: var(--color-text-muted-on-dark);
   white-space: nowrap;
 }
-/* The <b> carries the phrase that must be read, so it holds the same AA-safe
-   token as its parent. --color-accent (#477c78) measures only 4.28:1 on the
-   light topbar, under the 4.5:1 body floor for 11.5px text. */
-.topbar-item b { color: var(--color-accent-text); font-weight: 600; }
-/* Icons are non-text UI, so they only need the 3:1 large/graphic threshold;
-   --color-accent clears that at 4.28:1. */
-.topbar-item svg { color: var(--color-accent); width: 14px; height: 14px; }
+/* The <b> carries the phrase that must be read. Same AA-safe token as its
+   parent; the 600 weight is what marks it as the emphasis. */
+.topbar-item b { color: var(--color-text-muted-on-dark); font-weight: 600; }
+/* Icons are non-text UI and only need the 3:1 graphic threshold, but this is
+   the accent sitting on a dark surface, so it uses the token built for exactly
+   that: --color-accent-on-dark = 7.20:1 / 6.24:1 on the gradient. */
+.topbar-item svg { color: var(--color-accent-on-dark); width: 14px; height: 14px; }
 .topbar-dot {
   width: 3px; height: 3px; border-radius: 50%;
-  /* Dark-theme leftover: white at 22% was invisible on the light topbar.
-     These dots are purely decorative separators between the trust items. */
-  background: var(--color-border);
+  /* Purely decorative separators between the trust items, on graphite — white
+     at 22% keeps them visible without competing with the text. */
+  background: rgba(255, 255, 255, 0.22);
 }
 .site-header { padding-bottom: 0; }
 .header-inner { padding-block: 10px; }

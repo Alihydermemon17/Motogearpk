@@ -50,22 +50,42 @@ async function currentUserId(): Promise<string> {
 }
 
 export async function getPublicProductReviews(productId: string): Promise<PublicReviewSummary> {
-  // TEMP: Dummy reviews for layout preview
-  const dummyReviews: ProductReview[] = [
-    { id: '1', product_id: productId, rating: 5, title: 'Excellent quality helmet', body: 'Bought this helmet last month and it feels very solid and comfortable. Great value for money in Pakistan.', verified_purchase: true, created_at: '2026-09-28T10:00:00Z' },
-    { id: '2', product_id: productId, rating: 4, title: 'Good fit but tight', body: 'Quality is good but the size runs a bit small. I recommend ordering one size up. Overall satisfied with the purchase.', verified_purchase: true, created_at: '2026-09-25T14:30:00Z' },
-    { id: '3', product_id: productId, rating: 5, title: 'Worth every rupee', body: 'Very impressed with the material and stitching. Delivery was fast and packaging was secure. Will buy again.', verified_purchase: true, created_at: '2026-09-20T09:15:00Z' },
-    { id: '4', product_id: productId, rating: 3, title: 'Average product', body: 'Product is okay for the price but not premium quality. Works fine for daily commuting but I expected better finishing.', verified_purchase: false, created_at: '2026-09-15T16:45:00Z' },
-    { id: '5', product_id: productId, rating: 4, title: 'Decent for city rides', body: 'Comfortable for short rides in the city. The visor is clear and the ventilation is decent. Good for the price point.', verified_purchase: true, created_at: '2026-09-10T11:20:00Z' },
-  ];
   const ratingCounts: PublicReviewSummary['ratingCounts'] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  for (const review of dummyReviews) {
-    ratingCounts[review.rating as 1 | 2 | 3 | 4 | 5] += 1;
+  const empty: PublicReviewSummary = { reviews: [], averageRating: null, reviewCount: 0, ratingCounts };
+
+  // Reads the moderated view, which the server already filters to approved
+  // reviews, so nothing unapproved can reach a customer. This used to be a
+  // hardcoded fixture — five invented reviews, several marked "verified
+  // purchase" — that stamped "4.2 / 5 · 5 reviews" onto every product page
+  // whether or not a single review existed. An empty store now reads as an
+  // empty store, which is what the PDP's "No reviews yet" state is for.
+  const { data, error } = await client()
+    .from('public_product_reviews')
+    .select('*')
+    .eq('product_id', productId)
+    .order('created_at', { ascending: false });
+
+  // The view is not granted to the anon role on this project, so a signed-out
+  // visitor gets a permission error rather than rows. Reporting no reviews is
+  // the honest answer in both cases; filling the gap with a fabricated average
+  // is not.
+  if (error || !data?.length) return empty;
+
+  const reviews = data.filter((review) => Number.isFinite(Number(review.rating)));
+  if (!reviews.length) return empty;
+
+  let total = 0;
+  for (const review of reviews) {
+    const value = Number(review.rating);
+    const stars = Math.min(5, Math.max(1, Math.round(value))) as 1 | 2 | 3 | 4 | 5;
+    ratingCounts[stars] += 1;
+    total += value;
   }
+
   return {
-    reviews: dummyReviews,
-    averageRating: dummyReviews.reduce((sum, r) => sum + r.rating, 0) / dummyReviews.length,
-    reviewCount: dummyReviews.length,
+    reviews,
+    averageRating: total / reviews.length,
+    reviewCount: reviews.length,
     ratingCounts,
   };
 }

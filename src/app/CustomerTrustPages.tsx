@@ -76,7 +76,10 @@ export function ProductReviews({ product, navigate }: { product: Product; naviga
 
   return <section className="trust-section customer-reviews" aria-labelledby="product-reviews-title">
     <div className="section-head"><div><Caption1 className="section-kicker">CUSTOMER REVIEWS</Caption1><Title3 id="product-reviews-title">Reviews</Title3></div>
-      {summary && <Badge appearance="tint">{summary.averageRating === null ? 'No rating yet' : `${summary.averageRating.toFixed(1)} / 5`} · {summary.reviewCount} {summary.reviewCount === 1 ? 'review' : 'reviews'}</Badge>}
+      {/* Only shown once real reviews exist — with none, the "No reviews yet"
+          card below already says so, and a "0 reviews" chip above it just adds
+          noise. */}
+      {summary && summary.reviewCount > 0 && <Badge appearance="tint" className="review-summary-badge">{summary.averageRating?.toFixed(1)} / 5 · {summary.reviewCount} {summary.reviewCount === 1 ? 'review' : 'reviews'}</Badge>}
     </div>
     {error && <MessageBar intent="error"><MessageBarBody>{error} <Button appearance="transparent" onClick={() => void load()}>Try again</Button></MessageBarBody></MessageBar>}
     {!busy && summary && summary.reviewCount > 0 && <div className="review-breakdown" aria-label="Rating breakdown">
