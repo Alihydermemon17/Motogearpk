@@ -4,7 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f4f3ef" />
+    <meta
+      name="description"
+      content="Motorcycle gear, lighting and performance parts for Pakistan. Fitment recorded per listing, nationwide cash on delivery, and a real support line."
+    />
     <title>MotoGear PK | Ride with intent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="/img/hero-1-1920.jpg"
+      imagesrcset="/img/hero-1-960.jpg 960w, /img/hero-1-1920.jpg 1920w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
     <script>
       (() => {
         try {
@@ -13,7 +31,7 @@
             ? preference
             : 'light';
           document.querySelector('meta[name="theme-color"]')?.setAttribute(
-            'content', document.documentElement.dataset.theme === 'dark' ? '#171e22' : '#f4f3ef');
+            'content', document.documentElement.dataset.theme === 'dark' ? '#0f1417' : '#f4f3ef');
         } catch {
           document.documentElement.dataset.theme = 'light';
         }

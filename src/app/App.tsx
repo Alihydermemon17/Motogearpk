@@ -1,20 +1,18 @@
-import { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  Badge, Body1, Button, Card, CardPreview, Caption1, createDarkTheme, createLightTheme,
-  Divider, FluentProvider, Input, MessageBar, MessageBarBody, Select, Skeleton, SkeletonItem,
-  Subtitle1, Title1, Title2, Title3,
+  Badge, Body1, Button, Caption1, createDarkTheme, createLightTheme,
+  Divider, FluentProvider, MessageBar, MessageBarBody, Select, Skeleton, SkeletonItem,
+  Subtitle1, Title1, Title3,
 } from '@fluentui/react-components';
-import { Option } from './SelectOption';
 import {
-  ArrowRightRegular, ArrowUpRightRegular, CartRegular, ChatRegular, CheckmarkCircleRegular,
-  ChevronLeftRegular, DismissRegular, HeartFilled, HeartRegular, HomeRegular, LocationRegular,
-  MailRegular, MoneyRegular, NavigationRegular, PersonRegular, PersonVoiceRegular, PhoneRegular,
-  RocketRegular, SearchRegular, ShieldCheckmarkRegular, SparkleRegular, TimerRegular,
+  ArrowRightRegular, CartRegular, ChatRegular, CheckmarkCircleRegular,
+  CheckmarkRegular, ChevronLeftRegular, DismissRegular, HeartFilled, HeartRegular, HomeRegular,
+  LocationRegular, MailRegular, NavigationRegular, PersonVoiceRegular,
+  PhoneRegular, SearchRegular, ShieldCheckmarkRegular, SparkleRegular, TimerRegular,
   VehicleBicycleRegular, WeatherMoonRegular, WeatherSunnyRegular, WrenchRegular,
 } from '@fluentui/react-icons';
 import { api } from '../api';
-import type { AvailabilityStatus, Product } from '../api/types';
+import type { AvailabilityStatus, BikeModel, Product } from '../api/types';
 import type { User } from '@supabase/supabase-js';
 import AdminDashboard from './AdminDashboard';
 import { getPublicBusinessSettings } from '../api/admin';
@@ -40,11 +38,17 @@ import { ProductImage } from './ProductImage';
  * and brand badges all pick up the teal identity from here.
  */
 const brandRamp = {
-  10: '#0e1a19', 20: '#17302e', 30: '#204340', 40: '#2e5c58',
-  50: '#477c78', 60: '#417370', 70: '#3b6a67', 80: '#35615e',
-  90: '#2e5754', 100: '#274c4a', 110: '#1f3f3d', 120: '#173130',
-  130: '#102423', 140: '#0a1918', 150: '#05100f', 160: '#020807',
+  10: '#0a1513', 20: '#12241f', 30: '#1a332e', 40: '#23443e',
+  50: '#2f6b63', 60: '#2a6059', 70: '#25554e', 80: '#1f4f49',
+  90: '#1b453f', 100: '#173b36', 110: '#14322e', 120: '#102926',
+  130: '#0d201e', 140: '#091816', 150: '#06100f', 160: '#030908',
 };
+
+/* Fluent's own components (buttons, inputs, cards, message bars) resolve their
+   type through the theme, not the CSS cascade — so the single body family has
+   to be injected here or those components keep the default system stack. */
+const fontFamilyBase =
+  "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
 const THEME_KEY = 'motogearpk.theme';
 type ThemeMode = 'light' | 'dark';
 
@@ -108,12 +112,11 @@ function App() {
   const auth = useCustomerAuth();
   const cart = useCustomerCart();
   const wishlist = useCustomerWishlist();
-  const reduceMotion = useReducedMotion();
 
   const toggleTheme = () => {
     const nextTheme: ThemeMode = themeMode === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = nextTheme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#171e22' : '#f4f3ef');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#0f1417' : '#f4f3ef');
     try {
       window.localStorage.setItem(THEME_KEY, nextTheme);
     } catch {
@@ -158,7 +161,11 @@ function App() {
   }, []);
 
   const route = path.split('?')[0];
-  const theme = themeMode === 'dark' ? createDarkTheme(brandRamp) : createLightTheme(brandRamp);
+  const theme = {
+    ...(themeMode === 'dark' ? createDarkTheme(brandRamp) : createLightTheme(brandRamp)),
+    fontFamilyBase,
+    fontFamilyMonospace: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+  };
 
   // The admin console is its own full-screen workspace — no storefront header or footer.
   if (route.startsWith('/admin')) {
@@ -194,7 +201,7 @@ function App() {
             </MessageBar>
           </div>
         )}
-        <motion.main key={path} initial={reduceMotion ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0 : 0.18, ease: 'easeOut' }}>
+        <main className="mg-main" key={path}>
           {route === '/' && <HomePage onNavigate={navigate} onAdd={addProduct} />}
           {route === '/shop' && <ShopPage onNavigate={navigate} onAdd={addProduct} />}
           {route.startsWith('/product/') && <ProductPage slug={route.split('/').pop() ?? ''} onNavigate={navigate} onAdd={addProduct} />}
@@ -242,7 +249,7 @@ function App() {
           {!KNOWN_ROUTES.some((known) => (known.exact ? route === known.path : route.startsWith(known.path))) && (
             <NotFoundPage navigate={navigate} />
           )}
-        </motion.main>
+        </main>
         <Footer onNavigate={navigate} />
       </div>
     </FluentProvider>
@@ -257,6 +264,19 @@ function App() {
     cart.add(product.id);
   }
 }
+
+/* --------------------------------------------------------------------------
+   Storefront chrome
+   The top bar and header are one sticky unit: scrolling collapses the top bar
+   so the header shrinks to 72px (64px on mobile) and the shop filter bar can
+   sit right underneath it.
+   -------------------------------------------------------------------------- */
+
+const TOPBAR_NOTICES = [
+  { icon: <LocationRegular aria-hidden="true" />, label: 'Nationwide cash on delivery' },
+  { icon: <CheckmarkCircleRegular aria-hidden="true" />, label: '7-day easy returns' },
+  { icon: <PersonVoiceRegular aria-hidden="true" />, label: 'Support 9am – 9pm, 7 days' },
+] as const;
 
 function Header({
   path,
@@ -278,139 +298,332 @@ function Header({
   onNavigate: (path: string) => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [catOpen, setCatOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [query, setQuery] = useState('');
+  const [notice, setNotice] = useState(0);
+  const burgerRef = useRef<HTMLButtonElement | null>(null);
   const business = getBusinessDisplaySettings();
   const route = path.split('?')[0];
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // One rotating message on mobile, three static ones on desktop. Rotation is
+  // skipped entirely under prefers-reduced-motion.
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const id = window.setInterval(
+      () => setNotice((current) => (current + 1) % TOPBAR_NOTICES.length),
+      4500,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setMenuOpen(false);
+      setCatOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Panels are modal on phones: stop the page behind them from scrolling, and
+  // hand focus back to the control that opened the drawer when it closes.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [menuOpen]);
+
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (wasOpen.current && !menuOpen) burgerRef.current?.focus();
+    wasOpen.current = menuOpen;
+  }, [menuOpen]);
+
+  const go = (next: string) => {
+    setMenuOpen(false);
+    setCatOpen(false);
+    onNavigate(next);
+  };
+
+  const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const term = query.trim();
+    go(term ? `/shop?q=${encodeURIComponent(term)}` : '/shop');
+  };
+
+  const navItems = [
+    { label: 'Home', path: '/', active: route === '/' },
+    { label: 'Shop', path: '/shop', active: route === '/shop' },
+    {
+      label: 'Track order',
+      path: '/orders',
+      active: route === '/orders' || route.startsWith('/orders/'),
+    },
+  ];
+
   return (
-    <header className="site-header">
-      <div className="topbar">
-        <div className="topbar-inner">
-          <span className="topbar-item"><LocationRegular /><b>Nationwide Cash on Delivery</b></span>
-          <span className="topbar-dot" aria-hidden="true" />
-          <span className="topbar-item"><CheckmarkCircleRegular />7-Day Easy Returns</span>
-          <span className="topbar-dot" aria-hidden="true" />
-          <span className="topbar-item"><PersonRegular /> Support ·9am – 9pm</span>
+    <header className={`mg-header${scrolled ? ' is-scrolled' : ''}`}>
+      <div className="mg-topbar">
+        <div className="mg-topbar-inner">
+          <div className="mg-topbar-desktop">
+            {TOPBAR_NOTICES.map((item, index) => (
+              <Fragment key={item.label}>
+                {index > 0 && <span className="mg-topbar-dot" aria-hidden="true" />}
+                <span className="mg-topbar-item">
+                  {item.icon}
+                  {item.label}
+                </span>
+              </Fragment>
+            ))}
+          </div>
+          <span className="mg-topbar-item mg-topbar-mobile">
+            {TOPBAR_NOTICES[notice].icon}
+            {TOPBAR_NOTICES[notice].label}
+          </span>
         </div>
       </div>
-      <div className="header-inner">
+
+      <div className="mg-header-inner">
         <button
           type="button"
-          className="brand-button"
-          onClick={() => onNavigate('/')}
+          className="mg-logo"
+          onClick={() => go('/')}
           aria-label="MotoGear PK home"
         >
-          <span className="brand-mark">MG</span>
-          <span className="brand-name">
-            MOTOGEAR <b>PK</b>
+          <span className="mg-logo-mark" aria-hidden="true">MG</span>
+          <span className="mg-logo-text">
+            MotoGear <span className="mg-logo-tag">PK</span>
           </span>
         </button>
 
-        <nav
-          id="main-navigation"
-          className={`header-nav${menuOpen ? ' is-open' : ''}`}
-          aria-label="Main navigation"
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') {
-              setMenuOpen(false);
-              document.querySelector<HTMLButtonElement>('.mobile-menu-toggle')?.focus();
-            }
-          }}
-        >
-          <Button
-            appearance="subtle"
-            icon={<HomeRegular />}
-            onClick={() => { setMenuOpen(false); onNavigate('/'); }}
-            className={`nav-link-btn${route === '/' ? ' is-active' : ''}`}
-          >
-            Home
-          </Button>
-          <Button
-            appearance="subtle"
-            icon={<SearchRegular />}
-            onClick={() => { setMenuOpen(false); onNavigate('/shop'); }}
-            className={`nav-link-btn${route === '/shop' ? ' is-active' : ''}`}
-          >
-            Shop
-          </Button>
-          <Button
-            appearance="subtle"
-            icon={<PersonRegular />}
-            onClick={() => { setMenuOpen(false); onNavigate(signedIn ? '/account' : '/login'); }}
-            className={`nav-link-btn${route === '/account' || route.startsWith('/orders') ? ' is-active' : ''}`}
-          >
-            {signedIn ? 'My Account' : 'Sign In'}
-          </Button>
-          {isAdmin && (
-            <Button
-              appearance="primary"
-              icon={<ShieldCheckmarkRegular />}
-              onClick={() => { setMenuOpen(false); onNavigate('/admin'); }}
-              className="nav-link-btn nav-admin-btn"
+        <nav className="mg-nav" aria-label="Main navigation">
+          {navItems.slice(0, 2).map((item) => (
+            <button
+              key={item.path}
+              type="button"
+              className={`mg-nav-link${item.active ? ' is-active' : ''}`}
+              aria-current={item.active ? 'page' : undefined}
+              onClick={() => go(item.path)}
             >
-              Admin
-            </Button>
-          )}
+              {item.label}
+            </button>
+          ))}
+
+          <div
+            className={`mg-nav-menu-wrap${catOpen ? ' is-open' : ''}`}
+            onMouseLeave={() => setCatOpen(false)}
+          >
+            <button
+              type="button"
+              className="mg-nav-link"
+              aria-haspopup="true"
+              aria-expanded={catOpen}
+              onClick={() => setCatOpen((open) => !open)}
+              onFocus={() => setCatOpen(true)}
+            >
+              Categories
+              <span className="mg-nav-caret" aria-hidden="true" />
+            </button>
+            <div className="mg-nav-menu">
+              {CATEGORY_TILES.map((tile) => (
+                <button
+                  key={tile.label}
+                  type="button"
+                  className="mg-nav-menu-item"
+                  onClick={() => go(`/shop?category=${encodeURIComponent(tile.label)}`)}
+                >
+                  {tile.label}
+                  <span>{tile.hint}</span>
+                </button>
+              ))}
+              <button type="button" className="mg-nav-menu-item" onClick={() => go('/shop')}>
+                All products
+                <span>Full catalog</span>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className={`mg-nav-link${navItems[2].active ? ' is-active' : ''}`}
+            aria-current={navItems[2].active ? 'page' : undefined}
+            onClick={() => go(navItems[2].path)}
+          >
+            {navItems[2].label}
+          </button>
         </nav>
 
-        <div className="header-actions">
-          <Button
-            appearance="subtle"
-            className="mobile-menu-toggle"
-            icon={menuOpen ? <DismissRegular /> : <NavigationRegular />}
-            aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
-            aria-controls="main-navigation"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((open) => !open)}
-          />
-          <Button
-            appearance="subtle"
-            className="theme-toggle"
-            icon={themeMode === 'dark' ? <WeatherSunnyRegular /> : <WeatherMoonRegular />}
+        <div className="mg-tools">
+          <form className="mg-search" role="search" onSubmit={submitSearch}>
+            <SearchRegular aria-hidden="true" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search parts…"
+              aria-label="Search products"
+            />
+          </form>
+
+          <button
+            type="button"
+            className="mg-icon-btn mg-hide-sm"
+            onClick={onToggleTheme}
             aria-label={`Switch to ${themeMode === 'dark' ? 'light' : 'dark'} mode`}
             title={`Switch to ${themeMode === 'dark' ? 'light' : 'dark'} mode`}
-            onClick={onToggleTheme}
-          />
-          <Button
-            appearance="subtle"
-            className="header-icon-btn"
-            icon={<SearchRegular />}
-            onClick={() => onNavigate('/shop')}
-            aria-label="Search products"
-            title="Search products"
-          />
+          >
+            {themeMode === 'dark' ? <WeatherSunnyRegular /> : <WeatherMoonRegular />}
+          </button>
 
-          <span className="header-sep" aria-hidden="true" />
-
-          <Button
-            appearance="subtle"
-            className={`wishlist-button${route === '/wishlist' ? ' is-active' : ''}${wishlistCount > 0 ? ' has-items' : ''}`}
-            icon={wishlistCount > 0 ? <HeartFilled /> : <HeartRegular />}
-            onClick={() => onNavigate('/wishlist')}
-            aria-label={`Wishlist with ${wishlistCount} ${wishlistCount === 1 ? 'item' : 'items'}`}
+          <button
+            type="button"
+            className={`mg-icon-btn mg-hide-sm${route === '/wishlist' ? ' is-active' : ''}`}
+            onClick={() => go('/wishlist')}
+            aria-label={`Wishlist, ${wishlistCount} ${wishlistCount === 1 ? 'item' : 'items'}`}
             title="Wishlist"
           >
-            <span className="button-label">Wishlist</span>
-            {wishlistCount > 0 && (
-              <Badge key={wishlistCount} className="wishlist-count" appearance="filled" color="danger" shape="circular">
-                {wishlistCount}
-              </Badge>
-            )}
-          </Button>
+            {wishlistCount > 0 ? <HeartFilled /> : <HeartRegular />}
+            {wishlistCount > 0 && <span className="mg-count">{wishlistCount}</span>}
+          </button>
 
-          <Button
-            appearance="primary"
-            icon={<CartRegular />}
-            onClick={() => onNavigate('/cart')}
-            className="cart-button"
-            aria-label={`Shopping cart with ${cartCount} items`}
+          {isAdmin && (
+            <button
+              type="button"
+              className="mg-icon-btn mg-hide-sm"
+              onClick={() => go('/admin')}
+              aria-label="Open the admin console"
+              title="Admin console"
+            >
+              <ShieldCheckmarkRegular />
+              <span>Admin</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="mg-cart"
+            onClick={() => go('/cart')}
+            aria-label={`Shopping cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
           >
-            <span className="button-label">Cart</span>
-            <Badge key={cartCount} className="cart-count" appearance="filled" color="important" shape="circular">
-              {cartCount}
-            </Badge>
-          </Button>
+            <CartRegular />
+            <span className="mg-cart-label">Cart</span>
+            <span className="mg-count">{cartCount}</span>
+          </button>
+
+          <button
+            type="button"
+            className="mg-icon-btn mg-burger"
+            ref={burgerRef}
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mg-mobile-drawer"
+          >
+            {menuOpen ? <DismissRegular /> : <NavigationRegular />}
+          </button>
         </div>
       </div>
+
+      {menuOpen && (
+        <>
+          <div
+            className="mg-drawer-backdrop is-open"
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <aside
+            id="mg-mobile-drawer"
+            className="mg-drawer is-open"
+            aria-label="Menu"
+          >
+            <div className="mg-drawer-head">
+              <span className="mg-logo-text">
+                MotoGear <span className="mg-logo-tag">PK</span>
+              </span>
+              <button
+                type="button"
+                className="mg-icon-btn"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Close menu"
+                autoFocus
+              >
+                <DismissRegular />
+              </button>
+            </div>
+
+            <form className="mg-drawer-search" role="search" onSubmit={submitSearch}>
+              <SearchRegular aria-hidden="true" />
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search parts, helmets, exhausts…"
+                aria-label="Search products"
+              />
+            </form>
+
+            <div className="mg-drawer-links">
+              {[
+                { label: 'Home', path: '/' },
+                { label: 'Shop all products', path: '/shop' },
+                { label: 'Track order', path: '/orders' },
+                { label: signedIn ? 'My account' : 'Sign in', path: signedIn ? '/account' : '/login' },
+                { label: 'Wishlist', path: '/wishlist' },
+                { label: 'FAQs', path: '/faq' },
+                { label: 'Customer support', path: '/support' },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  className="mg-drawer-link"
+                  onClick={() => go(item.path)}
+                >
+                  {item.label}
+                  <ArrowRightRegular aria-hidden="true" />
+                </button>
+              ))}
+              {isAdmin && (
+                <button type="button" className="mg-drawer-link" onClick={() => go('/admin')}>
+                  Admin console
+                  <ShieldCheckmarkRegular aria-hidden="true" />
+                </button>
+              )}
+            </div>
+
+            <div className="mg-drawer-foot">
+              <button
+                type="button"
+                className="mg-btn mg-btn--quiet"
+                onClick={onToggleTheme}
+              >
+                {themeMode === 'dark' ? <WeatherSunnyRegular /> : <WeatherMoonRegular />}
+                {themeMode === 'dark' ? 'Light mode' : 'Dark mode'}
+              </button>
+              {business.supportPhone && (
+                <a
+                  className="mg-btn mg-btn--brand"
+                  href={`tel:${business.supportPhone.replace(/[^0-9+]/g, '')}`}
+                >
+                  <PhoneRegular />
+                  {business.supportPhone}
+                </a>
+              )}
+            </div>
+          </aside>
+        </>
+      )}
     </header>
   );
 }
@@ -488,274 +701,664 @@ function AdminGate({
   return children;
 }
 
+/* Reduced-motion is read as state rather than a constant so a user changing the
+   OS preference mid-session is respected without a reload. */
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = () => setReduced(query.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+
+  return reduced;
+}
+
+/* Motorcycle-led by design: the hero never opens on car lighting. */
 const HERO_SLIDES = [
   {
-    image: 'https://images.unsplash.com/photo-1750203926587-3fbec7edf6c0?w=1600&auto=format&fit=crop&q=80', // 1st: Car LED dark bg
-    eyebrow: 'CAR LED LIGHTING · PLUG & PLAY',
-    titleTop: 'Light up every',
-    titleAccent: 'night drive.',
-    body: "Premium LED headlights, fog lamps, and DRL upgrades for cars — crisp white output engineered for Pakistan's roads and long highway runs.",
+    desktop: '/img/hero-1-1920.jpg',
+    mobile: '/img/hero-1-960.jpg',
+    eyebrow: 'Motorcycle gear · Built for Pakistan',
+    titleTop: 'Gear for the',
+    titleAccent: 'night ride.',
+    body: 'Parts, lighting and protective kit for the way Pakistan actually rides — filtered by the bikes they fit.',
+    alt: 'Motorcyclist riding a highway at dusk',
   },
   {
-    image: 'https://images.unsplash.com/photo-1709072245768-3cd68e00fbd9?w=1600&auto=format&fit=crop&q=80', // 2nd: Jeep LED dark bg
-    eyebrow: 'OFF-ROAD & 4X4 READY',
-    titleTop: 'Built tough for',
-    titleAccent: 'every terrain.',
-    body: 'Heavy-duty LED light bars and spotlights for jeeps and 4x4s — ready for mud, mountains, and everything in between.',
+    desktop: '/img/hero-2-1920.jpg',
+    mobile: '/img/hero-2-960.jpg',
+    eyebrow: 'Lighting & electrics',
+    titleTop: 'See further.',
+    titleAccent: 'Ride safer.',
+    body: 'LED headlights, projector lenses and DRL upgrades — with the fitment each listing actually confirms.',
+    alt: 'Sport motorcycle with its headlight on in a dark garage',
   },
   {
-    image: 'https://images.unsplash.com/photo-1736831900899-ac248a3db63d?w=1600&auto=format&fit=crop&q=80', // 3rd: Bike LED dark bg
-    eyebrow: 'BUILT FOR THE WAY YOU RIDE IN PAKISTAN',
-    titleTop: 'Find your next',
-    titleAccent: 'great ride.',
-    body: "Premium motorcycle accessories, performance parts, and protective gear engineered for Pakistan's roads and high-mileage riders.",
+    desktop: '/img/hero-3-1920.jpg',
+    mobile: '/img/hero-3-960.jpg',
+    eyebrow: 'Fitment first',
+    titleTop: 'Know it fits',
+    titleAccent: 'before you buy.',
+    body: 'Every listing names the bikes it fits, so you order once and get back on the road sooner.',
+    alt: 'Naked motorcycle parked on a wooded road',
   },
 ];
 
 const HERO_INTERVAL = 6000;
 
-/* Mirrors the `categories` table — tiles deep-link into the filtered shop view. */
+/* Mirrors the `categories` table — tiles deep-link into the filtered shop view.
+   Counts are computed from the live catalog, never hardcoded. */
 const CATEGORY_TILES = [
-  { label: 'Lighting & Electrics', hint: 'LED bulbs, projectors, DRL', icon: <SparkleRegular /> },
-  { label: 'Riding Gear', hint: 'Helmets, gloves, protection', icon: <ShieldCheckmarkRegular /> },
-  { label: 'Performance Parts', hint: 'Exhausts, filters, controls', icon: <RocketRegular /> },
-  { label: 'Bike Care & Accessories', hint: 'Lubes, covers, maintenance', icon: <WrenchRegular /> },
+  { label: 'Lighting & Electrics', hint: 'LED bulbs, projectors, DRL', image: '/img/cat-lighting.jpg' },
+  { label: 'Riding Gear', hint: 'Helmets, gloves, protection', image: '/img/cat-gear.jpg' },
+  { label: 'Performance Parts', hint: 'Exhausts, filters, controls', image: '/img/cat-performance.jpg' },
+  { label: 'Bike Care & Accessories', hint: 'Lubes, covers, maintenance', image: '/img/cat-care.jpg' },
 ] as const;
 
 function Hero({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const reduceMotion = usePrefersReducedMotion();
   const [slide, setSlide] = useState(0);
-  const reduceMotion = useReducedMotion();
+  const [paused, setPaused] = useState(false);
+  const active = HERO_SLIDES[slide];
 
   useEffect(() => {
-    const timer = setInterval(() => setSlide((s) => (s + 1) % HERO_SLIDES.length), HERO_INTERVAL);
-    return () => clearInterval(timer);
-  }, [slide]);
+    if (reduceMotion || paused) return;
+    const id = window.setInterval(
+      () => setSlide((current) => (current + 1) % HERO_SLIDES.length),
+      HERO_INTERVAL,
+    );
+    return () => window.clearInterval(id);
+  }, [reduceMotion, paused]);
+
+  const findMyBike = () => {
+    const target = document.getElementById('shop-by-bike');
+    if (!target) {
+      onNavigate('/shop');
+      return;
+    }
+    target.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'center',
+    });
+  };
 
   return (
-    <Card className="hero-card">
-      <div className="hero-slides">
-        {HERO_SLIDES.map((item, i) => (
+    <section
+      className="mg-hero"
+      aria-label="Featured"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+    >
+      <div className="mg-hero-media">
+        {HERO_SLIDES.map((item, index) => (
           <img
-            key={i}
-            className={`hero-slide${i === slide ? ' active' : ''}`}
-            src={item.image}
-            alt=""
-            aria-hidden="true"
-            loading={i === 0 ? 'eager' : 'lazy'}
+            key={item.desktop}
+            className={`mg-hero-img${index === slide ? ' is-active' : ''}`}
+            src={item.desktop}
+            srcSet={`${item.mobile} 960w, ${item.desktop} 1920w`}
+            sizes="100vw"
+            alt={index === slide ? item.alt : ''}
+            aria-hidden={index === slide ? undefined : true}
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : 'low'}
             decoding="async"
+            width={1920}
+            height={1280}
           />
         ))}
+        <div className="mg-hero-scrim" aria-hidden="true" />
       </div>
-      <div className="hero-overlay" aria-hidden="true" />
-      <div className="hero-mesh" aria-hidden="true" />
-      <div className="hero-glow" aria-hidden="true" />
 
-      <div className="hero-copy">
-        <div className="hero-copy-stack">
-          {HERO_SLIDES.map((item, i) => (
-            <div
-              key={i}
-              className={`hero-copy-slide${i === slide ? ' active' : ''}`}
-              aria-hidden={i !== slide}
-              // Inert keeps the off-screen copy out of the tab order and hit testing.
-              inert={i !== slide}
+      <div className="mg-hero-inner">
+        <div className="mg-hero-copy">
+          <span className="mg-hero-eyebrow">
+            <i aria-hidden="true" />
+            {active.eyebrow}
+          </span>
+
+          <h1 className="mg-display mg-hero-title">
+            {active.titleTop} <span>{active.titleAccent}</span>
+          </h1>
+
+          <p className="mg-hero-sub">{active.body}</p>
+
+          <div className="mg-hero-actions">
+            <button
+              type="button"
+              className="mg-btn mg-btn--accent"
+              onClick={() => onNavigate('/shop')}
             >
-              <div className="eyebrow">
-                <SparkleRegular /> {item.eyebrow}
-              </div>
-              {/* The first slide carries the page's only h1; the rest are h2s so
-                  the document outline has a single top-level heading even though
-                  every slide stays mounted. Off-screen slides are aria-hidden and
-                  inert, so assistive tech only ever reads the active one. */}
-              <Title1 as={i === 0 ? 'h1' : 'h2'}>
-                {item.titleTop}<br />
-                <span>{item.titleAccent}</span>
-              </Title1>
-              <Body1>{item.body}</Body1>
-            </div>
-          ))}
-        </div>
+              Shop gear
+              <ArrowRightRegular aria-hidden="true" />
+            </button>
+            <button type="button" className="mg-btn mg-btn--ghost" onClick={findMyBike}>
+              Find parts for my bike
+            </button>
+          </div>
 
-        <div className="hero-actions">
-          <Button
-            appearance="primary"
-            size="large"
-            icon={<ArrowRightRegular />}
-            iconPosition="after"
-            onClick={() => onNavigate('/shop')}
+          <div
+            className={`mg-hero-progress${paused ? ' is-paused' : ''}`}
+            role="group"
+            aria-label="Featured slides"
           >
-            Explore the collection
-          </Button>
-          <Button
-            appearance="secondary"
-            size="large"
-            onClick={() => onNavigate('/product/h4-mini-projector-lens-led-headlight')}
-          >
-            View H4 LED Projector
-          </Button>
-        </div>
-
-        <div className="hero-foot">
-          <div className="hero-dots" role="group" aria-label="Hero slides">
-            {HERO_SLIDES.map((item, i) => (
+            {HERO_SLIDES.map((item, index) => (
               <button
-                key={i}
+                key={item.desktop}
                 type="button"
-                className={`hero-dot${i === slide ? ' active' : ''}`}
-                aria-label={`Show slide ${i + 1}: ${item.titleTop} ${item.titleAccent}`}
-                aria-pressed={i === slide}
-                onClick={() => setSlide(i)}
+                className={`mg-progress${index < slide ? ' is-done' : ''}`}
+                aria-label={`Show slide ${index + 1}: ${item.titleTop} ${item.titleAccent}`}
+                aria-pressed={index === slide}
+                onClick={() => setSlide(index)}
               >
-                {!reduceMotion && i === slide && <span className="hero-dot-progress" key={`${slide}-${reduceMotion}`} />}
+                {index === slide && !reduceMotion && (
+                  <span
+                    key={`fill-${slide}`}
+                    className="mg-progress-fill"
+                    style={{ animationDuration: `${HERO_INTERVAL}ms` }}
+                  />
+                )}
+                {index < slide && (
+                  <span
+                    className="mg-progress-fill"
+                    style={{ animation: 'none', transform: 'scaleX(1)' }}
+                  />
+                )}
               </button>
             ))}
           </div>
-          <span className="hero-counter" aria-hidden="true">
-            <b>{String(slide + 1).padStart(2, '0')}</b>
-            <i />
-            <span>{String(HERO_SLIDES.length).padStart(2, '0')}</span>
-          </span>
         </div>
       </div>
-    </Card>
+    </section>
   );
 }
 
-function HomePage({ onNavigate, onAdd }: { onNavigate: (path: string) => void; onAdd: (product: Product) => void }) {
-  const { products: featured, state, error, retry } = useProducts(true);
+/* Progressive-enhancement reveal: the element renders fully visible, and only
+   an element that starts below the fold is "armed" (hidden) before the
+   IntersectionObserver plays its 250ms fade. A 1.5s failsafe guarantees content
+   can never stay hidden if the observer never fires. */
+function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const start = element.getBoundingClientRect().top;
+    if (start < window.innerHeight * 0.92) return;
+
+    element.classList.add('is-pending');
+
+    const reveal = () => {
+      element.classList.remove('is-pending');
+      element.classList.add('is-in');
+    };
+
+    const failsafe = window.setTimeout(reveal, 1500);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          window.clearTimeout(failsafe);
+          observer.disconnect();
+          reveal();
+        }
+      },
+      { rootMargin: '0px 0px -6% 0px', threshold: 0.04 },
+    );
+    observer.observe(element);
+
+    return () => {
+      window.clearTimeout(failsafe);
+      observer.disconnect();
+    };
+  }, []);
 
   return (
-    <div className="page-content">
-      <ScrollReveal><Hero onNavigate={onNavigate} /></ScrollReveal>
-
-      <ScrollReveal className="home-reveal" delay={0.04}><div className="trust-strip">
-        <Trust
-          icon={<VehicleBicycleRegular />}
-          title="Fitment you can trust"
-          text="Every part lists the bikes it actually fits — no guesswork before you buy."
-        />
-        <Trust
-          icon={<LocationRegular />}
-          title="Nationwide Cash on Delivery"
-          text="Pay in hand when your order arrives, anywhere in Pakistan."
-        />
-        <Trust
-          icon={<CheckmarkCircleRegular />}
-          title="Real availability status"
-          text="Live supplier stock is shown on every product page before you order."
-        />
-      </div></ScrollReveal>
-
-      <ScrollReveal className="home-reveal" delay={0.05}><section className="category-band" aria-label="Shop by category">
-        {CATEGORY_TILES.map((tile) => (
-          <button
-            key={tile.label}
-            type="button"
-            className="category-tile"
-            onClick={() => onNavigate(`/shop?category=${encodeURIComponent(tile.label)}`)}
-          >
-            <span className="category-tile-icon" aria-hidden="true">{tile.icon}</span>
-            <span className="category-tile-copy">
-              <b>{tile.label}</b>
-              <Caption1>{tile.hint}</Caption1>
-            </span>
-            <ArrowUpRightRegular className="category-tile-arrow" aria-hidden="true" />
-          </button>
-        ))}
-      </section></ScrollReveal>
-
-      <ScrollReveal className="home-reveal" delay={0.06}><div className="catalog-heading">
-        <div className="heading-group">
-          <Caption1 className="section-kicker">MOTOGEAR PK / FEATURED</Caption1>
-          <Title2 as="h2">Gear for every ride.</Title2>
-        </div>
-        <Button
-          appearance="subtle"
-          icon={<ArrowRightRegular />}
-          iconPosition="after"
-          onClick={() => onNavigate('/shop')}
-        >
-          Browse all products
-        </Button>
-      </div></ScrollReveal>
-
-      <ScrollReveal className="home-reveal" delay={0.08}><StatePanel state={state} error={error} retry={retry} emptyLabel="No featured products yet" />
-
-      <div className="product-grid">
-        {featured.map((product) => (
-          <ProductCard key={product.id} product={product} onNavigate={onNavigate} onAdd={onAdd} />
-        ))}
-      </div>
-      </ScrollReveal>
-
-      <ScrollReveal className="home-reveal" delay={0.1}><section className="promise-band" aria-label="The MotoGear promise">
-        <div className="promise-band-head">
-          <Caption1 className="section-kicker">WHY RIDERS PICK US</Caption1>
-          <Title2 as="h2">Built around the way Pakistan rides.</Title2>
-          <Body1>
-            Long highway runs, monsoon commutes, and weekend trails. We stock what survives them —
-            and we tell you exactly what fits before you pay.
-          </Body1>
-        </div>
-        <div className="promise-grid">
-          <PromiseCard
-            icon={<ShieldCheckmarkRegular />}
-            title="Warranty on record"
-            text="Supplier warranty terms are stored against every listing, so coverage is never a maybe."
-          />
-          <PromiseCard
-            icon={<TimerRegular />}
-            title="Dispatch you can follow"
-            text="Every order gets a tracking view from confirmed through to delivered at your door."
-          />
-          <PromiseCard
-            icon={<MoneyRegular />}
-            title="Cash on delivery, nationwide"
-            text="Pay when the parcel is in your hand — in every province we ship to."
-          />
-          <PromiseCard
-            icon={<PersonVoiceRegular />}
-            title="Humans on support"
-            text="Real people answer order questions from 9am to 9pm, seven days a week."
-          />
-        </div>
-      </section></ScrollReveal>
-
-      <ScrollReveal className="home-reveal" delay={0.12}><section className="cta-band">
-        <div className="cta-band-copy">
-          <Caption1 className="section-kicker">NOT SURE WHAT FITS?</Caption1>
-          <Title2 as="h2">Tell us your bike. We will shortlist the parts.</Title2>
-          <Body1>Send your model and we will point you at parts confirmed to fit it.</Body1>
-        </div>
-        <div className="cta-band-actions">
-          <Button appearance="primary" size="large" icon={<ArrowRightRegular />} iconPosition="after" onClick={() => onNavigate('/shop')}>
-            Browse the catalog
-          </Button>
-          <Button appearance="secondary" size="large" icon={<ChatRegular />} onClick={() => onNavigate('/support')}>
-            Ask about fitment
-          </Button>
-        </div>
-      </section></ScrollReveal>
+    <div ref={ref} className={`mg-reveal ${className}`.trim()}>
+      {children}
     </div>
   );
 }
 
-function ScrollReveal({ children, className, delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const reduceMotion = useReducedMotion();
-  return <motion.div
-    className={className}
-    initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-    whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.12 }}
-    transition={{ duration: reduceMotion ? 0 : 0.28, delay: reduceMotion ? 0 : delay, ease: 'easeOut' }}
-  >{children}</motion.div>;
+function TrustStrip() {
+  const items = [
+    { icon: <LocationRegular />, title: 'Nationwide cash on delivery', text: 'Pay when the parcel reaches you.' },
+    { icon: <CheckmarkCircleRegular />, title: '7-day easy returns', text: 'Unused, in the original packaging.' },
+    { icon: <VehicleBicycleRegular />, title: 'Fitment you can check', text: 'Each listing names the bikes it fits.' },
+    { icon: <PersonVoiceRegular />, title: 'Support 9am – 9pm', text: 'Real people, seven days a week.' },
+  ];
+
+  return (
+    <div className="mg-trust">
+      <div className="mg-trust-inner">
+        {items.map((item) => (
+          <div className="mg-trust-item" key={item.title}>
+            <span className="mg-trust-icon" aria-hidden="true">{item.icon}</span>
+            <span>
+              <b>{item.title}</b>
+              <span>{item.text}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SectionHeading({
+  kicker,
+  title,
+  action,
+  onAction,
+}: {
+  kicker: string;
+  title: string;
+  action?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="mg-section-head">
+      <div className="mg-section-head-copy">
+        <p className="mg-kicker">{kicker}</p>
+        <h2 className="mg-h2">{title}</h2>
+      </div>
+      {action && onAction && (
+        <button type="button" className="mg-section-link" onClick={onAction}>
+          {action}
+          <ArrowRightRegular aria-hidden="true" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ProductGrid({
+  products,
+  onNavigate,
+  onAdd,
+  variant = 'shop',
+}: {
+  products: Product[];
+  onNavigate: (path: string) => void;
+  onAdd: (product: Product) => void;
+  variant?: 'home' | 'shop';
+}) {
+  return (
+    <div className={`mg-grid mg-grid--${variant}`}>
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} onNavigate={onNavigate} onAdd={onAdd} />
+      ))}
+    </div>
+  );
+}
+
+function ProductGridSkeleton({ count = 4, variant = 'shop' }: { count?: number; variant?: 'home' | 'shop' }) {
+  return (
+    <div className={`mg-grid mg-grid--${variant}`} aria-hidden="true">
+      {Array.from({ length: count }).map((_, index) => (
+        <div className="mg-skeleton" key={index}>
+          <div className="mg-skeleton-media" />
+          <div className="mg-skeleton-line" />
+          <div className="mg-skeleton-line is-short" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EmptyState({
+  title,
+  body,
+  action,
+  onAction,
+}: {
+  title: string;
+  body: string;
+  action?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="mg-empty">
+      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <circle cx="15" cy="45" r="8.5" stroke="currentColor" strokeWidth="2" />
+        <circle cx="49" cy="45" r="8.5" stroke="currentColor" strokeWidth="2" />
+        <path d="M15 45 27 27h9l5 8h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M23 27h10M36 35h12l-4 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M44 22h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+      <h3 className="mg-h3">{title}</h3>
+      <p>{body}</p>
+      {action && onAction && (
+        <button type="button" className="mg-btn mg-btn--quiet" onClick={onAction}>
+          {action}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* Make → model picker. Years are not tracked in the catalog yet, so the
+   selector stops at the model rather than inventing a year dimension. */
+function BikeSelector({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const [bikes, setBikes] = useState<BikeModel[]>([]);
+  const [brand, setBrand] = useState('');
+  const [modelId, setModelId] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    api.listBikeModels()
+      .then((rows) => {
+        if (!active) return;
+        setBikes(rows);
+        setBrand(rows[0]?.brand ?? '');
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (!bikes.length) return null;
+
+  const brands = Array.from(
+    new Set(bikes.map((bike) => bike.brand).filter((value): value is string => Boolean(value))),
+  ).sort((a, b) => a.localeCompare(b));
+  const models = bikes.filter((bike) => bike.brand === brand);
+
+  return (
+    <div className="mg-bikes" id="shop-by-bike">
+      <div className="mg-field">
+        <label htmlFor="bike-make">Make</label>
+        <select
+          id="bike-make"
+          className="mg-select"
+          value={brand}
+          onChange={(event) => {
+            setBrand(event.target.value);
+            setModelId('');
+          }}
+        >
+          {brands.map((make) => (
+            <option key={make} value={make}>{make}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mg-field">
+        <label htmlFor="bike-model">Model</label>
+        <select
+          id="bike-model"
+          className="mg-select"
+          value={modelId}
+          onChange={(event) => setModelId(event.target.value)}
+        >
+          <option value="">Select a model</option>
+          {models.map((bike) => (
+            <option key={bike.id} value={bike.id}>{bike.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <button
+        type="button"
+        className="mg-btn mg-btn--brand"
+        disabled={!modelId}
+        onClick={() => onNavigate(`/shop?bike=${encodeURIComponent(modelId)}`)}
+      >
+        Show parts
+        <ArrowRightRegular aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
+
+function PromiseBand() {
+  const features = [
+    {
+      icon: <ShieldCheckmarkRegular />,
+      title: 'Warranty on record',
+      text: 'Supplier warranty terms are stored against every listing, so coverage is never a maybe.',
+    },
+    {
+      icon: <TimerRegular />,
+      title: 'Dispatch you can follow',
+      text: 'Every order carries a tracking view from confirmed through to delivered.',
+    },
+    {
+      icon: <WrenchRegular />,
+      title: 'Live supplier availability',
+      text: 'Availability comes from current supplier data rather than an invented stock number.',
+    },
+    {
+      icon: <LocationRegular />,
+      title: 'Delivered nationwide',
+      text: 'We ship across Pakistan and show the real delivery fee before you confirm.',
+    },
+  ];
+
+  return (
+    <section className="mg-band" aria-labelledby="why-riders">
+      <img
+        className="mg-band-bg"
+        src="/img/band-riders.jpg"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+      />
+      <div className="mg-band-veil" aria-hidden="true" />
+      <div className="mg-band-inner mg-container">
+        <div className="mg-band-head">
+          <p className="mg-kicker">Why riders pick us</p>
+          <h2 className="mg-h2" id="why-riders">Built around the way Pakistan rides.</h2>
+          <p className="mg-body">
+            Long highway runs, monsoon commutes, weekend trails. We stock what survives them —
+            and we tell you what fits before you pay.
+          </p>
+        </div>
+
+        <div className="mg-features">
+          {features.map((feature) => (
+            <div className="mg-feature" key={feature.title}>
+              <span className="mg-feature-icon" aria-hidden="true">{feature.icon}</span>
+              <b>{feature.title}</b>
+              <p>{feature.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CtaBand({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const business = getBusinessDisplaySettings();
+  const whatsapp = business.whatsappNumber?.replace(/[^0-9]/g, '');
+
+  return (
+    <section className="mg-cta" aria-labelledby="cta-title">
+      <img
+        className="mg-cta-bg"
+        src="/img/cta-workshop.jpg"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+      />
+      <div className="mg-cta-veil" aria-hidden="true" />
+      <div className="mg-cta-inner">
+        <div className="mg-cta-copy">
+          <p className="mg-kicker">Not sure what fits?</p>
+          <h2 className="mg-h2" id="cta-title">Tell us your bike. We will shortlist the parts.</h2>
+          <p className="mg-body">
+            Send your make and model on WhatsApp and we will point you at parts confirmed to fit it.
+          </p>
+        </div>
+        <div className="mg-cta-actions">
+          {whatsapp && (
+            <a
+              className="mg-btn mg-btn--accent"
+              href={`https://wa.me/${whatsapp}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <ChatRegular aria-hidden="true" />
+              Ask on WhatsApp
+            </a>
+          )}
+          <a
+            className="mg-btn mg-btn--ghost"
+            href="/shop"
+            onClick={(event) => {
+              event.preventDefault();
+              onNavigate('/shop');
+            }}
+          >
+            Browse catalog
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HomePage({ onNavigate, onAdd }: { onNavigate: (path: string) => void; onAdd: (product: Product) => void }) {
+  const { products, state, error, retry } = useProducts();
+  // Four items keeps a complete row at every breakpoint (4-up on desktop,
+  // 2×2 below 1024) — the grid never ends on a half-empty row.
+  const featured = products.slice(0, 4);
+  const counts = products.reduce<Record<string, number>>((total, product) => {
+    total[product.category] = (total[product.category] ?? 0) + 1;
+    return total;
+  }, {});
+
+  return (
+    <>
+      <Hero onNavigate={onNavigate} />
+      <TrustStrip />
+
+      <Reveal>
+        <section className="mg-section mg-section--canvas" aria-labelledby="category-title">
+          <div className="mg-container">
+            <div className="mg-section-head">
+              <div className="mg-section-head-copy">
+                <p className="mg-kicker">Shop by category</p>
+                <h2 className="mg-h2" id="category-title">Four ways to build your ride.</h2>
+              </div>
+            </div>
+
+            <div className="mg-cats">
+              {CATEGORY_TILES.map((tile) => {
+                const count = counts[tile.label] ?? 0;
+                return (
+                  <button
+                    key={tile.label}
+                    type="button"
+                    className="mg-cat"
+                    onClick={() => onNavigate(`/shop?category=${encodeURIComponent(tile.label)}`)}
+                  >
+                    <img src={tile.image} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                    <span className="mg-cat-arrow" aria-hidden="true">
+                      <ArrowRightRegular />
+                    </span>
+                    <span className="mg-cat-copy">
+                      <strong>{tile.label}</strong>
+                      <span className="mg-cat-meta">
+                        <span className="mg-cat-count">
+                          {count} {count === 1 ? 'product' : 'products'}
+                        </span>
+                        <span className="mg-cat-hint"> · {tile.hint}</span>
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
+      <Reveal>
+        <section className="mg-section mg-section--surface" aria-labelledby="featured-title">
+          <div className="mg-container">
+            <div className="mg-section-head">
+              <div className="mg-section-head-copy">
+                <p className="mg-kicker">Featured gear</p>
+                <h2 className="mg-h2" id="featured-title">Newest in the catalog.</h2>
+              </div>
+              <button type="button" className="mg-section-link" onClick={() => onNavigate('/shop')}>
+                View all
+                <ArrowRightRegular aria-hidden="true" />
+              </button>
+            </div>
+
+            {state === 'loading' && <ProductGridSkeleton count={4} variant="home" />}
+            {state === 'error' && (
+              <EmptyState
+                title="We could not load the catalog"
+                body={error || 'Something went wrong while fetching products.'}
+                action="Try again"
+                onAction={retry}
+              />
+            )}
+            {state === 'empty' && (
+              <EmptyState
+                title="No featured products yet"
+                body="New stock is added regularly. Browse the full catalog to see everything listed."
+                action="Browse the catalog"
+                onAction={() => onNavigate('/shop')}
+              />
+            )}
+            {state === 'data' && (
+              <ProductGrid products={featured} onNavigate={onNavigate} onAdd={onAdd} variant="home" />
+            )}
+          </div>
+        </section>
+      </Reveal>
+
+      <Reveal>
+        <section className="mg-section mg-section--canvas" aria-labelledby="bike-title">
+          <div className="mg-container">
+            <div className="mg-section-head">
+              <div className="mg-section-head-copy">
+                <p className="mg-kicker">Shop by bike</p>
+                <h2 className="mg-h2" id="bike-title">Start from your motorcycle.</h2>
+              </div>
+            </div>
+            <BikeSelector onNavigate={onNavigate} />
+          </div>
+        </section>
+      </Reveal>
+
+      <Reveal>
+        <PromiseBand />
+      </Reveal>
+
+      <Reveal>
+        <section className="mg-section mg-section--canvas" aria-label="Contact the team">
+          <div className="mg-container">
+            <CtaBand onNavigate={onNavigate} />
+          </div>
+        </section>
+      </Reveal>
+    </>
+  );
 }
 
 function ShopPage({ onNavigate, onAdd }: { onNavigate: (path: string) => void; onAdd: (product: Product) => void }) {
-  const { products, state, error, retry } = useProducts(false);
-  const initialCategory = new URLSearchParams(window.location.search).get('category') ?? 'All';
-  const [category, setCategory] = useState(initialCategory);
-  const [search, setSearch] = useState('');
+  const { products, state, error, retry } = useProducts();
+  const params = new URLSearchParams(window.location.search);
+  const [category, setCategory] = useState(params.get('category') ?? 'All');
+  const [search, setSearch] = useState(params.get('q') ?? '');
+  const [bikeId, setBikeId] = useState<string | null>(params.get('bike'));
+  const [bikeName, setBikeName] = useState('');
   const [sort, setSort] = useState<SortKey>('featured');
   const [categories, setCategories] = useState<string[]>(['All']);
 
@@ -767,132 +1370,210 @@ function ShopPage({ onNavigate, onAdd }: { onNavigate: (path: string) => void; o
     return () => { active = false; };
   }, []);
 
+  // Resolve the friendly bike name for the active-filter chip.
+  useEffect(() => {
+    if (!bikeId) { setBikeName(''); return; }
+    let active = true;
+    api.listBikeModels()
+      .then((rows) => {
+        if (!active) return;
+        const hit = rows.find((row) => row.id === bikeId);
+        setBikeName(hit ? `${hit.brand ? `${hit.brand} ` : ''}${hit.name}` : '');
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, [bikeId]);
+
   // Once categories are known, a deep link that names a removed category falls back to All.
-  // Guarded on the load completing so the initial selection is not wiped out.
   useEffect(() => {
     if (categories.length <= 1) return;
     if (category !== 'All' && !categories.includes(category)) setCategory('All');
   }, [categories, category]);
 
+  // Filters are additive, so every URL change has to re-emit the whole state —
+  // otherwise picking a category silently drops a bike or search deep link.
+  const syncUrl = (next: { category?: string; bike?: string | null }) => {
+    const params = new URLSearchParams();
+    const nextCategory = next.category ?? category;
+    const nextBike = next.bike === undefined ? bikeId : next.bike;
+    if (nextCategory !== 'All') params.set('category', nextCategory);
+    if (nextBike) params.set('bike', nextBike);
+    if (search.trim()) params.set('q', search.trim());
+    const query = params.toString();
+    window.history.replaceState({}, '', `/shop${query ? `?${query}` : ''}`);
+  };
+
   const selectCategory = (next: string) => {
     setCategory(next);
-    // Keep the URL in sync so the filtered view can be shared or bookmarked.
-    const url = next === 'All' ? '/shop' : `/shop?category=${encodeURIComponent(next)}`;
-    window.history.replaceState({}, '', url);
+    syncUrl({ category: next });
+  };
+
+  const clearBike = () => {
+    setBikeId(null);
+    syncUrl({ bike: null });
   };
 
   const filtered = applyCatalogSort(
     products.filter(
       (product) =>
         (category === 'All' || product.category === category) &&
+        (!bikeId || (product.compatibleBikes ?? []).some((bike) => bike.id === bikeId)) &&
         (!search ||
           product.name.toLowerCase().includes(search.toLowerCase()) ||
-          product.brand?.toLowerCase().includes(search.toLowerCase()))
+          product.brand?.toLowerCase().includes(search.toLowerCase())),
     ),
-    sort
+    sort,
   );
 
-  const hasActiveFilters = category !== 'All' || search.trim() !== '';
+  const hasActiveFilters = category !== 'All' || search.trim() !== '' || Boolean(bikeId);
 
   const clearFilters = () => {
     setCategory('All');
     setSearch('');
+    setBikeId(null);
     setSort('featured');
     window.history.replaceState({}, '', '/shop');
   };
 
   return (
-    <div className="page-content">
-      <div className="shop-header">
-        <div>
-          <Caption1 className="section-kicker">MOTORCYCLE ACCESSORIES & PARTS</Caption1>
-          <Title1 as="h1">Parts for every ride.</Title1>
-          <Body1>Explore lighting, controls, protective gear, and road-ready essentials with live supplier availability.</Body1>
-        </div>
+    <>
+      <div className="mg-container mg-shop-head">
+        <p className="mg-kicker">Motorcycle accessories &amp; parts</p>
+        <h1 className="mg-h1" style={{ marginTop: 10 }}>Parts for every ride.</h1>
+        <p>
+          Lighting, controls, protective gear and road-ready essentials — with the fitment and
+          availability each listing actually records.
+        </p>
       </div>
 
-      <div className="shop-toolbar">
-        <div className="shop-search-field">
-          <Input
-            value={search}
-            onChange={(_, data) => setSearch(data.value)}
-            placeholder="Search parts, helmets, exhausts..."
-            contentBefore={<SearchRegular />}
-            className="search-input"
-          />
-        </div>
+      <div className="mg-filterbar">
+        <div className="mg-filterbar-row">
+          <div className="mg-search-field">
+            <SearchRegular aria-hidden="true" />
+            <input
+              className="mg-input"
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search parts, helmets, exhausts…"
+              aria-label="Search products"
+            />
+          </div>
 
-        <label className="shop-sort">
-          <Caption1>Sort</Caption1>
-          <Select value={sort} onChange={(_, data) => setSort(data.value as SortKey)}>
-            <Option value="featured">Featured</Option>
-            <Option value="price-asc">Price: low to high</Option>
-            <Option value="price-desc">Price: high to low</Option>
-            <Option value="name">Name A–Z</Option>
-          </Select>
-        </label>
+          <div className="mg-field">
+            <select
+              className="mg-select"
+              value={sort}
+              onChange={(event) => setSort(event.target.value as SortKey)}
+              aria-label="Sort products"
+            >
+              <option value="featured">Sort: Featured</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="name">Name A–Z</option>
+            </select>
+          </div>
 
-        <div className="results-count">
-          <Caption1>
+          <div className="mg-results" role="status" aria-live="polite">
             <b>{filtered.length}</b> {filtered.length === 1 ? 'product' : 'products'}
-          </Caption1>
+          </div>
         </div>
-      </div>
 
-      <div className="category-pill-group shop-category-row">
-        {categories.map((cat) => (
-          <Button
-            key={cat}
-            appearance={category === cat ? 'primary' : 'subtle'}
-            size="small"
-            onClick={() => selectCategory(cat)}
-            className="category-pill"
-          >
-            {cat}
-          </Button>
-        ))}
-      </div>
-
-      {hasActiveFilters && (
-        <div className="shop-active-filters">
-          <Caption1>Showing</Caption1>
-          {category !== 'All' && (
-            <span className="filter-chip">
-              {category}
-              <button type="button" onClick={() => selectCategory('All')} aria-label={`Clear category ${category}`}>
-                <DismissRegular />
-              </button>
-            </span>
-          )}
-          {search.trim() !== '' && (
-            <span className="filter-chip">
-              “{search.trim()}”
-              <button type="button" onClick={() => setSearch('')} aria-label="Clear search">
-                <DismissRegular />
-              </button>
-            </span>
-          )}
-          <button type="button" className="filter-clear" onClick={clearFilters}>Clear all</button>
+        <div className="mg-pills" role="group" aria-label="Filter by category">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`mg-pill${category === cat ? ' is-active' : ''}`}
+              aria-pressed={category === cat}
+              onClick={() => selectCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
-      )}
 
-      <StatePanel state={state} error={error} retry={retry} emptyLabel="No products match these filters" />
-
-      {state === 'data' && filtered.length === 0 && (
-        <Card className="empty-state">
-          <SearchRegular />
-          <Title3 as="h3">Nothing matches those filters</Title3>
-          <Body1>Try a different category, or clear the filters to see the full catalog.</Body1>
-          <Button appearance="primary" onClick={clearFilters}>Clear filters</Button>
-        </Card>
-      )}
-
-      <div className="product-grid">
-        {filtered.map((product) => (
-          <ProductCard key={product.id} product={product} onNavigate={onNavigate} onAdd={onAdd} />
-        ))}
+        {hasActiveFilters && (
+          <div className="mg-active-filters">
+            <span>Filtered by</span>
+            {category !== 'All' && (
+              <span className="mg-chip">
+                {category}
+                <button
+                  type="button"
+                  onClick={() => selectCategory('All')}
+                  aria-label={`Clear category ${category}`}
+                >
+                  <DismissRegular />
+                </button>
+              </span>
+            )}
+            {bikeId && (
+              <span className="mg-chip">
+                {bikeName || 'Selected bike'}
+                <button
+                  type="button"
+                  onClick={clearBike}
+                  aria-label="Clear bike filter"
+                >
+                  <DismissRegular />
+                </button>
+              </span>
+            )}
+            {search.trim() !== '' && (
+              <span className="mg-chip">
+                “{search.trim()}”
+                <button type="button" onClick={() => setSearch('')} aria-label="Clear search">
+                  <DismissRegular />
+                </button>
+              </span>
+            )}
+            <button type="button" className="mg-clear" onClick={clearFilters}>Clear all</button>
+          </div>
+        )}
       </div>
-    </div>
+
+      <div className="mg-container mg-shop-grid-wrap">
+        <section aria-labelledby="shop-results-title">
+          <h2 className="mg-sr-only" id="shop-results-title">
+            {category === 'All' ? 'All products' : category}
+          </h2>
+
+          {state === 'loading' && <ProductGridSkeleton count={6} variant="shop" />}
+
+          {state === 'error' && (
+            <EmptyState
+              title="We could not load the catalog"
+              body={error || 'Something went wrong while fetching products.'}
+              action="Try again"
+              onAction={retry}
+            />
+          )}
+
+          {state === 'empty' && (
+            <EmptyState
+              title="No products listed yet"
+              body="The catalog is being stocked. Check back shortly or ask us about a specific part."
+              action="Talk to support"
+              onAction={() => onNavigate('/support')}
+            />
+          )}
+
+          {state === 'data' && filtered.length === 0 && (
+            <EmptyState
+              title="Nothing matches those filters"
+              body="Try a different category or bike, or clear the filters to see the full catalog."
+              action="Clear filters"
+              onAction={clearFilters}
+            />
+          )}
+
+          {state === 'data' && filtered.length > 0 && (
+            <ProductGrid products={filtered} onNavigate={onNavigate} onAdd={onAdd} variant="shop" />
+          )}
+        </section>
+      </div>
+    </>
   );
 }
 
@@ -1100,26 +1781,66 @@ function ProductCard({
 }) {
   const wishlist = useCustomerWishlist();
   const wished = wishlist.has(product.id);
+  const [added, setAdded] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
   const availability =
     product.availabilityStatus ??
     (product.status === 'Limited' || product.status === 'Low stock' ? 'CHECK_REQUIRED' : 'AVAILABLE');
   const available = isAvailable(product);
-  const availabilityColor =
-    availability === 'AVAILABLE' ? 'success' : availability === 'UNAVAILABLE' ? 'danger' : 'warning';
+
+  // Only ever show a discount that exists in the data (selling price vs the
+  // recorded discount price) — never a computed or invented promotion.
+  const originalPrice = product.originalPrice ?? 0;
+  const hasDiscount = originalPrice > product.pricePk && product.pricePk > 0;
+  const discountPct = hasDiscount
+    ? Math.round((1 - product.pricePk / originalPrice) * 100)
+    : 0;
+
+  useEffect(() => () => {
+    if (timer.current) window.clearTimeout(timer.current);
+  }, []);
+
+  const handleAdd = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (!available) return;
+    onAdd(product);
+    setAdded(true);
+    if (timer.current) window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setAdded(false), 1500);
+  };
 
   return (
-    <Card className="product-card" onClick={() => onNavigate(`/product/${product.slug}`)}>
-      <CardPreview className="product-preview">
-        <ProductImage src={product.image} alt={product.name} category={product.category} name={product.name} />
-        <div className="product-badge-wrap">
-          <Badge appearance="filled" color={availabilityColor}>
-            {availabilityLabel(availability)}
-          </Badge>
-        </div>
-        <Button
-          appearance="subtle"
-          className={`wishlist-toggle${wished ? ' is-active' : ''}`}
-          icon={wished ? <HeartFilled /> : <HeartRegular />}
+    <article className="mg-card">
+      {/* One stretched link = one keyboard stop for the whole card. The wishlist
+          and cart buttons sit above it and stop propagation. */}
+      <a
+        className="mg-card-link"
+        href={`/product/${product.slug}`}
+        aria-label={`View ${product.name}`}
+        onClick={(event) => {
+          event.preventDefault();
+          onNavigate(`/product/${product.slug}`);
+        }}
+      />
+
+      <div className="mg-card-media">
+        <ProductImage
+          className="mg-card-img"
+          src={product.image}
+          alt={product.name}
+          category={product.category}
+          name={product.name}
+        />
+
+        {discountPct > 0 && <span className="mg-discount">-{discountPct}%</span>}
+
+        <span className={`mg-stock${available ? '' : ' is-unavailable'}`}>
+          {available ? 'In stock' : availabilityLabel(availability)}
+        </span>
+
+        <button
+          type="button"
+          className={`mg-wish${wished ? ' is-active' : ''}`}
           aria-pressed={wished}
           aria-label={wished ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
           title={wished ? 'Remove from wishlist' : 'Add to wishlist'}
@@ -1127,90 +1848,69 @@ function ProductCard({
             event.stopPropagation();
             wishlist.toggle(product.id);
           }}
-        />
-      </CardPreview>
-
-      <div className="product-card-body">
-        <span className="product-brand">{product.brand ?? 'MOTOGEAR PK'}</span>
-        <Subtitle1 className="product-title" title={product.name}>
-          {product.name}
-        </Subtitle1>
-        <div className="product-meta-row">
-          <span className="product-cat-pill">{product.category}</span>
-          {product.compatibleBikes?.length ? (
-            <span className="product-bikes-pill">{product.compatibleBikes.length} Bikes</span>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="product-card-bottom">
-        <div className="price-stack">
-          <strong>{money(product.pricePk)}</strong>
-          {product.originalPrice && product.originalPrice > product.pricePk ? (
-            <del>{money(product.originalPrice)}</del>
-          ) : null}
-        </div>
-        <Button
-          size="small"
-          appearance="primary"
-          icon={<CartRegular />}
-          disabled={!available}
-          onClick={(event) => {
-            event.stopPropagation();
-            onAdd(product);
-          }}
         >
-          {available ? 'Add to cart' : 'Out of stock'}
-        </Button>
+          {wished ? <HeartFilled /> : <HeartRegular />}
+        </button>
       </div>
-    </Card>
-  );
-}
 
-function Trust({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
-  return (
-    <div className="trust-item">
-      <span className="trust-icon">{icon}</span>
-      <div>
-        <Subtitle1>{title}</Subtitle1>
-        <Caption1>{text}</Caption1>
+      <div className="mg-card-body">
+        <span className="mg-card-cat">{product.category}</span>
+        <h3 className="mg-card-title" title={product.name}>{product.name}</h3>
       </div>
-    </div>
-  );
-}
 
-function PromiseCard({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
-  return (
-    <article className="promise-card">
-      <span className="promise-card-icon" aria-hidden="true">{icon}</span>
-      <Subtitle1 className="promise-card-title">{title}</Subtitle1>
-      <Caption1 className="promise-card-text">{text}</Caption1>
+      <div className="mg-card-foot">
+        <div className="mg-price">
+          <strong>{money(product.pricePk)}</strong>
+          {hasDiscount && <del>{money(originalPrice)}</del>}
+        </div>
+
+        <button
+          type="button"
+          className={`mg-add${added ? ' is-added' : ''}`}
+          disabled={!available}
+          onClick={handleAdd}
+          aria-label={available ? `Add ${product.name} to cart` : `${product.name} is unavailable`}
+        >
+          {added ? (
+            <>
+              <CheckmarkRegular aria-hidden="true" />
+              Added
+            </>
+          ) : (
+            <>
+              <CartRegular aria-hidden="true" />
+              {available ? 'Add to cart' : 'Unavailable'}
+            </>
+          )}
+        </button>
+      </div>
     </article>
   );
 }
 
-function useProducts(featured: boolean) {
+function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [state, setState] = useState<DataState>('loading');
   const [error, setError] = useState('');
 
-  const load = () => {
+  const load = useCallback(() => {
     setState('loading');
     api.getCatalog()
       .then((items) => {
-        setProducts(featured ? items.filter((item) => item.featured) : items);
+        setProducts(items);
         setState(items.length ? 'data' : 'empty');
       })
       .catch((reason: unknown) => {
         setError(reason instanceof Error ? reason.message : 'Unable to load catalog.');
         setState('error');
       });
-  };
+  }, []);
 
-  useEffect(load, [featured]);
+  useEffect(load, [load]);
   return { products, state, error, retry: load };
 }
 
+/* Used by the product detail page, which has its own (narrower) layout. */
 function StatePanel({
   state,
   error,
@@ -1223,37 +1923,24 @@ function StatePanel({
   emptyLabel: string;
 }) {
   if (state === 'loading') {
-    return (
-      <div className="loading-grid">
-        <Skeleton>
-          <SkeletonItem size={32} />
-          <SkeletonItem />
-          <SkeletonItem />
-        </Skeleton>
-        <Skeleton>
-          <SkeletonItem size={32} />
-          <SkeletonItem />
-          <SkeletonItem />
-        </Skeleton>
-      </div>
-    );
+    return <ProductGridSkeleton count={4} variant="shop" />;
   }
   if (state === 'error') {
     return (
-      <MessageBar intent="error">
-        <MessageBarBody>
-          {error || 'Something went wrong.'} <Button appearance="transparent" onClick={retry}>Try again</Button>
-        </MessageBarBody>
-      </MessageBar>
+      <EmptyState
+        title="We could not load this page"
+        body={error || 'Something went wrong.'}
+        action="Try again"
+        onAction={retry}
+      />
     );
   }
   if (state === 'empty') {
     return (
-      <Card className="empty-state">
-        <SparkleRegular />
-        <Title3>{emptyLabel}</Title3>
-        <Body1>Try another view and we will keep the good stuff coming.</Body1>
-      </Card>
+      <EmptyState
+        title={emptyLabel}
+        body="Try another view and we will keep the good stuff coming."
+      />
     );
   }
   return null;
@@ -1266,104 +1953,86 @@ function Footer({ onNavigate }: { onNavigate: (path: string) => void }) {
   const whatsapp = business.whatsappNumber?.trim();
 
   return (
-    <footer className="site-footer">
-      <div className="footer-ribbon" aria-hidden="true" />
-      <div className="footer-inner">
-        <div className="footer-grid">
-          <div className="footer-col brand-col">
+    <footer className="mg-footer">
+      <div className="mg-container">
+        <div className="mg-footer-grid">
+          <div className="mg-footer-brand-col">
             <button
               type="button"
-              className="brand-button footer-brand-button"
+              className="mg-footer-brand"
               onClick={() => onNavigate('/')}
               aria-label="MotoGear PK home"
             >
-              <span className="brand-mark">MG</span>
-              <span className="brand-name footer-brand-name">
-                MOTOGEAR <b>PK</b>
+              <span className="mg-logo-mark" aria-hidden="true">MG</span>
+              <span className="mg-logo-text">
+                MotoGear <span className="mg-logo-tag">PK</span>
               </span>
             </button>
-            <p className="footer-desc">
-              Motorcycle parts and accessories for riders in Pakistan. Product fitment, warranty, and
-              availability details are shown when recorded.
+            <p className="mg-footer-desc">
+              Motorcycle parts and accessories for riders in Pakistan. Product fitment,
+              warranty and availability details are shown when recorded.
             </p>
-            <div className="footer-trust-row">
-              <span className="footer-trust-chip"><ShieldCheckmarkRegular /> Warranty on record</span>
-              <span className="footer-trust-chip"><TruckDeliveryIcon /> Nationwide COD</span>
+          </div>
+
+          <div>
+            <h2 className="mg-footer-title">Shop</h2>
+            <div className="mg-footer-links">
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/')}>Home</button>
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/shop')}>All products</button>
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/shop?category=Riding%20Gear')}>Riding gear</button>
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/shop?category=Lighting%20%26%20Electrics')}>Lighting &amp; electrics</button>
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/wishlist')}>Wishlist</button>
             </div>
           </div>
 
-          <div className="footer-col links-col">
-            <h2 className="footer-col-title">Shop</h2>
-            <div className="footer-links">
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/')}>Home</button>
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/shop')}>All products</button>
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/shop?category=Riding%20Gear')}>Riding gear</button>
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/shop?category=Lighting%20%26%20Electrics')}>Lighting &amp; electrics</button>
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/wishlist')}>Wishlist</button>
+          <div>
+            <h2 className="mg-footer-title">Account</h2>
+            <div className="mg-footer-links">
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/account')}>My account</button>
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/orders')}>Track an order</button>
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/cart')}>Shopping cart</button>
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/faq')}>FAQs</button>
+              <button type="button" className="mg-footer-link" onClick={() => onNavigate('/support')}>Customer support</button>
             </div>
           </div>
 
-          <div className="footer-col links-col">
-            <h2 className="footer-col-title">Account</h2>
-            <div className="footer-links">
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/account')}>My account</button>
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/orders')}>Track an order</button>
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/cart')}>Shopping cart</button>
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/faq')}>FAQs</button>
-              <button type="button" className="footer-link-btn" onClick={() => onNavigate('/support')}>Customer support</button>
-            </div>
-          </div>
-
-          <div className="footer-col contact-col">
-            <h2 className="footer-col-title">Talk to us</h2>
-            <p className="footer-cities">
-              Order questions, fitment checks, and returns — answered by our team, 9am to 9pm, seven days a week.
+          <div className="mg-footer-contact-col">
+            <h2 className="mg-footer-title">Talk to us</h2>
+            <p className="mg-footer-note">
+              Order questions, fitment checks and returns — answered 9am to 9pm, seven days a week.
             </p>
-            <ul className="footer-contact-list">
+            <ul className="mg-footer-contact">
               {phone && (
                 <li>
-                  <a className="footer-contact-link" href={`tel:${phone.replace(/[^0-9+]/g, '')}`}>
+                  <a href={`tel:${phone.replace(/[^0-9+]/g, '')}`}>
                     <PhoneRegular aria-hidden="true" />
-                    <span><Caption1>Call us</Caption1><b>{phone}</b></span>
+                    <span><small>Call us</small><b>{phone}</b></span>
                   </a>
                 </li>
               )}
               {whatsapp && (
                 <li>
-                  <a
-                    className="footer-contact-link"
-                    href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer">
                     <ChatRegular aria-hidden="true" />
-                    <span><Caption1>WhatsApp</Caption1><b>{whatsapp}</b></span>
+                    <span><small>WhatsApp</small><b>{whatsapp}</b></span>
                   </a>
                 </li>
               )}
               {email && (
                 <li>
-                  <a className="footer-contact-link" href={`mailto:${email}`}>
+                  <a href={`mailto:${email}`}>
                     <MailRegular aria-hidden="true" />
-                    <span><Caption1>Email</Caption1><b>{email}</b></span>
+                    <span><small>Email</small><b>{email}</b></span>
                   </a>
-                </li>
-              )}
-              {!phone && !email && !whatsapp && (
-                <li className="footer-contact-empty">
-                  <LocationRegular aria-hidden="true" />
-                  <span><Caption1>Cash on Delivery</Caption1><b>Delivered across Pakistan</b></span>
                 </li>
               )}
             </ul>
           </div>
         </div>
 
-        <Divider className="footer-divider" />
-
-        <div className="footer-bottom">
-          <span className="footer-bottom-copy">© 2026 {business.businessName}. All rights reserved. Ride with intent.</span>
-          <span className="footer-bottom-badge">Cash on Delivery · MotoGear PK</span>
+        <div className="mg-footer-bottom">
+          <span>© 2026 {business.businessName}. All rights reserved.</span>
+          <strong>Ride with intent</strong>
         </div>
       </div>
     </footer>

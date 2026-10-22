@@ -75,7 +75,7 @@ export function ProductReviews({ product, navigate }: { product: Product; naviga
   };
 
   return <section className="trust-section customer-reviews" aria-labelledby="product-reviews-title">
-    <div className="section-head"><div><Caption1 className="section-kicker">CUSTOMER REVIEWS</Caption1><Title3 id="product-reviews-title">Reviews</Title3></div>
+    <div className="section-head"><div><Caption1 className="section-kicker">Customer feedback</Caption1><Title3 as="h2" id="product-reviews-title">Reviews</Title3></div>
       {/* Only shown once real reviews exist — with none, the "No reviews yet"
           card below already says so, and a "0 reviews" chip above it just adds
           noise. */}
