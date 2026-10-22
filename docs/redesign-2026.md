@@ -142,9 +142,10 @@ pattern — the main chunk dropped from ~1.18 MB to ~1.06 MB.
   input inside its 42px shell.
 * Reduced motion: hero autoplay, progress animation, card hover transforms,
   reveal transitions and the drawer slide are all disabled.
-* Contrast sweep: 12 routes × 6 widths (320–1440) plus a second pass over the
-  pages whose headings changed. 4,264 text pairs checked; worst pair 5.37:1
-  (product `AVAILABLE` badge). No layout overflow at 320px.
+* Contrast sweep: 12 routes × 6 widths (320–1440) — 4,264 text pairs — plus a
+  second pass over every route whose headings changed. No failures; the worst
+  pair on the final pass is **4.91:1** (trust-strip subtext on Home). No layout
+  overflow at 320px.
 * Disabled controls are visually inert (neutral fill + muted text), not a faded
   version of the active CTA.
 * Web vitals measured on the dev server (unminified bundle, no CDN):
