@@ -1,14 +1,18 @@
 # Storefront redesign — “night ride / garage”
 
-Visual and UX pass only. Routes, data access, cart/wishlist/auth logic, admin and
-the manual payment workflow are untouched. Everything below is presentation.
+Visual and UX pass only. Pass 1 rebuilt the storefront shell; Pass 2 tightened
+the shop and rebuilt the admin into an operations console. Routes, data access,
+cart/wishlist/auth logic, RLS and the manual payment workflow are unchanged.
+Everything here is presentation.
 
 ---
 
-## 1. Design tokens (`src/styles.css`)
+## 1. Design tokens (`src/styles/tokens.css`)
 
 One palette, declared once and mapped onto the semantic tokens the rest of the
-stylesheet already consumes.
+stylesheet already consumes. The CSS is split by surface (`base.css`,
+`storefront/*.css`, `admin/*.css`) and `src/styles.css` imports the parts in
+cascade order.
 
 | Token | Light | Dark | Used for |
 | --- | --- | --- | --- |
@@ -69,11 +73,12 @@ Fluent buttons no longer render in the old greyed teal.
 | `TrustStrip` | One slim inline row of 4 items, divided by hairlines, no boxes. Becomes a single scrollable row on phones with a soft mask edge. |
 | `CategoryTiles` | Four photo tiles (4/5 desktop, 4/3 on phones) with title, **live** product count and hint. Counts come from the catalog, never hardcoded. |
 | `SectionHeading` | Kicker + h2 + right-aligned “View all →” on the same baseline. |
-| `ProductGrid` | 4 columns ≥1024 on Home (4 items = complete row everywhere); Shop is 4 / 3 / 2 / 2. `align-items: stretch`, 24px gap (12px phone). |
+| `ProductGrid` | 4 columns ≥1024 on Home (4 items = complete row everywhere); Shop is 4 / 3 / 2 / 2. `align-items: stretch`, 24px gap (12px phone). A trailing gap is closed by one ask tile spanning exactly the empty cells, never two. |
 | `ProductCard` | One component used by Home, Shop and Wishlist. Flex column, `height:100%`, 4:3 media with a soft gradient tile, `object-fit: contain`, one category chip, two-line clamped title with reserved height, footer pinned with `margin-top:auto`. Whole card is **one** focusable link (stretched-link) with wishlist/cart buttons above it. Prices 20px/700 with a struck original and an amber discount pill only when the data records a discount. “Add to cart” is 44px, full width on mobile, shows “Added ✓” for 1.5s. |
+| `AskCard` | Dark graphite tile used only to close a partial grid row. Amber WhatsApp action, Browse all ghost action, no price/stock/cart. |
 | `CtaBand` | Workshop photograph under a directional scrim, real `wa.me` link from `business_settings`, plus a “Browse catalog” ghost button. |
 | `Footer` | Four columns, dark ink, no duplicated COD chips, contact rows from live settings, single bottom bar. |
-| `Shop` | Sticky filter bar (search, sort, count), scrollable category pills, active-filter chips, card-shaped skeletons, designed empty state with “Clear filters”, `?q=` / `?category=` / `?bike=` deep links. |
+| `Shop` | 300px category band (200px phone) with breadcrumb, category `h1` and live count; filter bar below on canvas with sort, count and scrollable category pills; header search is the only search ≥1120px; active-filter chips; card-shaped skeletons; empty state with Ask on WhatsApp + Browse all; `?q=` / `?category=` / `?bike=` deep links. |
 | `BikeSelector` | Make → model picker driven by `bike_models`; deep-links to `/shop?bike=<id>`. Stops at model because the catalog does not record a year — no invented dimension. |
 | `Reveal` | Progressive enhancement: content renders **visible**; only an element that starts below the fold is armed and faded in by an IntersectionObserver, with a 1.5s failsafe. Nothing can stay hidden if JS is slow or fails. |
 
@@ -155,9 +160,115 @@ pattern — the main chunk dropped from ~1.18 MB to ~1.06 MB.
   photograph at ~2.1–2.3s in dev, which is why the first hero frame is
   `fetchpriority=high` and preloaded from `index.html`.
 
-## 5. Screenshots
+## 5. Pass 2 — Shop and the operations console
 
-`docs/screenshots/` holds the before/after pairs (JPEG, full page):
+Pass 2 kept the Pass 1 palette and type system. It finished the shop’s entry
+states and replaced the old single-file admin with a dense, live-data console.
+No query, RPC, migration, RLS policy, cart/checkout rule or payment rule was
+changed.
+
+### 5.1 Shop
+
+* **Category band.** The shop opens on a 300px band (200px on phones): category
+  or catalog photograph, an ink scrim, a `Shop / <Category>` breadcrumb, the
+  category name as the `h1` (or `PARTS FOR EVERY RIDE.` for the full catalog),
+  one line of context and a live product count. `?category=` accepts either a
+  slug or a display name and rewrites the URL to the canonical slug. An empty or
+  unknown category resolves to All.
+* **One search, one category control.** Above 1120px the header search is the
+  only search; the filter-bar copy is hidden. Header search submits to
+  `/shop?q=`. Category pills are the primary category control; each pill shows
+  its live count and the active pill exposes `aria-pressed`. Header Categories
+  items are real `/shop?category=<slug>` anchors, so the matching pill is active
+  after navigation.
+* **No half-empty rows.** Shop is 4 / 3 / 2 / 2 columns; Home and Wishlist use
+  their own breakpoints. When the last row would leave cells blank, exactly one
+  dark **“Can’t find your part?”** tile spans the remaining cells and offers an
+  amber WhatsApp action plus Browse all. It is never rendered twice, and never
+  when the row is already complete. Cards stretch to equal height; the footer
+  (price + cart) is pinned.
+* **Zero-product categories.** On Home the tile reads **Coming soon** in amber
+  (no arrow, no navigation) and offers a WhatsApp request link. On Shop the
+  category remains in the pill row with `0`, and the grid shows
+  **“Nothing in <Category> yet”** with Ask on WhatsApp and Browse all.
+* **Illustration fallback.** `ProductImage` is the only place the SVG fallbacks
+  are chosen. Card media stay 4:3 with `object-fit: contain`, a light neutral
+  tile and 16px padding in both themes. A small sentence-case **Photo coming
+  soon** label identifies an illustration without pretending it is photography.
+* **Login.** The left panel is a photograph under an ink scrim; the QR block is
+  hidden below 1024px. `WELCOME BACK` uses Barlow Condensed at the same clamp as
+  the Shop `h1`.
+
+### 5.2 Admin shell and header
+
+* 248px sticky full-height sidebar. All 16 destinations fit at 1440×800 and
+  1440×900; the nav area is the only scrolling region and gets a fade mask when
+  it overflows. Footer links (View storefront, Sign out, signed-in email) are
+  pinned to the bottom.
+* Live count badges: Approvals from `pending_approvals`, Orders from
+  `pending_orders`, open Returns, open Support, reviews awaiting visibility.
+  No badge is hardcoded.
+* At ≤1280px the sidebar becomes a 64px icon rail with tooltips and remembers
+  the choice in `localStorage`. Below 768px the shell becomes a top bar plus
+  burger drawer. AI command center is visible but disabled and labelled
+  **Coming soon**.
+* Every page uses the same `PageHeader`: breadcrumb kicker, 28/34 semibold
+  sentence-case `h1`, one-line description, page-specific action and a personal
+  menu. The old global **New product** / **Reload** actions are gone. Overview’s
+  action is **Process orders**; Products owns **Add product**.
+
+### 5.3 Admin pages
+
+* **Overview** — four KPIs (collected revenue, orders, products live, customers),
+  an attention queue with per-type counts, a two-row order pipeline, six recent
+  orders with shared payment/fulfilment pills, jump links and estimated profit
+  with the missing-supplier-cost caveat. Every number comes from
+  `getDashboardMetrics()` / live orders; nothing is invented.
+* **Products** — dense table with search + category + status + availability
+  filters, 25-row pagination, sort, selection and archive. The right drawer has
+  Basics, Pricing & cost, Images, Fitment, Supplier & availability, Warranty &
+  returns and SEO sections; the footer is sticky; archive uses a danger
+  confirmation. At ≤767px the editor takes over the full page.
+* **Orders** — two-pane list and detail. The table shows the short (last 8)
+  order number and the full ID in the detail and `title`. Tabs carry live
+  counts. Customer and delivery are one block with click-to-call / WhatsApp.
+  Payment and fulfilment are visually distinct; payment changes still go through
+  `admin_update_order_payment` and the audit table. On phones the detail becomes
+  a full-width screen with a back button and no horizontal scroll.
+* **Shared pages** — Categories, Bike models, Suppliers, Returns, Customers,
+  Reviews, Feedback, Support, FAQs, Approvals and Automation logs all use the
+  same table/drawer/empty/error primitives, one `StatusPill`, skeletons and
+  inline “Try again” states. FAQ/Support/Returns drawers share the leave guard
+  for unsaved edits.
+* **Settings** — Store, Contact, Delivery and Policies cards with a sticky save
+  bar that appears only when dirty; header save was removed. Contact includes a
+  test WhatsApp link and the locked PKR currency is labelled as such.
+
+### 5.4 Code and CSS split
+
+* `src/app/App.tsx` is now the shell (theme, routing, chrome, admin gate).
+  Storefront pages live in `src/storefront/pages`, shared components in
+  `src/storefront/components`; admin pages and primitives live in `src/admin`.
+* The CSS monolith is split into `tokens.css`, `base.css`,
+  `storefront/{chrome,catalog,product,shop,cart,orders,footer,responsive,
+  premium,pass2,redesign,polish,misc,mobile,components,footer-premium}.css` and
+  `admin/{admin,gate}.css`, imported in cascade order from `src/styles.css`.
+* Dead legacy admin CSS was deleted and three exact duplicate rule blocks were
+  collapsed. `!important` dropped from **430 to 3** (all three are in the
+  Fluent admin gate). Where Fluent v9 injects atomic classes at equal
+  specificity, the design rules now win with one qualifying ancestor or a
+  `:root` prefix instead of `!important`; visual and computed-style snapshots
+  at 1440 and 390 were used to confirm the cascade.
+* `npm run build` and `npm test` pass; `framer-motion`, Tailwind, PostCSS and
+  Autoprefixer were removed from the dependencies.
+
+---
+
+## 6. Screenshots
+
+`docs/screenshots/` holds the Pass 1 before/after pairs and the Pass 2 set. The
+Pass 2 “before” captures were taken from the live Pass 1 deployment; “after”
+captures are the current local build. All are full-page JPEGs.
 
 | File | Viewport |
 | --- | --- |
@@ -166,24 +277,68 @@ pattern — the main chunk dropped from ~1.18 MB to ~1.06 MB.
 | `before-shop-1440.jpg` / `after-shop-1440.jpg` | Shop, 1440px |
 | `before-shop-390.jpg` / `after-shop-390.jpg` | Shop, 390px |
 | `after-home-dark-1440.jpg` / `after-shop-dark-1440.jpg` | Dark theme |
+| `pass2-before-shop-1440.jpg` / `pass2-after-shop-1440.jpg` | Shop, 1440px |
+| `pass2-before-shop-390.jpg` / `pass2-after-shop-390.jpg` | Shop, 390px |
+| `pass2-before-shop-category-1440.jpg` / `pass2-after-shop-category-1440.jpg` | `?category=lighting-electrics`, 1440px |
+| `pass2-before-shop-category-390.jpg` / `pass2-after-shop-category-390.jpg` | `?category=lighting-electrics`, 390px |
+| `pass2-before-admin-overview-1440.jpg` / `pass2-after-admin-overview-1440.jpg` | Admin Overview, 1440px |
+| `pass2-before-admin-overview-390.jpg` / `pass2-after-admin-overview-390.jpg` | Admin Overview, 390px |
+| `pass2-before-admin-products-1440.jpg` / `pass2-after-admin-products-1440.jpg` | Admin Products, 1440px |
+| `pass2-before-admin-products-390.jpg` / `pass2-after-admin-products-390.jpg` | Admin Products, 390px |
+| `pass2-after-admin-product-editor-390.jpg` | Product editor, 390px |
+| `pass2-before-admin-orders-1440.jpg` / `pass2-after-admin-orders-list-1440.jpg` | Admin Orders list + detail, 1440px |
+| `pass2-after-admin-orders-detail-1440.jpg` | Admin Orders detail, 1440px |
+| `pass2-before-admin-orders-390.jpg` / `pass2-after-admin-orders-list-390.jpg` | Admin Orders list, 390px |
+| `pass2-after-admin-orders-detail-390.jpg` | Admin Orders detail, 390px |
+| `pass2-before-admin-settings-1440.jpg` / `pass2-after-admin-settings-1440.jpg` | Admin Settings, 1440px |
+| `pass2-before-admin-settings-390.jpg` / `pass2-after-admin-settings-390.jpg` | Admin Settings, 390px |
 
 Sticky chrome is pinned to its layout position for these captures (CDP paints
-`position: sticky` elements at the last scroll offset otherwise, which reads as an
-overlap bug), and every lazy image is forced to decode first.
+`position: sticky` elements at the last scroll offset otherwise, which reads as
+an overlap bug), and every lazy image is forced to decode first.
 
-## 6. Known limitations
+## 7. Needs backend
 
-* **Shop trailing row.** With six published SKUs, a 4-up Shop grid ends with two
-  empty slots. Home is curated to a complete row; Shop shows the whole catalog
-  (4 / 3 / 2 / 2) rather than hiding stock to make the grid look neat.
+These are data/config gaps, not UI work. None of them were worked around with
+invented content.
+
+1. **Apply the FAQ accuracy migration**
+   (`supabase/migrations/20261022120000_faq_support_signin_accuracy.sql`). The
+   app reads the FAQ rows but the migration that corrects the copy has not been
+   applied to the project.
+2. **Grant anonymous read on `public_product_reviews`.** The policy currently
+   returns `42501` for anon, so approved reviews cannot be shown without a
+   backend grant (`GRANT SELECT` to `anon` on the approved view/table).
+3. **Create/confirm the `product-images` Storage bucket and its upload policy.**
+   The admin image picker uploads there; if the bucket or policy is missing the
+   upload fails defensively, but new photos cannot be stored.
+4. **Verify courier tracking URLs.** TCS, Leopards, M&P, Trax and PostEx links
+   are generated from known tracking-number patterns. Copying the number always
+   works; the deep links need verification against each courier’s current URL
+   format before they are treated as canonical.
+5. **Record supplier cost on the six live products.** Every product currently
+   has `supplier_cost` unset, so Overview/Pricing can show margin only as
+   “Not set” and estimated profit excludes the catalog. This is a data-entry
+   task, not a calculation change.
+6. **Confirm the Supabase redirect allowlist and Google consent round-trip.**
+   The auth code handles the callback errors, but the project’s allowed
+   redirect URLs and the Google consent screen need to be verified in the
+   dashboard/account. Neither can be checked from the client.
+
+## 8. Known limitations
+
 * **Bike selector has no Year.** `bike_models` stores make, model, slug and
   engine capacity only. Adding a year filter would require a schema change.
-* **Product photography is placeholder.** Six supplied 4:3 illustrations are
-  shown as-is; the card scales them 1.16× to trim the baked-in margin.
+* **Product photography is placeholder.** The six live products have no photo
+  file, so the card shows the category illustration with a “Photo coming soon”
+  label. The fallback is deliberately a neutral tile in both themes, not a fake
+  product shot.
 * **Hero/band photos** are Unsplash placeholders stored in `public/img/`
   (each < 250 KB, no external request at runtime).
+* **Admin data is sparse.** Empty states, zero-value KPIs and “no reviews”
+  panels are the honest current state of the live records, not mock data.
 
-## 7. Media credits
+## 9. Media credits
 
 All twelve files in `public/img/` are placeholder photography from **Unsplash**,
 used under the Unsplash License (free for commercial use, no attribution

@@ -1,0 +1,166 @@
+/* shop.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   SHOP TOOLBAR — search, sort, count, active filter chips
+   ============================================================ */
+:root .shop-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 18px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+:root .shop-toolbar .shop-search-field {
+  flex: 1 1 320px;
+  min-width: 240px;
+  max-width: 620px;
+}
+
+:root .shop-sort {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 190px;
+}
+
+:root .shop-sort .fui-Caption1 {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--motogear-subtle);
+  margin: 0;
+  line-height: 1;
+}
+
+:root .shop-sort .fui-Select {
+  min-width: 190px;
+}
+
+:root .shop-toolbar .results-count {
+  margin-left: auto;
+  padding-bottom: 9px;
+  white-space: nowrap;
+}
+
+:root .shop-toolbar .results-count .fui-Caption1 {
+  display: block;
+  font-size: 12.5px;
+  color: var(--motogear-muted);
+}
+
+:root .shop-toolbar .results-count b {
+  color: var(--color-text-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+:root .shop-category-row {
+  margin-bottom: 18px;
+}
+
+:root .shop-active-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: -6px 0 20px;
+}
+
+:root .shop-active-filters > .fui-Caption1 {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--motogear-subtle);
+  margin: 0;
+  line-height: 1;
+}
+
+:root .filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 320px;
+  padding: 5px 6px 5px 11px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--motogear-amber) 40%, transparent);
+  background: color-mix(in srgb, var(--motogear-amber) 12%, transparent);
+  color: var(--color-text-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root .filter-chip button {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--motogear-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+:root .filter-chip button:hover {
+  background: color-mix(in srgb, var(--motogear-amber) 26%, transparent);
+  color: var(--color-text-primary);
+}
+
+:root .filter-chip button svg {
+  width: 12px;
+  height: 12px;
+}
+
+:root .filter-clear {
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--motogear-amber);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+:root .filter-clear:hover {
+  background: color-mix(in srgb, var(--motogear-amber) 12%, transparent);
+}
+
+@media (max-width: 720px) {
+  :root .shop-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :root .shop-toolbar .shop-search-field,
+  :root .shop-sort,
+  :root .shop-sort .fui-Select {
+    max-width: none;
+    width: 100%;
+    min-width: 0;
+  }
+
+  :root .shop-toolbar .results-count {
+    margin-left: 0;
+    padding-bottom: 0;
+  }
+}
+
+

@@ -1,0 +1,102 @@
+/* gate.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   ADMIN CONSOLE — DEDICATED FULL-SCREEN WORKSPACE
+   The console renders outside the storefront shell (no header,
+   no footer). These rules finish the layout and override the
+   earlier shared responsive admin blocks further up the file.
+   ============================================================ */
+
+.admin-provider { background: var(--color-background); }
+
+/* ---- access gate (verifying / denied) ---- */
+.admin-gate {
+  min-height: 100vh;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--motogear-amber) 10%, transparent) 0%, transparent 62%),
+    var(--color-background);
+}
+
+/* Children may never exceed the gate box, so long titles wrap
+   instead of clipping on narrow phones. */
+.admin-gate > * {
+  min-width: 0;
+  max-width: 100%;
+  justify-self: center;
+  overflow-wrap: break-word;
+  white-space: normal !important;
+}
+
+.admin-gate-mark {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 17px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-on-accent);
+  background: linear-gradient(135deg, var(--color-accent-hover) 0%, var(--motogear-amber) 100%);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--color-accent) 28%, transparent);
+}
+
+.admin-gate strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(19px, 5.2vw, 26px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: center;
+  line-height: 1.1;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  white-space: normal !important;
+}
+
+.admin-gate .fui-Title3 {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(20px, 5.5vw, 28px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: center;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  white-space: normal !important;
+}
+
+.admin-gate-sub {
+  max-width: 48ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--motogear-muted);
+}
+
+.admin-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 6px;
+}

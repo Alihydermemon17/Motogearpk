@@ -1,0 +1,151 @@
+/* orders.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   ORDER CONFIRMATION + TRACKING STEPPER
+   ============================================================ */
+:root .success-hero {
+  text-align: center;
+  padding: 38px 32px 34px;
+  border-radius: 16px;
+  background:
+    radial-gradient(110% 130% at 50% -20%, color-mix(in srgb, var(--motogear-amber) 12%, transparent) 0%, transparent 60%),
+    var(--motogear-panel);
+}
+
+:root .success-ring {
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  color: #121316;
+  background: linear-gradient(135deg, var(--color-accent-hover) 0%, var(--color-accent) 100%);
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--color-accent) 34%, transparent);
+}
+:root .success-ring svg { width: 38px; height: 38px; }
+
+:root .success-lead {
+  max-width: 520px;
+  margin: 10px auto 0;
+  color: var(--motogear-muted);
+  line-height: 1.7;
+}
+
+:root .invoice-ref {
+  max-width: 470px;
+  margin: 26px auto 0;
+  padding: 15px 18px;
+  border-radius: 12px;
+  border: 1px dashed var(--motogear-border-light);
+  background: var(--color-input);
+  text-align: left;
+}
+:root .invoice-ref-label {
+  display: block;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--motogear-muted);
+  margin: 0 0 7px;
+}
+:root .invoice-ref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+:root .invoice-ref-row b {
+  font-family: var(--font-display), sans-serif;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--color-text-primary);
+  word-break: break-all;
+}
+:root .invoice-ref-row .fui-Button { border-radius: 9px; flex-shrink: 0; }
+
+:root .success-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 165px), 1fr));
+  gap: 12px;
+  margin-top: 22px;
+  text-align: left;
+}
+:root .success-stats .stat {
+  padding: 14px 16px;
+  border-radius: 11px;
+  border: 1px solid var(--motogear-border);
+  background: var(--color-input);
+}
+:root .success-stats .stat span {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--motogear-muted);
+  margin-bottom: 5px;
+}
+:root .success-stats .stat b { font-size: 16px; font-weight: 700; color: var(--color-text-primary); }
+
+/* --- vertical stepper --- */
+:root .tracking-card .fui-CardHeader { padding-bottom: 8px; }
+:root .track-steps { list-style: none; margin: 4px 0 22px; padding: 0; }
+:root .track-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 14px;
+  padding-bottom: 20px;
+}
+:root .track-step:last-child { padding-bottom: 0; }
+:root .track-step::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 38px;
+  bottom: 2px;
+  width: 2px;
+  background: var(--motogear-border);
+}
+:root .track-step:last-child::before { display: none; }
+:root .track-step.is-done::before { background: var(--motogear-amber); }
+
+:root .track-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--motogear-border);
+  background: var(--color-input);
+  color: transparent;
+  z-index: 1;
+}
+:root .track-dot svg { width: 17px; height: 17px; }
+:root .track-step.is-done .track-dot {
+  border-color: var(--motogear-amber);
+  background: var(--color-accent-on-dark);
+  color: #121316;
+}
+:root .track-step.is-current .track-dot {
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--motogear-amber) 20%, transparent);
+}
+
+:root .track-text { padding-top: 3px; }
+:root .track-text b {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 3px;
+}
+:root .track-step:not(.is-done) .track-text b { color: var(--motogear-muted); font-weight: 600; }
+:root .track-text .fui-Caption1 {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--motogear-muted);
+}
+

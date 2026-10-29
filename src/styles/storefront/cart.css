@@ -1,0 +1,566 @@
+/* cart.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   CUSTOMER CART & CHECKOUT
+   ============================================================ */
+:root .customer-cart-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+:root .customer-cart-row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 8px;
+}
+
+:root .customer-cart-row > img {
+  width: 88px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--color-input);
+}
+
+:root .customer-cart-product {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+:root .customer-cart-product .fui-Subtitle1 {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+:root .customer-cart-product .fui-Caption1 {
+  color: var(--motogear-muted);
+}
+
+:root .customer-cart-product strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: 20px;
+  color: var(--motogear-amber);
+}
+
+:root .quantity-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  background: var(--motogear-surface);
+  border: 1px solid var(--motogear-border);
+  border-radius: 6px;
+}
+
+:root .quantity-control > span {
+  min-width: 26px;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+:root .customer-cart-totals, :root .summary-card {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+}
+
+:root .summary-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--motogear-muted);
+}
+
+:root .summary-line b {
+  color: var(--motogear-text);
+  font-weight: 600;
+}
+
+:root .summary-line.total {
+  font-size: 18px;
+  color: var(--motogear-text);
+  font-weight: 700;
+  padding-top: 12px;
+}
+
+:root .summary-line.total b {
+  font-family: var(--font-display), sans-serif;
+  font-size: 24px;
+  color: var(--motogear-amber);
+}
+
+:root .customer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+/* Checkout Page */
+:root .checkout-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: clamp(20px, 2vw, 32px);
+  align-items: start;
+  margin-top: 24px;
+}
+
+:root .checkout-form {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+}
+
+:root .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+:root .customer-wide {
+  grid-column: 1 / -1;
+}
+
+:root .payment-method {
+  padding: 14px 0;
+  border-top: 1px solid var(--motogear-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--motogear-muted);
+}
+
+:root .customer-order-review {
+  position: sticky;
+  top: 90px;
+}
+
+/* Customer Auth (Sign In / Register Card) */
+:root .mg-main .auth-page-container {
+  max-width: 1020px;
+  margin: 20px auto 60px;
+  padding-inline: 16px;
+}
+
+:root .auth-page-container .auth-back-bar {
+  margin-bottom: 20px;
+}
+
+/* Split layout: brand/QR panel on the left, form panel on the right */
+:root .auth-page-container .auth-card {
+  padding: 0;
+  border-radius: 16px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 0;
+  overflow: hidden;
+}
+
+:root .auth-page-container .auth-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 40px 34px;
+  background:
+    radial-gradient(ellipse 90% 60% at 20% 0%, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 60%),
+    linear-gradient(160deg, color-mix(in srgb, var(--color-accent) 10%, transparent), color-mix(in srgb, var(--color-accent) 3%, transparent));
+  border-right: 1px solid var(--motogear-border);
+}
+
+:root .auth-page-container .auth-side-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+:root .auth-page-container .auth-side-title {
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h1);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 10px 0 0;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+:root .auth-page-container .auth-side-desc {
+  color: var(--motogear-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+:root .auth-perks {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+:root .auth-perks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+:root .auth-perks li svg {
+  color: var(--motogear-amber);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+:root .auth-page-container .auth-qr-block {
+  margin-top: auto;
+  padding-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+:root .auth-qr-box {
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--motogear-border);
+  line-height: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  flex-shrink: 0;
+}
+
+:root .auth-page-container .auth-qr-caption {
+  color: var(--motogear-muted);
+  line-height: 1.5;
+}
+
+:root .auth-page-container .auth-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 36px;
+  min-width: 0;
+}
+
+:root .auth-page-container .auth-google-btn {
+  width: 100%;
+  font-weight: 600;
+}
+
+:root .auth-page-container .auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--motogear-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+:root .auth-page-container .auth-divider::before,
+:root .auth-page-container .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--motogear-border);
+}
+
+@media (max-width: 860px) {
+  :root .auth-page-container .auth-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root .auth-page-container .auth-side {
+    border-right: 0;
+    border-bottom: 1px solid var(--motogear-border);
+    padding: 28px 24px;
+  }
+
+  :root .auth-page-container .auth-qr-block {
+    margin-top: 8px;
+    padding-top: 14px;
+  }
+
+  :root .auth-page-container .auth-main {
+    padding: 28px 24px;
+  }
+}
+
+:root .auth-page-container .auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: var(--motogear-surface);
+  border-radius: 8px;
+  border: 1px solid var(--motogear-border);
+}
+
+:root .auth-page-container .auth-tab-btn {
+  border: 0;
+  background: transparent;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--motogear-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+:root .auth-page-container .auth-tab-btn:hover {
+  color: var(--motogear-text);
+}
+
+:root .auth-page-container .auth-tab-btn.active {
+  /* The tab is a filled chip, so it needs --color-accent (the real brand
+     fill) rather than --color-accent-on-dark. The latter is the light teal
+     reserved for text on graphite, and it is value-invariant across themes
+     while --color-on-accent flips (#ffffff in light, #10201e in dark). Pairing
+     them left white text on #7fb3ae in the light theme: 1.66:1. Against
+     --color-accent the white text measures 4.75:1. */
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 700;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+:root .auth-page-container .auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+:root .auth-page-container .auth-title {
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-display);
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+:root .auth-page-container .auth-desc {
+  color: var(--motogear-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+:root .auth-page-container .auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+:root .auth-page-container .auth-form .fui-Field {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:root .auth-page-container .auth-form .fui-Input {
+  width: 100%;
+  background: var(--color-input);
+  border-color: var(--motogear-border);
+}
+
+:root .auth-page-container .auth-submit-btn {
+  margin-top: 8px;
+  width: 100%;
+  font-weight: 700;
+}
+
+:root .auth-page-container .auth-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--motogear-border);
+  font-size: 13px;
+}
+
+:root .customer-auth-page {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+:root .customer-form, :root .profile-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 24px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+}
+
+:root .customer-auth-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+:root .account-content-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(20px, 2vw, 32px);
+  align-items: start;
+  margin-top: 20px;
+}
+
+:root .profile-card {
+  padding: 24px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+}
+
+:root .customer-order-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-top: 12px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 8px;
+}
+
+:root .customer-order-card .order-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+:root .order-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr);
+  gap: clamp(20px, 2vw, 32px);
+  align-items: start;
+  margin-top: 20px;
+}
+
+:root .order-detail-card, :root .shipping-card, :root .timeline-card {
+  padding: 20px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+}
+
+:root .order-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 0;
+}
+
+:root .order-timeline-event {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 14px;
+  min-height: 56px;
+  position: relative;
+}
+
+:root .order-timeline-event:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 26px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--motogear-border);
+}
+
+:root .timeline-marker {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--motogear-border);
+  background: var(--motogear-panel);
+  color: var(--motogear-muted);
+}
+
+:root .timeline-marker.current {
+  color: var(--color-on-accent);
+  border-color: var(--motogear-amber);
+  background: var(--color-accent-on-dark);
+}
+
+:root .order-success-page {
+  display: grid;
+  gap: 20px;
+}
+
+:root .success-card {
+  padding: 48px 24px;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 12px;
+}
+
+:root .mg-main .empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  background: var(--motogear-panel);
+  border: 1px dashed var(--motogear-border);
+  border-radius: 10px;
+  color: var(--motogear-amber);
+  margin: 24px 0;
+}
+
+:root .mg-main .empty-state .fui-Title3, :root .mg-main .empty-state .fui-Body1 {
+  color: var(--motogear-text);
+}
+
+:root .loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 20px;
+  margin: 24px 0;
+}
+

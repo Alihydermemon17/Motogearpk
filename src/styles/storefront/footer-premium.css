@@ -1,0 +1,196 @@
+/* footer-premium.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   FOOTER — 4-column premium layout with live contact details
+   ============================================================ */
+:root .footer-ribbon {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-accent-on-dark) 55%, transparent) 18%,
+    var(--color-accent-on-dark) 50%,
+    color-mix(in srgb, var(--color-accent-on-dark) 55%, transparent) 82%,
+    transparent 100%
+  );
+  opacity: 0.75;
+}
+
+:root .site-footer .footer-grid {
+  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+  gap: clamp(24px, 3vw, 48px);
+}
+
+/* The brand name appears in both the header (on the page background) and the
+   footer (on graphite), so the footer variant needs its own colour rather than
+   inheriting --color-text-primary, which measured 1.02:1 on graphite. */
+:root .site-footer .footer-brand-name {
+  color: var(--color-text-on-graphite);
+}
+
+/* Footer column heading. One rule — earlier revisions set 20px, then 14px,
+   then 13px in three places that overrode each other. */
+:root .site-footer .footer-col-title {
+  font-size: var(--type-h3);
+  letter-spacing: 0.16em;
+  color: var(--color-text-on-graphite);
+  margin-bottom: 6px;
+}
+
+:root .site-footer .footer-links {
+  gap: 9px;
+}
+
+:root .site-footer .footer-link-btn {
+  position: relative;
+  padding-left: 0;
+  transition: color 0.16s ease, padding-left 0.16s ease;
+}
+
+/* The visible label stays 19px tall so the footer keeps its compact rhythm,
+   but the interactive area is stretched to 24px — the WCAG 2.2 AA target-size
+   minimum. The ::before below is repurposed for the hover indicator; this
+   pseudo-element is the hit area. */
+:root .site-footer .footer-link-btn::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 24px;
+  transform: translateY(-50%);
+}
+
+:root .site-footer .footer-link-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 1.5px;
+  background: var(--color-accent-on-dark);
+  transform: translateY(-50%);
+  transition: width 0.18s ease;
+}
+
+:root .site-footer .footer-link-btn:hover {
+  padding-left: 14px;
+}
+
+:root .site-footer .footer-link-btn:hover::before {
+  width: 9px;
+}
+
+:root .footer-trust-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+:root .footer-trust-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--motogear-border);
+  background: var(--motogear-panel);
+  color: var(--motogear-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+:root .footer-trust-chip svg {
+  width: 14px;
+  height: 14px;
+  color: var(--color-accent-on-dark);
+  flex-shrink: 0;
+}
+
+:root .footer-contact-list {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+:root .footer-contact-link,
+:root .footer-contact-empty {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  color: inherit;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+:root .footer-contact-link:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-graphite-soft);
+  transform: translateX(2px);
+}
+
+:root .footer-contact-link > svg,
+:root .footer-contact-empty > svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  color: var(--color-accent-on-dark);
+}
+
+:root .footer-contact-link > span,
+:root .footer-contact-empty > span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+:root .footer-contact-link .fui-Caption1,
+:root .footer-contact-empty .fui-Caption1 {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted-on-dark);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Contact values sit on the graphite footer, so they use on-graphite text.
+   #252b2d measured 1.02:1 there. */
+:root .footer-contact-link b,
+:root .footer-contact-empty b {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-on-graphite);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root .footer-contact-empty {
+  cursor: default;
+}
+
+@media (max-width: 1024px) {
+  :root .site-footer .footer-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  :root .site-footer .footer-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+}
+
+

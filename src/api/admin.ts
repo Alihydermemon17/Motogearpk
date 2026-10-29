@@ -47,6 +47,7 @@ export type AdminCustomer = Pick<ProfileRow, 'id' | 'full_name' | 'email' | 'pho
 export type AdminReview = ReviewRow & { product_name: string | null; customer_name: string | null; order_number: string | null; order_status: OrderRow['status'] | null };
 export type AdminFeedback = FeedbackRow & { customer_name: string | null };
 export type AdminSupplierProduct = SupplierProductRow & { product_name: string | null; supplier_name: string | null; availability: SupplierAvailabilityRow | null };
+export type AdminSupplier = SupplierRow;
 
 export interface DashboardCategoryInput {
   name: string;

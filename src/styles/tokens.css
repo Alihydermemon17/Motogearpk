@@ -1,0 +1,283 @@
+/* tokens.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* Fonts are linked from index.html (preconnect + stylesheet) so the browser can
+   fetch them in parallel with the bundle instead of waiting on this file. */
+
+/* ==========================================================================
+   MotoGear PK — design tokens
+   Structure is graphite + off-white; actions, selection and focus are muted
+   teal. Light is the default theme; [data-theme='dark'] swaps to graphite.
+   Every colour below is referenced through var(), so the palette lives here
+   and nowhere else.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- Typography -------------------------------------------------------
+     One family pair, used everywhere: Inter for UI, Barlow Condensed 700 for
+     display headings only (display + h1). Anything at h2 or below stays
+     sentence case in Inter. ------------------------------------------------ */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Barlow Condensed', 'Inter', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  /* Type scale — display 56/60, h1 40/44, h2 32/38, h3 20/28, body 16/24,
+     small 14/20, micro 12/16. The clamps shrink gracefully below 720px. */
+  --type-display: clamp(40px, 5.2vw, 56px);
+  --type-h1: clamp(32px, 3.4vw, 40px);
+  --type-h2: clamp(26px, 2.4vw, 32px);
+  --type-h3: clamp(18px, 1.4vw, 20px);
+  --type-body-lg: 17px;
+  --type-body: 16px;
+  --type-sm: 14px;
+  --type-caption: 12px;
+  --type-label: 11px;
+  --leading-display: 1.03;
+  --leading-h1: 1.08;
+  --leading-h2: 1.18;
+  --leading-h3: 1.4;
+  --leading-body: 1.5;
+
+  /* --- Layout ----------------------------------------------------------- */
+  --container-wide: 1280px;
+  --container-narrow: 1120px;
+  --container-gutter: clamp(16px, 3vw, 32px);
+  --content-section-space: clamp(32px, 4vw, 56px);
+  /* Section rhythm: 96px desktop, 64px mobile. */
+  --section-space: clamp(64px, 7vw, 96px);
+
+  /* --- Spacing scale ---------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* --- Radius ----------------------------------------------------------- */
+  --radius-xs: 4px;
+  --radius-control: 8px;
+  --radius-panel: 12px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  --radius-pill: 999px;
+
+  /* --- Motion ----------------------------------------------------------- */
+  --motion-fast: 150ms;
+  --motion-standard: 200ms;
+  --motion-smooth: 250ms;
+  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* --- Brand palette ----------------------------------------------------
+     Named once, then mapped onto the semantic tokens the rest of the sheet
+     already consumes. Every colour below is referenced through var().
+     Contrast discipline:
+       · --color-accent (brand teal) is 6.2:1 on white → safe for icons,
+         graphics and small text.
+       · --color-text-muted (5.2:1 on canvas) is the only muted text token.
+       · --accent-amber is 2.0:1 on white → it is a FILL ONLY, never text or
+         a thin icon. It always carries --ink on top (9.3:1). ------------- */
+  --ink: #0f1417;
+  --surface: #ffffff;
+  --canvas: #f4f3ef;
+  --brand: #2f6b63;
+  --brand-strong: #1f4f49;
+  --muted: #5e676e;
+  --border: #e5e7eb;
+  --accent-amber: #f5a524;
+  --accent-amber-hover: #e09513;
+  --danger: #d64545;
+  --success: #2f6b63;
+
+  /* --- Surfaces --------------------------------------------------------- */
+  --color-background: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-elevated: #ffffff;
+  --color-surface-muted: #edede7;
+  --color-surface-sunken: #eae9e3;
+  --color-graphite: #1a2226;
+  --color-graphite-soft: #222c31;
+  --color-graphite-deep: var(--ink);
+
+  /* --- Text ------------------------------------------------------------- */
+  --color-text-primary: var(--ink);
+  --color-text-secondary: #3d474d;
+  --color-text-muted: var(--muted);
+  /* Text sitting on the graphite surfaces (footer, topbar, hero, dark bands). */
+  --color-on-graphite: #e9edeb;
+  --color-on-graphite-muted: #a3aeac;
+  --color-text-on-graphite: var(--color-on-graphite);
+  --color-text-on-graphite-muted: var(--color-on-graphite-muted);
+  /* Text laid over photography. Fixed rather than themed. */
+  --color-text-on-image: #f8fafc;
+
+  /* --- Lines ------------------------------------------------------------ */
+  --color-border: var(--border);
+  --color-border-strong: #ccd2ce;
+
+  /* --- Accent: brand teal ------------------------------------------------ */
+  --color-accent: var(--brand);
+  --color-accent-hover: var(--brand-strong);
+  --color-accent-active: #173d38;
+  --color-accent-text: var(--brand-strong);
+  --color-accent-soft: #e6efec;
+  --color-accent-border: #b7cfc9;
+  --color-on-accent: #ffffff;
+  --color-focus: var(--brand);
+  /* Amber is a fill token. Text on amber is always --ink. */
+  --color-accent-fill: var(--accent-amber);
+  --color-on-accent-fill: var(--ink);
+
+  /* Muted text is tuned per surface. */
+  --color-text-muted-on-dark: var(--color-on-graphite-muted);
+
+  /* --- Semantic --------------------------------------------------------- */
+  --color-success: #2f6b63;
+  --color-success-soft: #e6efec;
+  --color-warning: #8a5a00;
+  --color-warning-soft: #fbf0d9;
+  --color-error: #a5281f;
+  --color-error-soft: #fce9e7;
+  --color-info: #2b5478;
+  --color-info-soft: #e7edf4;
+
+  /* --- Chrome ----------------------------------------------------------- */
+  --color-header: rgba(255, 255, 255, 0.86);
+  --color-footer: var(--ink);
+  --color-input: #ffffff;
+  --color-pill: rgba(15, 20, 23, 0.05);
+  --shadow-header: 0 1px 0 rgba(15, 20, 23, 0.06);
+  /* Accent tuned for the graphite surfaces. */
+  --color-accent-on-dark: #7fb3ae;
+  --color-accent-on-dark-hover: #9ac7c3;
+
+  /* --- Elevation: one card shadow, one lift ----------------------------- */
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
+  --shadow-raised: 0 2px 4px rgb(0 0 0 / 0.05), 0 14px 32px rgb(0 0 0 / 0.1);
+  --shadow-overlay: 0 18px 48px rgb(0 0 0 / 0.18);
+
+  /* --- Component dimensions --------------------------------------------- */
+  --btn-height: 42px;
+  --btn-height-sm: 34px;
+  --btn-height-lg: 48px;
+  --btn-padding-x: 18px;
+  --input-height: 44px;
+  --card-padding: 20px;
+  --card-padding-lg: 28px;
+  --badge-padding-y: 3px;
+  --badge-padding-x: 10px;
+  --table-header-height: 36px;
+  --table-row-height: 46px;
+  --modal-padding: 24px;
+
+  /* --- Legacy aliases ---------------------------------------------------
+     Existing rules still reference the original names. Pointing them at the
+     new tokens means the whole 6,800-line sheet follows the palette without
+     a rename sweep. `--motogear-amber` is a deprecated name that now resolves
+     to the teal accent. -------------------------------------------------- */
+  --motogear-accent: var(--color-accent);
+  --motogear-accent-light: var(--color-accent-hover);
+  --motogear-amber: var(--color-accent);
+  --motogear-amber-light: var(--color-accent-hover);
+  --motogear-bg: var(--color-background);
+  --motogear-surface: var(--color-surface);
+  --motogear-panel: var(--color-surface-elevated);
+  --motogear-panel-hover: var(--color-surface-muted);
+  --motogear-border: var(--color-border);
+  --motogear-border-light: var(--color-border-strong);
+  --motogear-text: var(--color-text-primary);
+  --motogear-muted: var(--color-text-muted);
+  --motogear-subtle: var(--color-text-muted);
+
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  color: var(--motogear-text);
+  background: var(--motogear-bg);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* --- Brand palette, dark --------------------------------------------- */
+  --ink: #0f1417;
+  --surface: #151a1d;
+  --canvas: #0f1417;
+  --border: #263036;
+
+  --color-background: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-elevated: #1a2024;
+  --color-surface-muted: #232b30;
+  --color-surface-sunken: #0b0f11;
+  --color-graphite: #151a1d;
+  --color-graphite-soft: #1e262a;
+  --color-graphite-deep: #0b0f11;
+
+  --color-text-primary: #e6e8ea;
+  --color-text-secondary: #c2cac9;
+  --color-text-muted: #94a0a2;
+  /* The footer/topbar sit at #0f1417 in dark mode, so these lift to stay
+     above 4.5:1 there. */
+  --color-on-graphite: #eef1ef;
+  --color-on-graphite-muted: #a3aeac;
+  --color-text-on-graphite: var(--color-on-graphite);
+  --color-text-on-graphite-muted: var(--color-on-graphite-muted);
+  --color-text-on-image: #f8fafc;
+
+  --color-border: #263036;
+  --color-border-strong: #354249;
+
+  /* On graphite the teal has to lighten to stay legible, so the accent IS the
+     text token here and the fill token is inverted (dark label on light teal). */
+  --color-accent: #7fb3ae;
+  --color-accent-on-dark: #9cc8c4;
+  --color-accent-on-dark-hover: #b3d6d2;
+  --color-accent-hover: #9cc8c4;
+  --color-accent-active: #b3d6d2;
+  --color-accent-text: #9cc8c4;
+  --color-accent-soft: #1d2b2b;
+  --color-accent-border: #3a5a5d;
+  --color-on-accent: #0f1417;
+  --color-focus: #7fb3ae;
+  --color-accent-fill: var(--accent-amber);
+  --color-on-accent-fill: var(--ink);
+
+  --color-text-muted-on-dark: #a3aeac;
+
+  --color-success: #7fb3ae;
+  --color-success-soft: #1d2b2b;
+  --color-warning: #e0a93c;
+  --color-warning-soft: #33291a;
+  --color-error: #e08c80;
+  --color-error-soft: #3a221f;
+  --color-info: #8aaecb;
+  --color-info-soft: #1e2a35;
+
+  --color-header: rgba(21, 26, 29, 0.88);
+  --color-footer: #0b0f11;
+  --color-input: #1b2226;
+  --color-pill: rgba(255, 255, 255, 0.06);
+  --shadow-header: 0 1px 0 rgba(0, 0, 0, 0.4);
+
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.28);
+  --shadow-raised: 0 2px 4px rgb(0 0 0 / 0.4), 0 14px 32px rgb(0 0 0 / 0.45);
+  --shadow-overlay: 0 18px 48px rgb(0 0 0 / 0.55);
+
+  --motogear-panel-hover: #232b30;
+  --motogear-border-light: #354249;
+  --motogear-subtle: #94a0a2;
+}

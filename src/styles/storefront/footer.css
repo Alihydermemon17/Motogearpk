@@ -1,0 +1,137 @@
+/* footer.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+/* Single authoritative footer rule. A later duplicate at 5137 set
+   background: var(--motogear-panel), which out-cascaded var(--color-footer)
+   here and rendered the footer white. --color-footer resolves per theme
+   (#202a30 light, #11171a dark), so this stays correct when the theme flips. */
+:root .site-footer {
+  position: relative;
+  margin-top: 60px;
+  border-top: 1px solid var(--motogear-border);
+  background: var(--color-footer);
+}
+
+:root .footer-inner {
+  max-width: var(--container-wide);
+  margin: 0 auto;
+  padding: clamp(40px, 4vw, 64px) var(--container-gutter) 28px;
+}
+
+:root .footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.9fr) minmax(0, 1.3fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: flex-start;
+}
+
+:root .footer-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+:root .footer-brand-button {
+  margin-bottom: 2px;
+  cursor: pointer;
+}
+
+:root .footer-desc {
+  display: block;
+  color: var(--color-on-graphite-muted);
+  line-height: 1.6;
+  font-size: 14px;
+  max-width: 360px;
+  margin: 0;
+}
+
+:root .footer-col-title {
+  font-family: var(--font-display), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--type-h3);
+  font-weight: 700;
+  color: var(--color-text-on-graphite);
+  margin: 0 0 14px;
+  line-height: 1.2;
+}
+
+:root .footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+:root .footer-link-btn {
+  background: transparent;
+  border: 0;
+  /* Kept at 19.6px deliberately: the WCAG 2.2 24px target minimum is met by
+     the ::after hit-area extension further down, not by padding, so the
+     footer keeps its compact rhythm. */
+  padding: 0;
+  margin: 0;
+  color: var(--color-on-graphite-muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s ease;
+  line-height: 1.4;
+}
+
+:root .footer-link-btn:hover {
+  color: var(--color-on-graphite);
+}
+
+:root .footer-cities {
+  display: block;
+  color: var(--color-on-graphite-muted);
+  line-height: 1.6;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* One badge rule. Two competing declarations existed — one at 2914 with (amber, square, 6px gap) and one later (pill, 7px gap). Merged. */
+:root .footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  color: var(--color-accent-on-dark);
+  font-size: 12px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--color-accent-on-dark) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-on-dark) 34%, transparent);
+  padding: 7px 13px;
+  border-radius: 9999px;
+}
+
+:root .footer-divider {
+  margin: 36px 0 20px;
+  border-color: var(--motogear-border);
+}
+
+:root .footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+:root .footer-bottom-copy {
+  color: var(--color-text-muted-on-dark);
+}
+
+:root .footer-bottom-badge {
+  color: var(--color-text-muted-on-dark);
+  font-weight: 500;
+}
+

@@ -1,0 +1,229 @@
+/* misc.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   ADMIN ENTRY POINTS — storefront must surface the console
+   ============================================================ */
+:root .nav-admin-btn {
+  margin-left: 6px;
+  background: var(--motogear-amber);
+  color: #121316;
+  font-weight: 700;
+  border: 1px solid var(--motogear-amber);
+}
+
+:root .nav-admin-btn:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+:root .nav-admin-btn svg {
+  color: #121316;
+}
+
+:root .account-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 680px) {
+  :root .account-head-actions {
+    width: 100%;
+  }
+
+  :root .account-head-actions > * {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  :root .nav-admin-btn {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+/* ============================================================
+   CUSTOMER ORDER CARD — fix crammed order number / date and
+   the centred layout measured at desktop widths
+   ============================================================ */
+:root .customer-order-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Order number and its timestamp must stack, never run together on one line. */
+:root .customer-order-card > div:first-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
+}
+
+:root .customer-order-card > div:first-child > .fui-Subtitle1,
+:root .customer-order-card > div:first-child > .fui-Caption1 {
+  display: block;
+  margin: 0;
+}
+
+:root .customer-order-card > div:first-child > .fui-Subtitle1 {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+:root .customer-order-card > div:first-child > .fui-Caption1 {
+  color: var(--motogear-muted);
+  line-height: 1.4;
+}
+
+:root .customer-order-card .order-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+:root .customer-order-card .order-meta .fui-Badge {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+:root .customer-order-card .order-meta strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+@media (max-width: 680px) {
+  :root .customer-order-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  :root .customer-order-card .order-meta {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  :root .customer-order-card .order-meta .fui-Button {
+    margin-left: auto;
+  }
+}
+
+
+/* ============================================================
+   404 / NOT FOUND — every unknown route lands here
+   ============================================================ */
+:root .not-found-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: clamp(360px, 52vh, 560px);
+  padding-top: clamp(48px, 8vw, 96px);
+  padding-bottom: clamp(48px, 8vw, 96px);
+}
+
+:root .not-found-page::before {
+  /* Huge ghosted numeral behind the copy, matching the display type. */
+  content: '404';
+  position: absolute;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(160px, 26vw, 340px);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: color-mix(in srgb, var(--motogear-amber) 9%, transparent);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+:root .not-found-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root .not-found-page .fui-Title1 {
+  display: block;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-display);
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin: 8px 0 12px;
+  color: var(--color-text-primary);
+  max-width: 16ch;
+}
+
+:root .not-found-page .fui-Body1 {
+  display: block;
+  color: var(--motogear-muted);
+  font-size: 15.5px;
+  line-height: 1.65;
+  max-width: 56ch;
+  margin: 0 0 26px;
+}
+
+:root .not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+:root .not-found-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--motogear-border);
+  width: 100%;
+  max-width: 560px;
+}
+
+:root .not-found-links button {
+  padding: 7px 13px;
+  border: 1px solid var(--motogear-border);
+  border-radius: 999px;
+  background: var(--motogear-panel);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+:root .not-found-links button:hover {
+  border-color: var(--motogear-amber);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 620px) {
+  :root .not-found-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  :root .not-found-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  :root .not-found-page .fui-Title1 {
+    max-width: 100%;
+  }
+}
+

@@ -1,0 +1,100 @@
+/* base.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--motogear-bg);
+  color: var(--motogear-text);
+}
+
+.app-provider {
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  transition: background-color var(--motion-smooth) var(--motion-ease), color var(--motion-smooth) var(--motion-ease);
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Ensure typography elements always display as block and do not merge inline */
+.fui-Title1,
+.fui-Title2,
+.fui-Title3,
+.fui-Subtitle1,
+.fui-Subtitle2,
+.fui-Body1,
+.fui-Caption1 {
+  display: block;
+}
+
+/* Heading scale. Fluent's Title/Text components render as <span> with no
+   intrinsic hierarchy and carry griffel class pairs such as `.fui-Title2.fui-Text`
+   (specificity 0,2,0), so these selectors are written at that same weight to
+   actually win. The semantic level is set per usage via the `as` prop; the size
+   follows that level rather than the component name. Per-context rules further
+   down override weight, colour and casing but never size. */
+.fui-Title1.fui-Text,
+.fui-Title1.fui-Text span {
+  font-size: var(--type-h1);
+  font-weight: var(--weight-semibold);
+  line-height: 1.15;
+}
+.fui-Title2.fui-Text,
+.fui-Title2.fui-Text span {
+  font-size: var(--type-h2);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+}
+.fui-Title3.fui-Text,
+.fui-Title3.fui-Text span {
+  font-size: var(--type-h3);
+  font-weight: var(--weight-semibold);
+  line-height: 1.3;
+}
+
+/* App Provider & Shell */
+.app-provider {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell > main {
+  flex: 1;
+}
+
+/* Common Page Container - Ensures Exact Alignment across entire app */
+.page-content {
+  width: 100%;
+  max-width: var(--container-wide);
+  margin: 0 auto;
+  padding: clamp(24px, 3vw, 48px) var(--container-gutter) 72px;
+}
+
+.page-content.narrow {
+  max-width: var(--container-narrow);
+}
+

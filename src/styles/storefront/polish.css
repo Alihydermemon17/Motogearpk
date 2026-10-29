@@ -1,0 +1,361 @@
+/* polish.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   UI POLISH — Entrance Animations & Micro-Interactions
+   ============================================================ */
+
+/* Smooth fade-in for page content */
+:root .app-shell > main {
+  animation: page-fade-in 0.3s var(--motion-ease) both;
+}
+
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Product card entrance — opacity only so hover transform works */
+:root .product-card {
+  animation: card-enter 0.35s var(--motion-ease) backwards;
+}
+
+@keyframes card-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger grid children */
+:root .product-grid > *:nth-child(1) { animation-delay: 0ms; }
+:root .product-grid > *:nth-child(2) { animation-delay: 40ms; }
+:root .product-grid > *:nth-child(3) { animation-delay: 80ms; }
+:root .product-grid > *:nth-child(4) { animation-delay: 120ms; }
+:root .product-grid > *:nth-child(5) { animation-delay: 160ms; }
+:root .product-grid > *:nth-child(6) { animation-delay: 200ms; }
+
+/* Trust row items stagger */
+:root .trust-row > *:nth-child(1) { animation: fade-slide-up 0.3s var(--motion-ease) both; }
+:root .trust-row > *:nth-child(2) { animation: fade-slide-up 0.3s var(--motion-ease) 60ms both; }
+:root .trust-row > *:nth-child(3) { animation: fade-slide-up 0.3s var(--motion-ease) 120ms both; }
+
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero entrance */
+:root .hero-card {
+  animation: hero-enter 0.5s var(--motion-ease) both;
+}
+
+@keyframes hero-enter {
+  from { opacity: 0; transform: scale(0.98) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Button hover lift */
+:root .fui-Button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+/* Admin record slide-in */
+:root .admin-record {
+  animation: fade-slide-up 0.25s var(--motion-ease) both;
+}
+
+/* Spec card hover */
+:root .spec-card {
+  transition: transform var(--motion-standard) var(--motion-ease), border-color var(--motion-standard) var(--motion-ease), box-shadow var(--motion-standard) var(--motion-ease);
+}
+
+:root .spec-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--motogear-amber);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Shop controls bar entrance */
+:root .shop-controls-bar {
+  animation: fade-slide-up 0.3s var(--motion-ease) both;
+}
+
+/* Auth card entrance */
+:root .auth-page-container .auth-card {
+  animation: card-enter 0.35s var(--motion-ease) both;
+}
+
+/* Auth tab button smooth */
+:root .auth-page-container .auth-tab-btn {
+  transition: all var(--motion-fast) var(--motion-ease);
+}
+
+/* Category pill hover */
+:root .category-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Detail image box entrance */
+:root .detail-image-box {
+  animation: card-enter 0.4s var(--motion-ease) both;
+}
+
+/* Detail copy entrance */
+:root .detail-copy {
+  animation: fade-slide-up 0.35s var(--motion-ease) 80ms both;
+}
+
+/* Cart row entrance */
+:root .customer-cart-row {
+  animation: fade-slide-up 0.25s var(--motion-ease) both;
+}
+
+/* Order card entrance */
+:root .customer-order-card {
+  animation: fade-slide-up 0.25s var(--motion-ease) both;
+}
+
+/* Footer link hover slide */
+:root .footer-link-btn:hover {
+  color: var(--color-accent-on-dark-hover);
+  transform: translateX(3px);
+}
+
+/* Nav link hover */
+:root .nav-link-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Cart count pop on change */
+:root .cart-count {
+  animation: cart-pop 0.25s var(--motion-ease) both;
+}
+
+@keyframes cart-pop {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Mobile nav smooth */
+@media (max-width: 860px) {
+  :root #main-navigation.is-open {
+    animation: mobile-nav-slide 0.2s var(--motion-ease) both;
+  }
+}
+
+@keyframes mobile-nav-slide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Loading skeleton pulse */
+:root .fui-SkeletonItem {
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Empty state icon bounce */
+:root .mg-main .empty-state > svg {
+  animation: empty-bounce 2s ease-in-out infinite;
+}
+
+@keyframes empty-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Success card check */
+:root .success-card {
+  animation: success-pop 0.4s var(--motion-ease) both;
+}
+
+@keyframes success-pop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Admin metric hover lift */
+:root .admin-metric:hover {
+  border-color: var(--motogear-amber);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+/* Product card active press */
+:root .product-card:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Smooth image load transition */
+:root img {
+  transition: opacity 0.3s ease;
+}
+
+/* Header nav link active indicator */
+:root .header-nav .nav-link-btn[appearance='primary'] {
+  position: relative;
+}
+
+:root .header-nav .nav-link-btn[appearance='primary']::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-accent-on-dark);
+  animation: nav-indicator 0.2s var(--motion-ease) both;
+}
+
+@keyframes nav-indicator {
+  from { width: 0; opacity: 0; }
+  to { width: 16px; opacity: 1; }
+}
+
+/* Mobile nav indicator hide */
+@media (max-width: 860px) {
+  :root .header-nav .nav-link-btn[appearance='primary']::after {
+    display: none;
+  }
+}
+
+/* Theme toggle icon spin */
+:root .theme-toggle .fui-Button__icon {
+  transition: transform var(--motion-standard) var(--motion-ease);
+}
+
+:root .theme-toggle:hover .fui-Button__icon {
+  transform: rotate(15deg);
+}
+
+/* Mobile menu toggle icon rotate */
+:root .mobile-menu-toggle .fui-Button__icon {
+  transition: transform var(--motion-standard) var(--motion-ease);
+}
+
+:root .mobile-menu-toggle:hover .fui-Button__icon {
+  transform: rotate(90deg);
+}
+
+/* Input focus glow */
+:root .fui-Input:focus-within {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus) 35%, transparent);
+  transition: box-shadow var(--motion-fast) var(--motion-ease);
+}
+
+/* Checkout form section entrance */
+:root .checkout-form {
+  animation: fade-slide-up 0.3s var(--motion-ease) both;
+}
+
+/* Summary card entrance */
+:root .summary-card {
+  animation: fade-slide-up 0.3s var(--motion-ease) 60ms both;
+}
+
+/* Profile card entrance */
+:root .profile-card {
+  animation: fade-slide-up 0.3s var(--motion-ease) both;
+}
+
+/* Order detail card entrance */
+:root .order-detail-card, :root .shipping-card, :root .timeline-card {
+  animation: fade-slide-up 0.3s var(--motion-ease) both;
+}
+
+
+/* ============================================================
+   PRODUCT MEDIA — designed fallback when no image is uploaded
+   ============================================================ */
+:root .product-media-fallback {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 85% at 50% -10%, color-mix(in srgb, var(--media-tint) 26%, transparent) 0%, transparent 62%),
+    linear-gradient(160deg, var(--color-input) 0%, color-mix(in srgb, var(--color-input) 70%, #000) 100%);
+}
+
+:root .media-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--media-tint) 16%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--media-tint) 16%, transparent) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+  opacity: 0.55;
+}
+
+:root .media-glyph {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(58px, 32%, 88px);
+  aspect-ratio: 1;
+  border-radius: 22%;
+  color: var(--media-tint);
+  background: color-mix(in srgb, var(--media-tint) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--media-tint) 34%, transparent);
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--media-tint) 22%, transparent);
+}
+
+:root .media-glyph svg { width: 56%; height: 56%; }
+
+:root .media-caption {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.2;
+  text-align: left;
+}
+:root .media-caption b {
+  font-family: var(--font-display), sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--media-tint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+:root .media-caption i {
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--motogear-muted);
+}
+
+:root .product-media-fallback {
+  background:
+    radial-gradient(120% 85% at 50% -10%, color-mix(in srgb, var(--media-tint) 18%, transparent) 0%, transparent 62%),
+    linear-gradient(160deg, #ffffff 0%, var(--color-surface-muted) 100%);
+}
+
+:root[data-theme='dark'] .product-media-fallback {
+  background:
+    radial-gradient(120% 85% at 50% -10%, color-mix(in srgb, var(--media-tint) 22%, transparent) 0%, transparent 62%),
+    linear-gradient(160deg, var(--color-surface) 0%, var(--color-surface-sunken) 100%);
+}
+

@@ -1,0 +1,627 @@
+/* chrome.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   HEADER & NAVBAR (Unified Sticky Header)
+   ============================================================ */
+:root .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-header);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--motogear-border);
+  box-shadow: var(--shadow-header);
+}
+
+:root .header-inner {
+  max-width: var(--container-wide);
+  margin: 0 auto;
+  padding: 12px var(--container-gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(16px, 2vw, 36px);
+}
+
+:root .header-nav {
+  margin-left: 0;
+  gap: clamp(4px, 0.6vw, 10px);
+}
+
+:root .header-actions {
+  gap: clamp(8px, 1vw, 16px);
+  margin-left: 0;
+}
+
+:root .brand-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+:root .brand-button:hover .brand-mark {
+  transform: scale(1.05);
+}
+
+:root .brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: -0.02em;
+  transition: transform 0.18s ease;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+:root .brand-name {
+  font-family: var(--font-display), sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+}
+
+:root .brand-name b {
+  display: inline-block;
+  padding: 2px 6px;
+  margin-left: 3px;
+  border-radius: 3px;
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+  font-size: 11px;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+:root .header-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+:root .nav-link-btn {
+  font-weight: 600;
+}
+
+:root .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+:root .delivery-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+  color: var(--motogear-amber);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+:root .delivery-pill b {
+  color: var(--color-text-on-image);
+}
+
+:root .cart-button {
+  position: relative;
+  font-weight: 700;
+}
+
+:root .wishlist-button {
+  position: relative;
+  font-weight: 600;
+}
+
+:root .cart-button .fui-Badge,
+:root .wishlist-button .fui-Badge {
+  margin-inline-start: 6px;
+  flex: 0 0 auto;
+}
+
+:root .wishlist-button.is-active {
+  color: var(--color-accent-text);
+}
+
+:root .wishlist-button.has-items .fui-Button__icon {
+  color: var(--color-error);
+}
+
+:root .wishlist-button .fui-Button__icon,
+:root .mg-main .wishlist-toggle .fui-Button__icon {
+  transition: transform var(--motion-standard) var(--motion-ease);
+}
+
+:root .wishlist-button:hover .fui-Button__icon {
+  transform: scale(1.12);
+}
+
+:root .mobile-menu-toggle {
+  display: none;
+}
+
+:root .cart-notice {
+  width: 100%;
+  max-width: var(--container-wide);
+  margin: 12px auto 0;
+  padding-inline: var(--container-gutter);
+}
+
+/* ============================================================
+   HERO BANNER
+   ============================================================ */
+:root .app-provider .hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid var(--motogear-border-light);
+  display: block;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 64px);
+  padding: clamp(36px, 4vw, 60px);
+  background: transparent;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  color: var(--color-text-primary);
+}
+
+:root .app-provider .hero-card::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: -45% auto -45% -38%;
+  width: 28%;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.015) 34%, rgba(255, 255, 255, 0.075) 50%, rgba(255, 255, 255, 0.015) 66%, transparent 100%);
+  transform: skewX(-12deg);
+  animation: hero-sheen 12s var(--motion-ease) infinite;
+}
+
+:root .hero-card {
+  position: relative;
+  overflow: hidden;
+}
+
+:root .hero-slides {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+:root .hero-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+
+:root .hero-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+:root .hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(135deg, rgba(10, 10, 14, 0.45) 0%, rgba(10, 10, 14, 0.2) 50%, rgba(10, 10, 14, 0.5) 100%);
+  pointer-events: none;
+}
+
+:root .hero-mesh {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  opacity: 0.7;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+:root .hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 40% at 78% 20%, rgba(255, 200, 60, 0.12), transparent 60%),
+    radial-gradient(ellipse 40% 50% at 82% 55%, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 50%),
+    radial-gradient(ellipse 30% 30% at 70% 80%, rgba(243, 107, 33, 0.06), transparent 50%);
+  animation: hero-glow-pulse 6s ease-in-out infinite;
+}
+
+@keyframes hero-glow-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* LED beam effect */
+:root .hero-glow::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: -5%;
+  width: 50%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(255, 200, 60, 0.25), transparent);
+  filter: blur(2px);
+  transform: rotate(-12deg);
+  animation: led-beam 4s ease-in-out infinite;
+}
+
+@keyframes led-beam {
+  0%, 100% { opacity: 0.4; transform: rotate(-12deg) translateX(0); }
+  50% { opacity: 0.8; transform: rotate(-12deg) translateX(-15px); }
+}
+
+:root .hero-slides,
+:root .hero-overlay,
+:root .hero-glow,
+:root .hero-copy,
+:root .hero-stamp {
+  position: relative;
+}
+
+/* Scrim over the hero photo. A later rule at line ~625 re-declares .hero-overlay
+   without a background, which silently dropped the gradient defined at line 555
+   and left the headline sitting on raw photo pixels (measured 1.2:1 against the
+   brightest slide). Re-asserting it here, after both earlier rules, guarantees a
+   dark backdrop under the copy in every slide and in both themes. */
+:root .hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    100deg,
+    rgba(10, 14, 17, 0.86) 0%,
+    rgba(10, 14, 17, 0.72) 38%,
+    rgba(10, 14, 17, 0.42) 68%,
+    rgba(10, 14, 17, 0.3) 100%
+  );
+  pointer-events: none;
+}
+
+:root .hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+:root .hero-copy {
+  position: relative;
+  z-index: 4;
+}
+
+:root .hero-stamp {
+  position: relative;
+  z-index: 4;
+}
+
+:root .hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  max-width: 760px;
+  padding: 8px 0;
+  position: relative;
+  z-index: 4;
+}
+
+/* Subtle backdrop for hero text readability */
+:root .hero-copy::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(ellipse at 30% 50%, rgba(10, 10, 14, 0.4), transparent 70%);
+  border-radius: 20px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+:root .eyebrow, :root .section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  /* 11px is body-size text, so it needs 4.5:1. --motogear-amber aliases
+     --color-accent (#477c78), which is only 4.28:1 on the page background.
+     --color-accent-text (#2e524f) clears it at 7.76:1. The hero eyebrow sits
+     on the dark photograph and is overridden to --color-accent-on-dark by
+     `.hero-card .eyebrow` below. */
+  color: var(--color-accent-text);
+}
+
+/* Hero headline. Sized on the shared type scale rather than its own scale —
+   it leads the page without dwarfing the section headings below it. The hero
+   always sits on a dark photo, so its copy uses the on-graphite text tokens
+   in both themes. */
+/* The hero card is background:transparent, but that does NOT mean the text sits
+   on the page background — the .hero-slides photo fills the card behind it
+   (measured at opacity 0.72 with no scrim, so the effective backdrop is the
+   dark photo). Light-on-graphite tokens are therefore correct here; the
+   graphite-on-page-background variant measured 1.2:1 against the photo. */
+:root .app-provider .hero-card .fui-Title1 {
+  display: block;
+  font-family: var(--font-display), sans-serif;
+  width: 100%;
+  font-size: var(--type-display);
+  line-height: 1.1;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  margin: 0;
+  max-width: 680px;
+  color: var(--color-text-on-graphite);
+}
+
+/* Emphasised word: lightened accent. --color-accent (#477c78) reaches only
+   3.42:1 over the photo; --color-accent-on-dark reaches ~6.9:1. The gradient
+   remains as a fallback for browsers without background-clip:text. */
+:root .app-provider .hero-card .fui-Title1 span {
+  color: var(--color-accent-on-dark);
+  background: linear-gradient(135deg, var(--color-accent-on-dark-hover) 0%, var(--color-accent-on-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+:root .app-provider .hero-card .fui-Body1 {
+  display: block;
+  max-width: 600px;
+  color: var(--color-text-on-graphite);
+  line-height: 1.6;
+  font-size: var(--type-body-lg);
+  margin: 0;
+}
+
+/* Eyebrow also sits over the photo, so it uses the on-dark accent too. */
+:root .hero-card .eyebrow {
+  color: var(--color-accent-on-dark);
+}
+
+:root .hero-actions {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Rotating hero copy — stacked so the tallest slide sets the height (no layout jump) */
+:root .hero-copy-stack {
+  display: grid;
+  width: 100%;
+}
+
+:root .hero-copy-slide {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+}
+
+:root .hero-copy-slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+:root .hero-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+:root .hero-dot {
+  width: 24px;
+  height: 3px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+:root .hero-dot:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+:root .hero-dot.active {
+  width: 42px;
+  background: var(--color-accent-on-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root .hero-copy-slide {
+    transition: opacity 0.2s ease;
+    transform: none;
+  }
+}
+
+@keyframes hero-sheen {
+  0%, 18% { left: -38%; opacity: 0; }
+  24% { opacity: 1; }
+  58% { left: 118%; opacity: 0.8; }
+  64%, 100% { left: 118%; opacity: 0; }
+}
+
+:root .hero-stamp {
+  position: relative;
+  justify-self: center;
+  align-self: center;
+  width: min(100%, 320px);
+  padding: 18px 0 4px 24px;
+  border-left: 1px solid color-mix(in srgb, var(--color-accent-on-dark) 46%, transparent);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(15px, 1.3vw, 20px);
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  color: var(--color-text-on-graphite-muted);
+  text-align: right;
+  opacity: 0.75;
+}
+
+:root .hero-stamp b {
+  color: var(--motogear-amber);
+  font-size: 14px;
+}
+
+/* Mobile responsiveness for hero */
+@media (max-width: 1024px) {
+  :root .hero-content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  :root .hero-stamp {
+    max-width: 100%;
+    border-left: none;
+    border-top: 3px solid var(--motogear-amber);
+    padding: 16px 0 8px 0;
+    order: -1;
+  }
+  :root .hero-copy {
+    justify-content: flex-start;
+    padding-bottom: 16px;
+  }
+}
+
+/* ============================================================
+   TRUST ROW (Value Props)
+   ============================================================ */
+:root .trust-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2vw, 32px);
+  margin: clamp(28px, 3vw, 48px) 0;
+  padding: 24px 0;
+  border-block: 1px solid var(--motogear-border);
+}
+
+:root .trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+:root .trust-icon {
+  color: var(--motogear-amber);
+  font-size: 26px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+:root .trust-item .fui-Subtitle1 {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--motogear-text);
+  margin-bottom: 2px;
+}
+
+:root .trust-item .fui-Caption1 {
+  display: block;
+  color: var(--motogear-muted);
+  line-height: 1.45;
+}
+
+/* ============================================================
+   SECTION HEADINGS
+   ============================================================ */
+:root .catalog-heading, :root .section-head, :root .account-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: var(--content-section-space) 0 20px;
+}
+
+:root .heading-group,
+:root .catalog-heading > div,
+:root .section-head > div,
+:root .account-head > div,
+:root .shop-header > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+:root .catalog-heading .section-kicker,
+:root .section-head .section-kicker,
+:root .account-head .section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  /* See `.eyebrow` above: --color-accent is 4.28:1 on the page background,
+     under the 4.5:1 body floor for 11px text. These headings all sit on
+     light surfaces. */
+  color: var(--color-accent-text);
+  margin: 0;
+  line-height: 1;
+}
+
+:root .catalog-heading .fui-Title1,
+:root .section-head .fui-Title1,
+:root .account-head .fui-Title1,
+:root .shop-header .fui-Title1 {
+  display: block;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h1);
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+:root .section-head .fui-Title3,
+:root .catalog-heading .fui-Title3 {
+  font-family: var(--font-sans), sans-serif;
+  font-size: var(--type-h2);
+  font-weight: 700;
+  line-height: var(--leading-h2);
+  text-transform: none;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+

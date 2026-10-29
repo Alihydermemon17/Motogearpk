@@ -1,0 +1,170 @@
+/* product.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   PRODUCT DETAIL PAGE
+   ============================================================ */
+:root .product-back-bar {
+  margin-bottom: 20px;
+}
+
+:root .detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+}
+
+:root .detail-image-box {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-input);
+  border: 1px solid var(--motogear-border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+:root .detail-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+:root .image-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+}
+
+:root .detail-copy {
+  display: flex;
+  flex-direction: column;
+}
+
+:root .detail-copy .fui-Title1 {
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-display);
+  line-height: 1.08;
+  text-transform: uppercase;
+  margin: 8px 0 14px;
+}
+
+:root .detail-desc {
+  color: var(--motogear-muted);
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+:root .detail-price-box {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 20px 0 10px;
+}
+
+:root .price-main {
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h1);
+  font-weight: 700;
+  color: var(--motogear-amber);
+}
+
+:root .price-del {
+  font-size: 17px;
+  color: var(--motogear-subtle);
+}
+
+:root .stock-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-success);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 22px;
+}
+
+:root .detail-cta-row {
+  margin-bottom: 24px;
+}
+
+:root .detail-copy .fui-Divider {
+  margin: 16px 0 24px;
+  border-color: var(--motogear-border);
+}
+
+:root .spec-heading {
+  margin-bottom: 12px;
+}
+
+:root .spec-heading .fui-Subtitle1 {
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+:root .spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+:root .spec-card {
+  padding: 12px 14px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+:root .spec-label {
+  color: var(--motogear-muted);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+:root .spec-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--motogear-text);
+  overflow-wrap: anywhere;
+}
+
+:root .compatible-bikes {
+  grid-column: 1 / -1;
+}
+
+:root .detail-note {
+  margin-top: 48px;
+  padding: 28px;
+  border-radius: 12px;
+  background: var(--motogear-surface);
+  border: 1px solid var(--motogear-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fade-slide-up 0.35s var(--motion-ease) 120ms both;
+}
+
+:root .detail-note .fui-Title3 {
+  font-family: var(--font-display), sans-serif;
+  text-transform: uppercase;
+  font-size: var(--type-h2);
+  margin: 0;
+  line-height: 1.15;
+}
+
+:root .detail-note .fui-Body1 {
+  color: var(--motogear-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+

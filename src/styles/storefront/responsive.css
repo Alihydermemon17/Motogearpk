@@ -1,0 +1,1508 @@
+/* responsive.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   RESPONSIVE DESIGN (Media Queries)
+   ============================================================ */
+@media (max-width: 1024px) {
+  :root .admin-shell {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  :root .admin-sidebar {
+    position: static;
+    max-height: none;
+  }
+  :root .admin-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+  }
+  :root .admin-nav-group { display: contents; }
+  :root .admin-nav-label { padding: 0; margin: 0; }
+  :root .admin-nav-link {
+    flex: 0 0 auto;
+    min-height: 34px;
+    border-radius: 999px;
+  }
+  :root .admin-nav-link.is-active::before { display: none; }
+  :root .admin-sidebar-foot {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+  :root .admin-sidebar-foot .fui-Button { width: auto; }
+  :root .admin-sidebar-foot .fui-Caption1 { text-align: left; }
+  :root .admin-hero { grid-template-columns: 1fr; }
+  :root .admin-order-layout { grid-template-columns: 1fr; }
+  :root .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  :root .footer-col:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 860px) {
+  :root .detail-layout, :root .checkout-layout, :root .account-content-grid, :root .order-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  :root .trust-row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  :root .customer-order-review {
+    position: static;
+  }
+}
+
+@media (max-width: 680px) {
+  :root .page-content {
+    padding: 20px 16px 54px;
+  }
+  :root .header-inner {
+    padding: 10px 16px;
+  }
+  :root .brand-name {
+    display: none;
+  }
+  :root .delivery-pill {
+    display: none;
+  }
+  :root .header-nav {
+    gap: 2px;
+  }
+  :root .hero-card {
+    padding: 28px 20px;
+    min-height: 420px;
+  }
+  :root .hero-card .fui-Title1 {
+    font-size: var(--type-display);
+  }
+  :root .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  :root .hero-actions > .fui-Button {
+    width: 100%;
+  }
+  :root .hero-stamp {
+    position: static;
+    margin-top: 24px;
+    text-align: left;
+  }
+  :root .shop-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  :root .category-pill-group {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  :root .customer-cart-row {
+    grid-template-columns: 68px minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+  :root .customer-cart-row > img {
+    width: 68px;
+    height: 60px;
+  }
+  :root .quantity-control {
+    grid-column: 2;
+    justify-self: start;
+  }
+  :root .form-grid, :root .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+  :root .admin-metric-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  :root .admin-order-layout {
+    grid-template-columns: 1fr;
+  }
+  :root .admin-record {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  :root .admin-filter-row {
+    grid-template-columns: 1fr;
+  }
+  :root .admin-hero-tiles {
+    grid-template-columns: 1fr;
+  }
+  :root .admin-workspace-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  :root .admin-head-actions {
+    justify-content: space-between;
+  }
+  :root .admin-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  :root .admin-attention-copy strong {
+    font-size: 13.5px;
+  }
+  :root .customer-order-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  :root .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* Shared responsive safeguards for the storefront, account, and admin surfaces. */
+html,
+:root body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+:root .app-shell,
+:root .app-shell > main,
+:root .page-content,
+:root .admin-shell,
+:root .admin-workspace,
+:root .admin-page-content,
+:root .footer-inner,
+:root .header-inner {
+  min-width: 0;
+}
+
+:root .page-content,
+:root .cart-notice,
+:root .footer-inner,
+:root .header-inner {
+  padding-inline: clamp(16px, 3vw, 32px);
+}
+
+:root button,
+:root a,
+:root input,
+:root select,
+:root textarea {
+  min-width: 0;
+}
+
+:root :where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--motogear-amber-light);
+  outline-offset: 2px;
+}
+
+:root .admin-record-main,
+:root .admin-record-actions,
+:root .admin-order-detail,
+:root .admin-order-select,
+:root .admin-metric,
+:root .customer-order-card,
+:root .customer-order-card > *,
+:root .detail-copy,
+:root .product-card-body,
+:root .product-card-bottom,
+:root .summary-line > *,
+:root .footer-col {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+:root .admin-table-wrap {
+  max-width: 100%;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+:root .fui-MessageBar,
+:root .fui-MessageBarBody {
+  min-width: 0;
+  max-width: 100%;
+}
+
+:root .fui-MessageBarBody {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@media (min-width: 681px) and (max-width: 1024px) {
+  :root .admin-shell {
+    grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  :root .admin-sidebar {
+    position: sticky;
+    top: 76px;
+    max-height: calc(100vh - 92px);
+    overflow-y: auto;
+  }
+
+  :root .admin-nav {
+    display: grid;
+  }
+
+  :root .footer-grid {
+    gap: 28px;
+  }
+}
+
+@media (max-width: 860px) {
+  :root .detail-layout,
+  :root .checkout-layout,
+  :root .account-content-grid,
+  :root .order-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  :root .detail-copy .fui-Title1 {
+    font-size: var(--type-display);
+    line-height: 1.08;
+  }
+
+  :root .admin-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :root .admin-order-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root .hero-stamp {
+    position: static;
+    justify-self: start;
+    width: min(100%, 360px);
+    margin-top: 24px;
+    text-align: left;
+  }
+
+  :root .app-provider .hero-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  :root .hero-copy {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 681px) and (max-width: 860px) {
+  :root .header-inner {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  :root .header-actions {
+    margin-left: auto;
+  }
+
+  :root .mobile-menu-toggle {
+    display: inline-flex;
+    min-height: 44px;
+  }
+
+  :root .header-nav {
+    display: none;
+    order: 3;
+    flex: 0 0 100%;
+    width: 100%;
+    padding-top: 8px;
+    border-top: 1px solid var(--motogear-border);
+    justify-content: flex-start;
+  }
+
+  :root .header-nav.is-open {
+    display: flex;
+  }
+
+  :root .header-nav .nav-link-btn {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 680px) {
+  :root .page-content {
+    padding-block: 22px 48px;
+  }
+
+  :root .header-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-block: 8px;
+  }
+
+  :root .brand-name {
+    display: inline;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+  }
+
+  :root .brand-button {
+    flex: 1 1 auto;
+  }
+
+  :root .header-actions {
+    gap: 4px;
+  }
+
+  :root .mobile-menu-toggle {
+    display: inline-flex;
+    min-height: 44px;
+  }
+
+  :root .header-nav {
+    display: none;
+    order: 3;
+    flex: 0 0 100%;
+    width: 100%;
+    padding-top: 8px;
+    border-top: 1px solid var(--motogear-border);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  :root .header-nav.is-open {
+    display: grid;
+  }
+
+  :root .header-nav .nav-link-btn {
+    min-width: 0;
+    min-height: 44px;
+    padding-inline: 6px;
+    justify-content: center;
+  }
+
+  :root .header-nav .nav-link-btn .fui-Button__icon {
+    margin-inline-end: 6px;
+  }
+
+  :root .hero-card {
+    min-height: 0;
+    padding: clamp(24px, 7vw, 36px) clamp(18px, 5vw, 24px);
+  }
+
+  /* On narrow screens the copy wraps across the card's full width, so it runs
+     into the light end of the 100deg scrim, where alpha falls to 0.30. Sampled
+     against the real slide photograph that measured 3.06:1 for the 14px body
+     copy and 4.45:1 for the gradient-filled accent span — both under the 4.5:1
+     AA floor for their size. The desktop gradient is left exactly as it is;
+     this only raises the mobile floor, where the copy covers most of the photo
+     anyway. Verified by sampling the actual slide image through the scrim
+     rather than by eye. */
+  :root .hero-overlay {
+    background: linear-gradient(
+      100deg,
+      rgba(10, 14, 17, 0.9) 0%,
+      rgba(10, 14, 17, 0.86) 38%,
+      rgba(10, 14, 17, 0.8) 68%,
+      rgba(10, 14, 17, 0.76) 100%
+    );
+  }
+
+  :root .hero-card .fui-Title1 {
+    max-width: 100%;
+    font-size: var(--type-display);
+    line-height: 1.08;
+    overflow-wrap: anywhere;
+  }
+
+  :root .hero-card .fui-Body1 {
+    font-size: 15px;
+  }
+
+  :root .hero-stamp {
+    font-size: 11px;
+  }
+
+  :root .catalog-heading,
+  :root .section-head,
+  :root .account-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    margin-block: 28px 16px;
+  }
+
+  :root .catalog-heading > .fui-Button,
+  :root .section-head > .fui-Button,
+  :root .account-head > .fui-Button {
+    max-width: 100%;
+  }
+
+  :root .catalog-heading .fui-Title1,
+  :root .section-head .fui-Title1,
+  :root .account-head .fui-Title1,
+  :root .shop-header .fui-Title1 {
+    font-size: var(--type-h1);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+
+  :root .trust-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-block: 24px;
+    padding-block: 20px;
+  }
+
+  :root .product-grid,
+  :root .loading-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+    gap: 14px;
+  }
+
+  :root .product-preview {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  :root .product-card-bottom {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 12px;
+  }
+
+  :root .price-stack {
+    flex-wrap: wrap;
+  }
+
+  :root .product-card-bottom > .fui-Button {
+    min-height: 40px;
+  }
+
+  :root .shop-controls-bar {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  :root .shop-search-field {
+    min-width: 0;
+    width: 100%;
+  }
+
+  :root .category-pill-group {
+    max-width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  :root .category-pill-group > * {
+    flex: 0 0 auto;
+    min-height: 40px;
+  }
+
+  :root .detail-layout {
+    gap: 20px;
+  }
+
+  :root .detail-copy .fui-Title1 {
+    font-size: var(--type-display);
+  }
+
+  :root .detail-price-box {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  :root .detail-cta-row > .fui-Button {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  :root .spec-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
+  }
+
+  :root .detail-note {
+    margin-top: 28px;
+    padding: 20px;
+  }
+
+  :root .customer-cart-row {
+    grid-template-columns: 64px minmax(0, 1fr) 40px;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  :root .customer-cart-row > img {
+    width: 64px;
+    height: 60px;
+  }
+
+  :root .customer-cart-product .fui-Subtitle1 {
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  :root .quantity-control {
+    grid-column: 2 / 3;
+    min-height: 40px;
+  }
+
+  :root .quantity-control .fui-Button,
+  :root .customer-cart-row > .fui-Button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  :root .customer-cart-totals,
+  :root .summary-card {
+    padding: 16px;
+  }
+
+  :root .summary-line {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  :root .summary-line > :last-child {
+    text-align: right;
+  }
+
+  :root .customer-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  :root .customer-actions > .fui-Button {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  :root .checkout-layout {
+    gap: 16px;
+  }
+
+  :root .checkout-form,
+  :root .profile-form,
+  :root .customer-form {
+    padding: 16px;
+  }
+
+  :root .form-grid,
+  :root .customer-form-grid,
+  :root .admin-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root .customer-wide,
+  :root .admin-wide {
+    grid-column: auto;
+  }
+
+  :root .customer-order-review {
+    position: static;
+  }
+
+  :root .auth-page-container .auth-side {
+    padding: 22px 18px;
+  }
+
+  :root .auth-page-container .auth-main {
+    padding: 22px 18px;
+  }
+
+  :root .auth-page-container .auth-card-footer {
+    flex-wrap: wrap;
+  }
+
+  :root .account-content-grid,
+  :root .order-detail-grid {
+    gap: 16px;
+  }
+
+  :root .customer-order-card {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 14px;
+  }
+
+  :root .customer-order-card .order-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  :root .order-detail-card,
+  :root .shipping-card,
+  :root .timeline-card,
+  :root .profile-card {
+    padding: 16px;
+  }
+
+  :root .success-card {
+    padding: 32px 18px;
+  }
+
+  :root .admin-shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  :root .admin-sidebar {
+    position: static;
+    max-width: 100%;
+    padding: 12px;
+  }
+
+  :root .admin-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  :root .admin-nav-link {
+    min-height: 44px;
+    height: auto;
+    padding: 8px;
+    white-space: normal;
+    text-align: left;
+  }
+
+  :root .admin-workspace-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  :root .admin-workspace-head .fui-Title1 {
+    font-size: var(--type-h1);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+
+  :root .admin-page-content {
+    gap: 14px;
+  }
+
+  :root .admin-editor {
+    padding: 16px;
+  }
+
+  :root .admin-section-title,
+  :root .admin-editor-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  :root .admin-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  :root .admin-actions > .fui-Button,
+  :root .admin-inline-actions > .fui-Button {
+    min-height: 44px;
+  }
+
+  :root .admin-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :root .admin-metric {
+    padding: 12px;
+  }
+
+  :root .admin-metric strong {
+    font-size: var(--type-h2);
+    overflow-wrap: anywhere;
+  }
+
+  :root .admin-record {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  :root .admin-record-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-width: 100%;
+  }
+
+  :root .admin-filter-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root .admin-order-select {
+    min-width: 0;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  :root .admin-order-detail.fui-Card {
+    padding: 16px;
+  }
+
+  :root .admin-table {
+    min-width: 640px;
+  }
+
+  :root .footer-inner {
+    padding-block: 32px 22px;
+  }
+
+  :root .footer-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  :root .footer-col:last-child {
+    grid-column: auto;
+  }
+
+  :root .footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1600px) {
+  :root .admin-metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 861px) and (max-width: 1100px) {
+  :root .app-provider .hero-card .fui-Title1 {
+    font-size: var(--type-display);
+  }
+}
+
+@media (max-width: 380px) {
+  :root .header-inner,
+  :root .cart-notice {
+    padding-inline: 12px;
+  }
+
+  :root .brand-button {
+    gap: 7px;
+  }
+
+  :root .brand-name {
+    font-size: 14px;
+  }
+
+  :root .admin-metric-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root .customer-cart-row {
+    grid-template-columns: 56px minmax(0, 1fr) 36px;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  :root .customer-cart-row > img {
+    width: 56px;
+    height: 52px;
+  }
+
+  :root .auth-page-container .auth-tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Base type size. Heading sizes come from the token block at the top of the
+   file — that block is the single source of truth for the type scale. */
+:root body {
+  font-size: var(--type-body);
+  line-height: 1.5;
+  transition: background-color var(--motion-smooth) var(--motion-ease), color var(--motion-smooth) var(--motion-ease);
+}
+
+/* Fluent's tint badge paints 12px brand-coloured text on a pale brand wash,
+   which measured 3.31:1 — under the 4.5:1 floor for its size. This swaps in the
+   darker accent token that exists for exactly this case: it is 7.76:1 on light
+   surfaces and must never be used as a fill. */
+:root .trust-section .review-summary-badge {
+  color: var(--color-accent-text);
+}
+
+/* The support phone and email in the delivery grid render as bare anchors with
+   no class, measuring 20px tall — under the 24px target minimum. These are
+   inline, so vertical padding grows the clickable box without changing the
+   line box or shifting the rows beneath. */
+:root .delivery-info-grid a[href] {
+  padding: 2px 0;
+}
+
+:root .review-breakdown {
+  display: grid;
+  gap: var(--space-2);
+  width: min(100%, 460px);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+}
+
+:root .review-breakdown-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--type-caption);
+}
+
+:root .review-breakdown-row progress {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  accent-color: var(--color-accent);
+  background: var(--color-border);
+}
+
+:root .review-breakdown-row progress::-webkit-progress-bar {
+  border-radius: 999px;
+  background: var(--color-border);
+}
+
+:root .review-breakdown-row progress::-webkit-progress-value {
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+
+:root .review-breakdown-row progress::-moz-progress-bar {
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+
+/* Shared card surface. The header and footer were never meant to be in this
+   list — they are page chrome, not cards, so they are excluded here. */
+:root .product-card,
+:root .admin-record,
+:root .admin-metric,
+:root .shop-controls-bar,
+:root .spec-card,
+:root .checkout-form,
+:root .summary-card,
+:root .profile-card,
+:root .order-detail-card,
+:root .shipping-card,
+:root .timeline-card,
+:root .delivery-info {
+  margin-top: 0;
+  padding: var(--card-padding);
+  background: var(--motogear-surface);
+  border: 1px solid var(--motogear-border);
+  border-radius: var(--radius-card);
+}
+
+:root .delivery-info {
+  margin-top: var(--space-6);
+}
+
+:root .delivery-info-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: var(--color-success);
+}
+
+:root .delivery-info-title .fui-Subtitle1 {
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+:root .delivery-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+:root .delivery-info-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+:root .delivery-info-grid Caption1 {
+  color: var(--motogear-muted);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+:root .delivery-info-grid strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+:root .delivery-info-grid a {
+  color: var(--motogear-amber);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+:root .delivery-info-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--motogear-border);
+}
+
+@media (max-width: 680px) {
+  :root .delivery-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  :root .delivery-info-actions {
+    flex-direction: column;
+  }
+  
+  :root .delivery-info-actions > * {
+    width: 100%;
+  }
+}
+
+/* FAQ page */
+:root .faq-topic-filter {
+  margin-bottom: 20px;
+  max-width: 320px;
+}
+
+:root .faq-list {
+  display: grid;
+  gap: 12px;
+}
+
+:root .faq-entry {
+  padding: 16px 20px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color var(--motion-fast) var(--motion-ease);
+}
+
+:root .faq-entry:hover {
+  border-color: var(--motogear-amber);
+}
+
+:root .faq-entry summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  list-style: none;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  /* The summary row was 20px tall, under the 24px WCAG 2.2 target-size
+     minimum. min-height lifts only the hit area; the visual rhythm is
+     unchanged because the row is already vertically centred inside the
+     16px-padded .faq-entry. */
+  min-height: 24px;
+}
+
+:root .faq-entry summary::-webkit-details-marker {
+  display: none;
+}
+
+:root .faq-entry summary > span {
+  flex: 1;
+}
+
+:root .faq-entry summary > Caption1 {
+  color: var(--motogear-amber);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+:root .faq-entry[open] summary {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--motogear-border);
+}
+
+:root .faq-entry > .fui-Body1 {
+  color: var(--motogear-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Support page */
+:root .support-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.4fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+:root .support-list {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+}
+
+:root .support-thread-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--motogear-surface);
+  border: 1px solid var(--motogear-border);
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--motion-fast) var(--motion-ease);
+}
+
+:root .support-thread-link:hover {
+  border-color: var(--motogear-amber);
+}
+
+:root .support-thread-link.selected {
+  border-color: var(--motogear-amber);
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+}
+
+:root .support-thread-link strong {
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+:root .support-thread-link Caption1 {
+  color: var(--motogear-muted);
+  font-size: 12px;
+}
+
+:root .support-workspace {
+  min-width: 0;
+}
+
+@media (max-width: 860px) {
+  :root .support-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Trust pages & customer reviews */
+:root .trust-section {
+  margin-top: 48px;
+}
+
+:root .trust-record-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+:root .trust-record {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+}
+
+:root .trust-record-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+:root .trust-record-heading > strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: 20px;
+  color: var(--motogear-amber);
+}
+
+:root .trust-record .fui-Subtitle1 {
+  font-weight: 600;
+  margin: 0;
+}
+
+:root .trust-record .fui-Body1 {
+  color: var(--motogear-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+:root .trust-empty {
+  margin-top: 16px;
+}
+
+:root .trust-muted {
+  color: var(--motogear-muted);
+  margin-top: 8px;
+  display: block;
+}
+
+:root .trust-form-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 16px 20px;
+  background: var(--motogear-surface);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+}
+
+:root .trust-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 24px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 10px;
+}
+
+:root .trust-form .fui-Field {
+  width: 100%;
+}
+
+/* Section head spacing for trust pages */
+:root .trust-section .section-head {
+  margin-bottom: 16px;
+}
+
+/* Review breakdown alignment */
+:root .review-breakdown-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Section head Title3 alignment */
+:root .section-head .fui-Title3 {
+  display: block;
+  margin: 0;
+}
+
+/* Trust section entrance */
+:root .trust-section {
+  animation: fade-slide-up 0.35s var(--motion-ease) 140ms both;
+}
+
+@media (max-width: 680px) {
+  :root .trust-form-note {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  :root .trust-record-heading {
+    gap: 8px;
+  }
+}
+
+:root .fui-Button,
+:root .footer-link-btn,
+:root .category-pill,
+:root .auth-page-container .auth-tab-btn,
+:root .quantity-control,
+:root .support-thread-link,
+:root .faq-entry summary,
+:root .theme-toggle .fui-Button__icon,
+:root .mobile-menu-toggle .fui-Button__icon {
+  transition: color var(--motion-fast) var(--motion-ease), background-color var(--motion-fast) var(--motion-ease), border-color var(--motion-fast) var(--motion-ease), transform var(--motion-fast) var(--motion-ease), box-shadow var(--motion-fast) var(--motion-ease);
+}
+
+:root .fui-Button:not(:disabled):active,
+:root .footer-link-btn:active,
+:root .category-pill:active,
+:root .auth-page-container .auth-tab-btn:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+:root .fui-Button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+:root .fui-Input:focus-within,
+:root .fui-Textarea:focus-within,
+:root .fui-Select:focus-within {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus) 45%, transparent);
+}
+
+/* Native <option> visibility inside Fluent Select.
+   The OS popup paints options, so give them explicit readable colors. */
+:root .fui-Select__select option {
+  color: var(--motogear-text);
+  background-color: var(--motogear-panel);
+}
+
+:root .fui-Select__select option:hover,
+:root .fui-Select__select option:focus,
+:root .fui-Select__select option:checked {
+  background-color: var(--motogear-amber);
+  color: var(--color-on-accent);
+}
+
+/* Ensure the select dropdown never gets clipped by layout containers */
+:root .checkout-form,
+:root .checkout-layout,
+:root .customer-form-grid,
+:root .form-grid,
+:root .page-content,
+:root .page-content.narrow,
+:root .faq-topic-filter {
+  overflow: visible;
+}
+
+:root :where(button, a, input, select, textarea):focus-visible {
+  outline-color: var(--color-focus);
+}
+
+:root .product-card {
+  box-shadow: var(--shadow-panel);
+  transition-duration: var(--motion-standard);
+}
+
+:root .product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-panel);
+}
+
+:root .product-preview img {
+  transition: transform var(--motion-smooth) var(--motion-ease);
+}
+
+:root .product-card:hover .product-preview img {
+  transform: scale(1.025);
+}
+
+:root .product-card:active {
+  transform: scale(0.995);
+}
+
+:root .admin-metric:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-panel);
+}
+
+:root .admin-table-wrap {
+  background: var(--color-surface-elevated);
+}
+
+:root .admin-table th {
+  color: var(--color-text-secondary);
+}
+
+:root .fui-DialogSurface {
+  max-width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-panel);
+}
+
+:root .fui-SkeletonItem {
+  background-color: var(--color-border);
+}
+
+:root .mobile-menu-toggle,
+:root .theme-toggle {
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  flex: 0 0 44px;
+  padding: 0;
+}
+
+:root .home-reveal {
+  width: 100%;
+}
+
+/* Graphite dark mode — the light default already covers structure, so this
+   block only adjusts depth and anything that sits directly on the page. */
+:root[data-theme='dark'] .hero-card {
+  background: transparent;
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-panel);
+}
+
+:root[data-theme='dark'] .product-card,
+:root[data-theme='dark'] .admin-record,
+:root[data-theme='dark'] .admin-metric,
+:root[data-theme='dark'] .spec-card,
+:root[data-theme='dark'] .trust-record,
+:root[data-theme='dark'] .checkout-form,
+:root[data-theme='dark'] .auth-page-container .auth-card,
+:root[data-theme='dark'] .profile-card,
+:root[data-theme='dark'] .order-detail-card,
+:root[data-theme='dark'] .shipping-card,
+:root[data-theme='dark'] .timeline-card,
+:root[data-theme='dark'] .summary-card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme='dark'] .product-card:hover,
+:root[data-theme='dark'] .admin-metric:hover {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 22px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme='dark'] .detail-image-box {
+  box-shadow: var(--shadow-panel);
+}
+
+@media (max-width: 860px) {
+  :root #main-navigation {
+    display: none;
+  }
+
+  :root #main-navigation.is-open {
+    display: grid;
+    padding-top: 8px;
+    border-top-color: var(--color-border);
+    animation: mobile-nav-reveal var(--motion-standard) var(--motion-ease) both;
+  }
+
+  :root .header-nav .nav-link-btn {
+    min-height: 44px;
+  }
+}
+
+@keyframes mobile-nav-reveal {
+  from { opacity: 0.92; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+:root .cart-count {
+  animation: cart-count-pop var(--motion-standard) var(--motion-ease) both;
+}
+
+@keyframes cart-count-pop {
+  from { transform: scale(0.9); }
+  to { transform: scale(1); }
+}
+
+@media (max-width: 680px) {
+  :root .app-provider .hero-card {
+    padding: clamp(20px, 6vw, 30px);
+  }
+
+  :root .app-provider .hero-card .fui-Title1 {
+    font-size: var(--type-display);
+    line-height: 1.08;
+  }
+
+  :root .app-provider .hero-card .fui-Body1 {
+    font-size: 15px;
+  }
+
+  :root .hero-stamp {
+    width: 100%;
+    max-width: 360px;
+    padding: 12px 0 0 16px;
+    font-size: clamp(16px, 4vw, 20px);
+  }
+}
+
+@media (max-width: 1100px) {
+  :root .delivery-pill {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root .cart-button,
+  :root .wishlist-button {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  :root .cart-button .button-label,
+  :root .wishlist-button .button-label {
+    display: none;
+  }
+
+  :root .cart-button .fui-Badge,
+  :root .wishlist-button .fui-Badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    margin: 0;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-size: 10px;
+    line-height: 18px;
+    pointer-events: none;
+  }
+
+  :root .cart-button .fui-Button__icon,
+  :root .wishlist-button .fui-Button__icon {
+    margin-inline-end: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  :root .header-actions {
+    gap: 2px;
+  }
+
+  :root .theme-toggle,
+  :root .mobile-menu-toggle {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding-inline: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  :root .brand-name {
+    display: none;
+  }
+
+  :root .cart-button,
+  :root .wishlist-button {
+    padding-inline: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, :root *::before, :root *::after {
+    animation-duration: 0.01ms;
+    transition-duration: 0.01ms;
+    scroll-behavior: auto;
+  }
+
+  *, :root *::before, :root *::after {
+    animation-iteration-count: 1;
+  }
+
+  :root .home-reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  :root .app-provider .hero-card::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+

@@ -87,16 +87,23 @@ export function ProductImage({
 }) {
   const [failed, setFailed] = useState(false);
   const url = (src ?? '').trim();
+  // The catalog still ships line illustrations for some listings. They are
+  // legitimate fallback art, not a broken image — say so quietly instead of
+  // letting the drawing look like a missing photo.
+  const isIllustration = /\.svg($|\?)/i.test(url);
 
   if (!failed && url) {
     return (
-      <img
-        className={className}
-        src={url}
-        alt={alt || name || 'Product'}
-        loading="lazy"
-        onError={() => setFailed(true)}
-      />
+      <>
+        <img
+          className={className}
+          src={url}
+          alt={alt || name || 'Product'}
+          loading="lazy"
+          onError={() => setFailed(true)}
+        />
+        {isIllustration && <span className="media-note">Photo coming soon</span>}
+      </>
     );
   }
 
@@ -122,6 +129,7 @@ export function ProductImage({
         <b>{label}</b>
         <i>MotoGear PK</i>
       </span>
+      <span className="media-note">Photo coming soon</span>
     </div>
   );
 }

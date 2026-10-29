@@ -1,0 +1,102 @@
+/* mobile.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   STOREFRONT MOBILE REFINEMENTS
+   ============================================================ */
+@media (max-width: 640px) {
+  /* Product grid reads better as a single column on phones. */
+  :root .product-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root .product-card-bottom {
+    min-height: 0;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  :root .price-stack {
+    min-height: 0;
+  }
+
+  /* Hero copy needs a real size floor so it never overruns the card. */
+  :root .app-provider .hero-card .fui-Title1 {
+    font-size: var(--type-display);
+    line-height: 1.08;
+    max-width: 100%;
+  }
+
+  :root .app-provider .hero-card .fui-Body1 {
+    font-size: 14px;
+    max-width: 100%;
+  }
+
+  :root .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :root .hero-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  :root .hero-foot {
+    gap: 12px;
+  }
+
+  :root .hero-copy {
+    padding-bottom: 4px;
+  }
+
+  /* Category tiles and promise cards go full width on phones. */
+  :root .category-band {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  :root .promise-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  :root .trust-strip {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  :root .cta-band-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :root .cta-band-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  :root .catalog-heading,
+  :root .section-head,
+  :root .account-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  :root .shop-active-filters {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  :root .app-provider .hero-card .fui-Title1 {
+    font-size: var(--type-display);
+  }
+
+  :root .category-tile {
+    padding: 13px 14px;
+  }
+}
+
+

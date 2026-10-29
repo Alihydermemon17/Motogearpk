@@ -1,0 +1,452 @@
+/* components.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   ANNOUNCEMENT BAR + HEADER REFINEMENTS
+   ============================================================ */
+:root .topbar {
+  background: linear-gradient(90deg, var(--color-graphite-deep) 0%, var(--color-graphite) 50%, var(--color-graphite-deep) 100%);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+:root .topbar-inner {
+  max-width: var(--container-wide);
+  margin: 0 auto;
+  padding: 7px var(--container-gutter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+:root .topbar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  /* .topbar paints its OWN graphite gradient (see the .topbar rule above) — it
+     is not the light header surface beneath it. Measured on that gradient,
+     --color-text-muted-on-dark (#9faaa9) gives 7.06:1 on --color-graphite-deep
+     and 6.13:1 on --color-graphite, both clearing the 4.5:1 floor for 11.5px
+     text. --color-accent-text (#2e524f) was a dark-on-dark mistake here: it
+     measured 1.70:1. */
+  color: var(--color-text-muted-on-dark);
+  white-space: nowrap;
+}
+/* The <b> carries the phrase that must be read. Same AA-safe token as its
+   parent; the 600 weight is what marks it as the emphasis. */
+:root .topbar-item b { color: var(--color-text-muted-on-dark); font-weight: 600; }
+/* Icons are non-text UI and only need the 3:1 graphic threshold, but this is
+   the accent sitting on a dark surface, so it uses the token built for exactly
+   that: --color-accent-on-dark = 7.20:1 / 6.24:1 on the gradient. */
+:root .topbar-item svg { color: var(--color-accent-on-dark); width: 14px; height: 14px; }
+:root .topbar-dot {
+  width: 3px; height: 3px; border-radius: 50%;
+  /* Purely decorative separators between the trust items, on graphite — white
+     at 22% keeps them visible without competing with the text. */
+  background: rgba(255, 255, 255, 0.22);
+}
+:root .site-header { padding-bottom: 0; }
+:root .header-inner { padding-block: 10px; }
+
+/* Consistent, deliberate nav — no more solid amber pills */
+:root .nav-link-btn.fui-Button {
+  position: relative;
+  font-weight: 600;
+  /* 14px body text on the light header needs 4.5:1; --motogear-muted
+     (#6c767b) measures 4.19:1 there. */
+  color: var(--color-text-secondary);
+  padding-inline: 14px;
+  border-radius: 8px;
+}
+:root .nav-link-btn.fui-Button:hover {
+  color: var(--color-text-primary);
+  background: var(--color-pill);
+}
+:root .nav-link-btn.fui-Button::after {
+  content: '';
+  position: absolute;
+  left: 14px; right: 14px; bottom: 3px;
+  height: 2px;
+  border-radius: 2px;
+  /* Active-tab indicator on a light header. --color-accent-on-dark is a light
+     teal (#7fb3ae) that only reaches contrast on graphite; against the light
+     header it was 2.11:1. */
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.22s var(--motion-ease);
+}
+:root .nav-link-btn.fui-Button.is-active {
+  color: var(--color-text-primary);
+  background: transparent;
+}
+:root .nav-link-btn.fui-Button.is-active .fui-Button__icon { color: var(--color-accent-text); }
+:root .nav-link-btn.fui-Button.is-active::after { transform: scaleX(1); }
+
+:root .header-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--motogear-border);
+  margin-inline: 2px;
+}
+
+:root .header-icon-btn.fui-Button,
+:root .theme-toggle.fui-Button {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 10px;
+}
+:root .header-icon-btn.fui-Button:hover,
+:root .theme-toggle.fui-Button:hover { background: var(--color-pill); }
+
+/* Wishlist + cart read as a matched pair of "action" buttons */
+:root .wishlist-button.fui-Button {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--motogear-border);
+}
+:root .wishlist-button.fui-Button:hover { border-color: var(--motogear-amber); }
+
+:root .cart-button.fui-Button {
+  height: 38px;
+  border-radius: 10px;
+  padding-inline: 14px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+/* ============================================================
+   PRODUCT CARD — richer, more deliberate layout
+   ============================================================ */
+/* Restrained card depth — a hairline border does most of the work. */
+:root .product-card {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-panel);
+}
+:root .product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-raised);
+}
+:root .product-preview { height: 200px; }
+:root .product-preview img,
+:root .product-preview .product-media-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+:root .product-card-bottom {
+  padding: 13px 16px;
+  gap: 12px;
+}
+
+:root .price-stack { display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+:root .price-stack strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+:root .price-stack del {
+  font-size: 12.5px;
+  color: var(--motogear-muted);
+  opacity: 0.75;
+}
+
+:root .product-card-bottom .fui-Button {
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+:root .product-cat-pill,
+:root .product-bikes-pill {
+  border-radius: 6px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+:root .product-bikes-pill {
+  color: var(--motogear-amber);
+  background: color-mix(in srgb, var(--motogear-amber) 12%, transparent);
+}
+
+/* ============================================================
+   TRUST STRIP — give the feature row real structure
+   ============================================================ */
+:root .trust-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 14px;
+  margin: 28px 0 8px;
+}
+:root .trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--motogear-border);
+  border-radius: 12px;
+  background: var(--motogear-panel);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+:root .trust-item:hover { border-color: var(--motogear-amber); transform: translateY(-2px); }
+:root .trust-icon {
+  display: grid;
+  place-items: center;
+  width: 38px; height: 38px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  color: var(--motogear-amber);
+  background: color-mix(in srgb, var(--motogear-amber) 12%, transparent);
+}
+:root .trust-icon svg { width: 20px; height: 20px; }
+:root .trust-item .fui-Subtitle1 {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 2px;
+  color: var(--color-text-primary);
+}
+:root .trust-item .fui-Caption1 {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--motogear-muted);
+}
+
+/* ============================================================
+   PRODUCT DETAIL — balanced media, boxed description
+   ============================================================ */
+:root .detail-image-box {
+  aspect-ratio: 5 / 4;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.3);
+}
+
+/* Fill the tall detail panel so a missing photo still looks intentional */
+:root .detail-image-box .product-media-fallback::after {
+  content: 'MG';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(150px, 40%, 260px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--media-tint) 7%, transparent);
+  pointer-events: none;
+}
+:root .detail-image-box .media-glyph { width: clamp(96px, 24%, 148px); }
+:root .detail-image-box .media-glyph svg { width: 54%; height: 54%; }
+:root .detail-image-box .media-caption {
+  left: 18px; bottom: 16px; gap: 2px;
+}
+:root .detail-image-box .media-caption b { font-size: 13px; }
+
+:root .detail-copy .detail-section-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--motogear-amber);
+  margin: 14px 0 8px;
+}
+
+:root .detail-desc.fui-Body1 {
+  display: block;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--motogear-border);
+  border-left: 3px solid var(--motogear-amber);
+  background: var(--motogear-panel);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+:root .detail-price-box { margin-top: 22px; }
+:root .price-main { font-size: 38px; font-weight: 800; }
+
+:root .detail-cta-row .fui-Button { border-radius: 10px; }
+
+/* Spec cards read as a clean definition grid */
+:root .spec-grid { gap: 12px; }
+:root .spec-card {
+  border-radius: 10px;
+  border: 1px solid var(--motogear-border);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+:root .spec-card:hover { border-color: var(--motogear-amber); transform: translateY(-2px); }
+:root .spec-card .spec-label { letter-spacing: 0.12em; text-transform: uppercase; }
+:root .spec-card .spec-value { font-size: 14.5px; line-height: 1.45; }
+
+/* "Made for miles" closing band */
+:root .detail-note {
+  margin-top: 48px;
+  padding: 30px 32px;
+  border-radius: 14px;
+  border: 1px solid var(--motogear-border);
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--motogear-amber) 10%, transparent) 0%, transparent 58%),
+    var(--motogear-panel);
+}
+:root .detail-note .fui-Title3 {
+  display: block;
+  font-family: var(--font-display), sans-serif;
+  font-size: 26px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 8px;
+  color: var(--color-text-primary);
+}
+:root .detail-note .fui-Body1 {
+  display: block;
+  max-width: 780px;
+  color: var(--motogear-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ============================================================
+   PRODUCT DETAIL — media column + assurance row
+   ============================================================ */
+:root .detail-media-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: sticky;
+  top: 92px;
+}
+
+:root .detail-assurance {
+  display: grid;
+  gap: 10px;
+}
+
+:root .assurance-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 11px;
+  border: 1px solid var(--motogear-border);
+  background: var(--motogear-panel);
+  transition: border-color 0.2s ease;
+}
+:root .assurance-item:hover { border-color: var(--motogear-amber); }
+:root .assurance-item > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--motogear-amber);
+}
+:root .assurance-item > div { display: flex; flex-direction: column; gap: 2px; }
+:root .assurance-item b {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+:root .assurance-item span {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--motogear-muted);
+}
+
+/* Soften the watermark so it reads as texture, not a competing glyph */
+:root .detail-image-box .product-media-fallback::after {
+  font-size: clamp(190px, 52%, 340px);
+  color: color-mix(in srgb, var(--media-tint) 4%, transparent);
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================
+   PRODUCT MEDIA — card variant drops the redundant caption
+   (the card already prints brand + category underneath)
+   ============================================================ */
+:root .product-preview .media-caption { display: none; }
+:root .product-preview .media-glyph { width: clamp(56px, 34%, 78px); }
+
+/* ============================================================
+   FOOTER — clearer hierarchy, stronger close
+   ============================================================ */
+:root .site-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-active) 45%, transparent 100%);
+}
+
+:root .footer-col-title {
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h3);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-on-graphite);
+  margin: 0 0 14px;
+}
+
+:root .footer-desc,
+:root .footer-cities {
+  color: var(--color-on-graphite-muted);
+  line-height: 1.7;
+  font-size: 13.5px;
+  max-width: 340px;
+}
+
+:root .footer-link-btn {
+  position: relative;
+  padding-left: 0;
+  color: var(--color-on-graphite-muted);
+  font-size: 13.5px;
+  transition: color 0.2s ease, padding-left 0.2s ease;
+}
+:root .footer-link-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 1px;
+  background: var(--color-accent-on-dark);
+  transform: translateY(-50%);
+  transition: width 0.22s var(--motion-ease);
+}
+:root .footer-link-btn:hover {
+  /* Was var(--color-text-primary) (#252b2d), which is 1.02:1 on the graphite
+     footer — hovering made the label effectively invisible. */
+  color: var(--color-on-graphite);
+  padding-left: 14px;
+}
+:root .footer-link-btn:hover::before { width: 8px; }
+
+:root .footer-bottom {
+  align-items: center;
+}
+:root .footer-bottom-copy { color: var(--color-text-muted-on-dark); font-size: 12.5px; }
+:root .footer-bottom-badge {
+  font-family: var(--font-display), sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent-on-dark);
+}
+
+/* Light theme: darken tinted media ink so icons stay legible on pale panels */
+:root[data-theme='dark'] .media-glyph,
+:root[data-theme='dark'] .media-caption b {
+  color: color-mix(in srgb, var(--media-tint) 72%, #eef1ef);
+}
+:root[data-theme='dark'] .media-glyph {
+  background: color-mix(in srgb, var(--media-tint) 16%, transparent);
+  border-color: color-mix(in srgb, var(--media-tint) 32%, transparent);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--media-tint) 16%, transparent);
+}
+

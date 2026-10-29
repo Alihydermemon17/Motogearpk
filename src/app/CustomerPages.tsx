@@ -149,6 +149,15 @@ export function SignInPage({ navigate, signUp = false, loginRequired = false }: 
 
       <Card className="auth-card">
         <aside className="auth-side">
+          <img
+            className="auth-side-bg"
+            src="/img/hero-1-1920.jpg"
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+          />
+          <div className="auth-side-veil" aria-hidden="true" />
           <div className="auth-side-brand">
             <span className="brand-mark">MG</span>
             <span className="brand-name">MOTOGEAR <b>PK</b></span>

@@ -1,0 +1,337 @@
+/* premium.css — split from the original single stylesheet.
+   Sections keep their original cascade order; see src/styles.css. */
+
+/* ============================================================
+   STOREFRONT PREMIUM PASS — hero progress, category band,
+   promise band, CTA band, product card polish
+   ============================================================ */
+
+/* ---- Hero: slide progress + counter ---- */
+:root .hero-foot {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  width: 100%;
+}
+
+:root .hero-dots { margin-top: 0; }
+
+:root .hero-dot {
+  position: relative;
+  /* The visual bar stays 4px, but the button itself is 24px tall so the
+     carousel dots meet the WCAG 2.2 AA target-size minimum. The bar is
+     .hero-dot-progress, absolutely positioned — so it is pinned to the
+     visual centre of the button below rather than filling it. */
+  height: 24px;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+}
+
+:root .hero-dot-progress {
+  position: absolute;
+  inset: auto 0;
+  top: 50%;
+  height: 4px;
+  width: 100%;
+  /* Centred with top/margin rather than transform:translateY, because the
+     fill animation below animates `transform` and would clobber it. */
+  margin-top: -2px;
+  transform-origin: left center;
+  background: var(--color-accent-on-dark);
+  border-radius: 999px;
+  animation: hero-dot-fill 6s linear forwards;
+}
+
+@keyframes hero-dot-fill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+:root .hero-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+:root .hero-counter b {
+  color: var(--motogear-amber);
+  font-weight: 700;
+}
+
+:root .hero-counter i {
+  width: 16px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* ---- Category band ---- */
+:root .category-band {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 12px;
+  margin: 26px 0 4px;
+}
+
+:root .category-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 16px;
+  background: var(--motogear-panel);
+  border: 1px solid var(--motogear-border);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+:root .category-tile:hover {
+  border-color: var(--motogear-amber);
+  transform: translateY(-2px);
+  background: var(--motogear-panel-hover);
+}
+
+:root .category-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  color: var(--motogear-amber);
+  background: color-mix(in srgb, var(--motogear-amber) 12%, transparent);
+}
+
+:root .category-tile-icon svg { width: 21px; height: 21px; }
+
+:root .category-tile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+:root .category-tile-copy b {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.25;
+}
+
+:root .category-tile-copy .fui-Caption1 {
+  display: block;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--motogear-muted);
+}
+
+:root .category-tile-arrow {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--motogear-subtle);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+:root .category-tile:hover .category-tile-arrow {
+  color: var(--motogear-amber);
+  transform: translate(2px, -2px);
+}
+
+/* ---- Promise band ---- */
+:root .promise-band {
+  margin-top: clamp(40px, 5vw, 72px);
+  padding: clamp(26px, 3.4vw, 44px);
+  border: 1px solid var(--motogear-border);
+  border-radius: 16px;
+  background:
+    radial-gradient(760px 240px at 8% -10%, color-mix(in srgb, var(--motogear-amber) 10%, transparent), transparent 68%),
+    var(--motogear-panel);
+}
+
+:root .promise-band-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 680px;
+  margin-bottom: clamp(22px, 2.6vw, 32px);
+}
+
+:root .promise-band-head .fui-Title1 {
+  display: block;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h1);
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+:root .promise-band-head .fui-Body1 {
+  display: block;
+  color: var(--motogear-muted);
+  font-size: 15px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+:root .promise-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 14px;
+}
+
+:root .promise-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 18px 20px;
+  border: 1px solid var(--motogear-border);
+  border-radius: 12px;
+  background: var(--motogear-bg);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+:root .promise-card:hover {
+  border-color: var(--color-accent-text);
+  transform: translateY(-2px);
+}
+
+:root .promise-card-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 4px;
+  border-radius: 10px;
+  color: var(--color-accent-text);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+:root .promise-card-icon svg { width: 21px; height: 21px; }
+
+:root .promise-card-title {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.25;
+}
+
+:root .promise-card-text {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ---- CTA band ---- */
+:root .cta-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(20px, 3vw, 44px);
+  flex-wrap: wrap;
+  margin-top: clamp(28px, 3.4vw, 44px);
+  padding: clamp(24px, 3vw, 38px) clamp(24px, 3.2vw, 42px);
+  border: 1px solid var(--motogear-border);
+  border-left: 3px solid var(--motogear-amber);
+  border-radius: 14px;
+  background: var(--motogear-panel);
+}
+
+:root .cta-band-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  flex: 1 1 340px;
+  min-width: 0;
+}
+
+:root .cta-band-copy .fui-Title1 {
+  display: block;
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--type-h1);
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+:root .cta-band-copy .fui-Body1 {
+  display: block;
+  color: var(--motogear-muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 520px;
+}
+
+:root .cta-band-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---- Product card polish ---- */
+:root .product-card-bottom {
+  gap: 8px;
+  /* Fixed height keeps every "Add to cart" button on the same baseline,
+     whether or not the card shows a struck-through original price. */
+  min-height: 64px;
+}
+
+:root .price-stack {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+  /* Reserve both lines up front so the bar never changes height. */
+  min-height: 38px;
+}
+
+:root .price-stack strong {
+  font-size: 21px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+:root .price-stack del {
+  font-size: 12px;
+  line-height: 1.25;
+  min-height: 15px;
+}
+
+/* ---- Responsive for the new sections ---- */
+@media (max-width: 860px) {
+  :root .hero-counter { display: none; }
+}
+
+@media (max-width: 680px) {
+  :root .cta-band {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :root .cta-band-actions { width: 100%; }
+  :root .cta-band-actions > * { flex: 1 1 auto; }
+
+  :root .promise-band { padding: 22px 18px; }
+}
+
+
